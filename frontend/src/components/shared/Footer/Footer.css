@@ -1,0 +1,100 @@
+.footer{
+    background-color: var(--secondary-background);
+}
+.footer *{
+    color: var(--text-field-color);
+}
+
+.footer .footer-container{
+    padding: 30px 25px;
+    display: flex;
+    align-items:flex-start;
+    justify-content: space-between;
+    gap: 10%;
+}
+.footer .footer-container .footer-section:first-child{
+    max-width: 30%;
+}
+
+.footer .footer-container .footer-section:last-child{
+    flex-grow: 1;
+    text-align: center;
+}
+
+.footer .footer-container .footer-section:last-child p{
+    text-align: left;
+}
+
+.footer .footer-container .footer-section h3{
+    font-size: 2.865rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    /* text-decoration: underline; */
+    margin-bottom: 20px;
+}
+
+.footer .footer-container .footer-section *{
+    font-size: 1.765rem;
+    font-weight: lighter;
+}
+
+.footer .footer-container .footer-section p.mobile span{
+    color: var(--secondary-color);
+}
+
+.footer .footer-container .footer-section a{
+    text-decoration: none;
+    display: block;
+    margin: 0;
+}
+.footer .footer-container .footer-section a:hover{
+    color: var(--secondary-color);
+}
+
+.footer .bottom-footer{
+    padding-bottom: 5px;
+}
+
+.footer .bottom-footer p{
+    font-size: 1.595rem;
+    font-weight: 100;
+    text-align: center;
+}
+
+
+@media screen and (max-width:426px) {
+    .footer .footer-container{
+
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .footer .footer-container .footer-section{
+        margin: 10px 0;
+        border-bottom: 1px solid;
+    }
+
+    .footer .footer-container .footer-section:first-child{
+        max-width: 100%;
+    }
+
+    .footer .footer-container .footer-section:nth-child(2){
+        width: 100%;
+    }
+
+    .footer .footer-container .footer-section:last-child{
+        text-align: left;
+    }
+
+}
+
+@media screen and (max-width:770px) {
+    .footer .footer-container .footer-section h3{
+        font-size: 2.065rem;
+    }
+
+    .footer .footer-container .footer-section *{
+        font-size: 1.365rem;
+    }
+}
+

@@ -1,0 +1,72 @@
+:root {
+
+  --body-background: #f7f7f7;
+  --secondary-background:#034359;
+  --primary-color: #000000;
+  --secondary-color: #f58634;
+  --sub-text-color: #8b8b8b;
+  --second-cards-color: #ffffff;
+  --text-field-color: #fff;
+
+  --body-background-dark: #141414;
+  --primary-color-dark: #e5e5e5;
+  --gray-hover-color: #dcdcdc;
+}
+
+* {
+  /* font-family: 'Lato', sans-serif; */
+  font-family: 'Rubik', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+  border: none;
+  text-decoration: none;
+  text-transform: capitalize;
+  transition: all 0.2s linear;
+  color: var(--primary-color);
+}
+
+*::selection {
+  background: var(--secondary-color);
+  color: var(--text-field-color);
+}
+
+html {
+  font-size: 50%;
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  /* scroll-padding-top: 6.5rem; */
+  scroll-behavior: smooth;
+  scrollbar-width: 10px;
+
+}
+
+html::-webkit-scrollbar {
+  width: 10px;
+  background-color: #fff;
+}
+
+html::-webkit-scrollbar-thumb{
+  background-color: var(--sub-text-color);
+  border-radius: 8px;
+
+}
+
+button {
+  cursor: pointer;
+}
+
+
+@media screen and (max-width: 780px) {
+  .hide-mobile{
+    display: none;
+  }
+}
+
+@media screen and (min-width: 780px) {
+  .hide-desktop{
+    display: none;
+  }
+}

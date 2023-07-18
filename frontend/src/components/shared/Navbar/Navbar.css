@@ -1,0 +1,77 @@
+nav.navbar {
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    background-color: var(--secondary-background);
+}
+
+.navbar .links {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.navbar .links div {
+    padding: 20px 5px;
+}
+
+.navbar .links div a:hover{
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+}
+
+
+.navbar .links div a{
+    padding: 10px 20px;
+    font-size: 1.965rem;
+    font-weight: 300;
+    color: var(--text-field-color);
+    text-decoration: none;
+}
+.navbar .links div a.active{
+    /* border-bottom: 2px solid var(--secondary-color); */
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+}
+   
+
+.navbar .more-links *{
+    font-size: 1.965rem;
+    font-weight: 300;
+}
+
+.navbar .more-links button {
+    background-color: transparent;
+    border: none;
+    color: var(--text-field-color);
+}
+
+.navbar .more-links .dropdown-menu{
+    padding: 10px 15px;
+    right: 0;
+    left: -50%;
+}
+
+@media screen and (max-width:425px) {
+    .navbar .links div {
+        padding: 15px 10px;
+    }
+
+    .navbar .links div a {
+        padding: 5px 10px;
+        font-size: 1.665rem;
+    }
+
+    .navbar .more-links {
+        font-size: 1.845rem;
+        padding: 6px;
+    }
+}
+
+@media screen and (min-width:426px) and (max-width:770px) {
+    .navbar .links div a {
+        font-size: 1.765rem;
+    }
+}

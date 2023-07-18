@@ -1,0 +1,62 @@
+.contact-section {
+    background-color: var(--body-background);
+    padding: 30px;
+  }
+  
+  .contact-section .contact-page-heading-container {
+    padding: 20px 10px;
+    background-color: #fff;
+    border-radius: 8px;
+  }
+  
+  .contact-section .contact-page-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .contact-section .contact-page-heading h5 {
+    font-size: 2.785rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    margin-bottom: 0;
+  }
+  
+  .contact-section .contact-page-heading a,
+  .contact-section .contact-page-heading span {
+    font-size: 1.865rem;
+  }
+  
+  .contact-section .contact-page-heading a {
+    text-decoration: none;
+    color: var(--secondary-color);
+    margin-right: 3px;
+  }
+
+  .contact-container {
+    margin-top: 20px;
+    border-radius: 8px;
+    background-color: #fff;
+    padding: 20px;
+  }
+
+  .contact-container .map-container{
+    height: 300px;
+  }
+
+  .contact-container .map-container iframe{
+    width: 100%;
+    height: 100%;
+  }
+
+  .contact-container div{
+    margin-top: 30px;
+  }
+  .contact-container div h3{
+    font-size: 3.465rem;
+  }
+  .contact-container div p{
+    font-size: 2.365rem;
+    margin-bottom: 0;
+    font-weight: 300;
+  }
