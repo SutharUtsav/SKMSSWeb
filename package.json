@@ -2,9 +2,9 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "Shree Kutchi Mevada Suthar Samaj - Sukhpar's Website",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node src/index.js",
     "heroku-postbuild":"NPM_CONFIG_PRODUCTION=false npm install --prefix frontend && npm run build --prefix frontend",
     "serve": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
