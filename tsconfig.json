@@ -1,0 +1,18 @@
+// tsconfig.json
+
+{
+  "compilerOptions": {
+    "target": "es6",               // The target ECMAScript version
+    "module": "commonjs",          // The module system for Node.js
+    "outDir": "./dist",            // The output directory for compiled files
+    "rootDir": "./src",            // The directory where your TypeScript source files reside
+    "strict": true,                // Enable strict type checking
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true        // Enables interoperability between CommonJS and ES modules
+  },
+  "include": ["./src/**/*.ts"],      // The files TypeScript should include for compilation
+  "exclude": ["node_modules", "dist", "frontend"],    // The files TypeScript should exclude from compilation
+}
