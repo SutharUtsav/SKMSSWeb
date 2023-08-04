@@ -1,11 +1,8 @@
 const express = require('express')
 const app = express()
 
-// const { admin, router } = require('./src/admin');
-
 const PORT = process.env['PORT'] ?? 3030
 
-// app.use(admin.options.rootPath, router);
 
 
 if(process.env['NODE_ENV'] === "production"){
@@ -19,5 +16,3 @@ if(process.env['NODE_ENV'] === "production"){
 app.listen(PORT,()=>{
     console.log(`Server is listening on ${PORT}`)
 })
-
-// admin.start();

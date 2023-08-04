@@ -1,10 +1,9 @@
 "use strict";
+var _a;
 const express = require('express');
 const app = express();
-// const { admin, router } = require('./src/admin');
-const PORT = process.env.PORT || 3030;
-// app.use(admin.options.rootPath, router);
-if (process.env.NODE_ENV === "production") {
+const PORT = (_a = process.env['PORT']) !== null && _a !== void 0 ? _a : 3030;
+if (process.env['NODE_ENV'] === "production") {
     app.use(express.static("frontend/build"));
     const path = require("path");
     app.get("*", (req, res) => {
@@ -14,4 +13,3 @@ if (process.env.NODE_ENV === "production") {
 app.listen(PORT, () => {
     console.log(`Server is listening on ${PORT}`);
 });
-// admin.start();
