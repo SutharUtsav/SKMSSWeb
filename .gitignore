@@ -25,3 +25,4 @@ frontend/yarn-error.log*
 
 #compiled code
 dist
+dist/*
