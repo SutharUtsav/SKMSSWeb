@@ -1,8 +1,14 @@
-import { PORT } from "./env";
 
-require('dotenv')
+const dotenv = require('dotenv');
+dotenv.config();
 const express = require('express')
 const app = express()
+
+const PORT = process.env['PORT'] ?? 3030
+
+
+
+
 
 if(process.env['NODE_ENV'] === "production"){
     app.use(express.static("frontend/build"));
