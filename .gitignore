@@ -26,3 +26,5 @@ frontend/yarn-error.log*
 #compiled code
 dist
 dist/*
+
+src/env.ts
