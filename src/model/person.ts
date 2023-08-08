@@ -1,13 +1,17 @@
+import { DataTypes } from "sequelize";
+import { sequelize } from "../config/db";
 import { ModelBaseWithCommonFields } from "./modelBase";
 
-export class Person extends ModelBaseWithCommonFields{
-    /**
-     * Person's Name
-     */
-    name!: string;
 
+
+export const Person = sequelize.define('Person',{
+    /**
+     * Person's name
+     */
+    name : DataTypes.STRING,
     /**
      * Person's Surname
      */
-    surname!:string;
-}
+    surname: DataTypes.STRING,
+    ...ModelBaseWithCommonFields
+})

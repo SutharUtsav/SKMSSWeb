@@ -1,4 +1,5 @@
-//#region  Common Interfaces
+import { DataTypes } from "sequelize";
+
 
 //#region  Base interface for all entity
 
@@ -68,74 +69,47 @@ export interface IRowVersion {
 
 //#region  Base Model/class Definitions
 
-//#region  Base model for all entity
-
-/**
- * Base class for all Entity of a Domain.
- */
-class ModelBase implements IModelBase {
- /**
- * Primary Key
- */
-    Id!: number;
-}
-
-//#endregion
-
-//#region  Base model for one time creation type entities.
-
-/**
- *  Base class for all entity where we don't need to record created information. 
- * e.g. One time creation and not required row version as update is not applicable or automatic.
-
- */
-class ModelBaseWithCreatedInfoFields extends ModelBase implements IRecordCreatedInfo {
-    /**
- * Record created DateTime information.
- */
-    CreatedOn!: Date;
-
-    /**
-     *  Record created by UserId
-     */
-    CreatedById!: number
-}
-
-//#endregion
-
-//#region  Base model for most of the entity which support CURD operations!
-
 /**
  *  Base class for Entity with common fields
  */
-export class ModelBaseWithCommonFields extends ModelBaseWithCreatedInfoFields implements IRecordModifiedInfo, IRowVersion {
+
+export const ModelBaseWithCommonFields = {
+    /**
+     *  Primary Key
+    */
+    Id: DataTypes.NUMBER,
     /**
      * Record Modified On DateTime. For newly created record it will be same as created on.
      */
-    ModifiedOn!: Date;
+    ModifiedOn: DataTypes.DATE,
 
     /**
      * Record Modified by UserId.
      */
-    ModifiedById?: number
+    ModifiedById: DataTypes.NUMBER,
+    /**
+    * Record created DateTime information.
+    */
+    CreatedOn: DataTypes.DATE,
 
+    /**
+     *  Record created by UserId
+     */
+    CreatedById: DataTypes.NUMBER,
     /**
      * Indicate that record is disable. e.g. Not allowed to update or uses
      */
-    Disabled!: boolean
+    Disabled: DataTypes.BOOLEAN,
 
     /**
      * DateTime when record was last Disabled or Enable again!
      */
-    EnabledDisabledOn!: Date
+    EnabledDisabledOn: DataTypes.DATE,
 
     /**
      * Record row version to support concurrency update for each record!
      */
-    RowVersion!: Uint8Array
+    RowVersion: DataTypes.BLOB
 }
-
-    //#endregion
-
 
 //#endregion
