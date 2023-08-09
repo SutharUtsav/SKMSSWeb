@@ -1,17 +1,24 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../config/db";
 import { ModelBaseWithCommonFields } from "./modelBase";
 
+const sequelize = require('../config/db')
 
-
-export const Person = sequelize.define('Person',{
+export const Person = sequelize.define('People', {
     /**
      * Person's name
      */
-    name : DataTypes.STRING,
+    name1: DataTypes.STRING,
     /**
      * Person's Surname
      */
     surname: DataTypes.STRING,
-    ...ModelBaseWithCommonFields
+//     /**
+//    * Person's ID
+//    */
+//   id: {
+//     type: DataTypes.INTEGER,
+//     primaryKey: true,
+//     default: true
+//   },
+    // ...ModelBaseWithCommonFields
 })

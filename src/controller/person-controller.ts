@@ -1,3 +1,5 @@
+import { Person } from "../model/person";
+
 const express = require('express');
 const router = express.Router();
 
@@ -6,9 +8,14 @@ router.get('/',async (req: any,res: any)=>{
 })
 
 router.post('/', async (req: any,res: any)=>{
-    console.log( req.body)
-    console.log( req.body.name)
-    await res.send("Post Persons");
+    await Person.create({
+        name1: req.body.name, 
+        surname: req.body.surname,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+    })
+
+    res.send("Post Persons");
 })
 
 module.exports = router
