@@ -17,7 +17,6 @@ export class PersonService extends BaseService implements IPersonService {
      * @returns 
      */
     public async Create(dtoRecord: PersonDto): Promise<PersonDto | undefined> {
-        debugger
         try {
 
             const recordCreatedInfo = this.SetRecordCreatedInfo(dtoRecord);

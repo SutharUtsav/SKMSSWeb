@@ -1,3 +1,4 @@
+
 const dotenv = require('dotenv');
 dotenv.config();
 const express = require('express')
@@ -7,13 +8,17 @@ const multer = require('multer')
 const upload = multer()
 const db = require('./config/db')
 
+import { dbContext } from "./model/dbContext";
 
 
 const initApp = async () => {
     const PORT = process.env['PORT'] ?? 3030
-    const commonURL = '/api/v1';
+    const commonURL = `/api/v1`;
 
     try {
+        
+        //define all database context and associations
+        dbContext();
 
         await db.authenticate();
         console.log("Connection has been established successfully")
@@ -23,8 +28,10 @@ const initApp = async () => {
 
         //routes
         const personController = require('./controller/person-controller');
+        const roleController = require('./controller/role-controller')
 
         app.use(`${commonURL}/person`, personController);
+        app.use(`${commonURL}/role`, roleController);
 
 
         if (process.env['NODE_ENV'] === "production") {

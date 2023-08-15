@@ -1,5 +1,4 @@
 import { PersonDto } from "../dtos/person-dto";
-import { Person } from "../model/person";
 import { PersonService } from "../service/person-service";
 
 const express = require('express');
