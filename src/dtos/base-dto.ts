@@ -25,7 +25,7 @@ export interface IRecordModifiedInfo {
     /**
      * Record last modified by UserId
      */
-    updatedById?: number
+    updatedById: number
 }
 //#endregion
 

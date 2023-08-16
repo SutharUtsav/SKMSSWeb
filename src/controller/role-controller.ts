@@ -56,6 +56,57 @@ router.post('/', async (req: any, res: any) => {
     }
 });
 
+/**
+ * Update Role Detail
+ */
+router.put('/', async (req:any, res:any) => {
+    const id = req.query.id;
+
+    let roleDto: RoleDto | ErrorDto | undefined = validateRole(req.body);
+
+    if (!roleDto) {
+        res.send(EnumErrorMsg.API_SOMETHING_WENT_WRONG);
+    }
+    else if (roleDto instanceof ErrorDto) {
+        res.status(parseInt(roleDto.errorCode)).send(roleDto);
+    }
+    else {
+        const roleService: IRoleService = new RoleService();
+        const response = await roleService.Update(roleDto, id);
+
+        if (!response) {
+            res.status(400).send({
+                status: 0,
+                message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+            })
+        }
+        if (response instanceof ApiResponseDto) {
+            res.send(response)
+        }
+    }
+})
+
+/**
+ * Delete RolePermission Detail
+ */
+router.delete('/', async (req: any, res: any) => {
+    const id = req.query.id;
+
+    const roleService: IRoleService = new RoleService();
+        const response = await roleService.Remove(id);
+
+    if (!response) {
+        res.status(404).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+        })
+    }
+    else {
+        res.send(response)
+    }
+
+})
+
 //#endregion
 
 //#region CRUD operation on RolePermission Entity
@@ -205,7 +256,8 @@ const validateRole = (body: RoleDto): RoleDto | ErrorDto | undefined => {
         //set fields of RoleDto
         roleDto.name = body.name;
         roleDto.description = body.description;
-        roleDto.rolePermissionIds = body.rolePermissionIds;
+        if(body.rolePermissionIds)
+            roleDto.rolePermissionIds = body.rolePermissionIds;
         //set roleType Field
         if (EnumRoleType[body.roleType as keyof typeof EnumRoleType] === undefined) {
             let errorDto = new ErrorDto();
