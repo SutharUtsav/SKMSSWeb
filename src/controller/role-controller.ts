@@ -59,7 +59,7 @@ router.post('/', async (req: any, res: any) => {
 /**
  * Update Role Detail
  */
-router.put('/', async (req:any, res:any) => {
+router.put('/', async (req: any, res: any) => {
     const id = req.query.id;
 
     let roleDto: RoleDto | ErrorDto | undefined = validateRole(req.body);
@@ -87,13 +87,13 @@ router.put('/', async (req:any, res:any) => {
 })
 
 /**
- * Delete RolePermission Detail
+ * Delete Role Detail
  */
 router.delete('/', async (req: any, res: any) => {
     const id = req.query.id;
 
     const roleService: IRoleService = new RoleService();
-        const response = await roleService.Remove(id);
+    const response = await roleService.Remove(id);
 
     if (!response) {
         res.status(404).send({
@@ -106,7 +106,47 @@ router.delete('/', async (req: any, res: any) => {
     }
 
 })
+//#endregion
 
+//#region specific API handling on Role Entity
+/**
+ * Get Permission Details of a Role
+ */
+router.get('/role-permission-by-role', async (req: any, res: any) => {
+    const id = req.query.id;
+
+    const roleService: IRoleService = new RoleService();
+    const response = await roleService.GetRolePermissions(id);
+
+    if (!response) {
+        res.status(400).send({
+            status: 0,
+            message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+        })
+    }
+    else {
+        res.send(response)
+    }
+})
+
+
+router.put('/role-permission-by-role', async (req: any, res: any) => {
+    const id = req.query.id;
+    const body = req.body.permissions;
+
+    const roleService: IRoleService = new RoleService();
+    const response = await roleService.UpdateRolePermission(body,id);
+
+    if (!response) {
+        res.status(400).send({
+            status: 0,
+            message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+        })
+    }
+    else {
+        res.send(response)
+    }
+})
 //#endregion
 
 //#region CRUD operation on RolePermission Entity
@@ -256,7 +296,7 @@ const validateRole = (body: RoleDto): RoleDto | ErrorDto | undefined => {
         //set fields of RoleDto
         roleDto.name = body.name;
         roleDto.description = body.description;
-        if(body.rolePermissionIds)
+        if (body.rolePermissionIds)
             roleDto.rolePermissionIds = body.rolePermissionIds;
         //set roleType Field
         if (EnumRoleType[body.roleType as keyof typeof EnumRoleType] === undefined) {

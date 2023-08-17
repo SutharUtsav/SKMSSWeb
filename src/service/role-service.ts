@@ -13,6 +13,11 @@ export interface IRoleService {
     GetRecords(): Promise<ApiResponseDto | undefined>;
 
     /**
+     * Get Permission detais of the role
+     */
+    GetRolePermissions(roleId: number): Promise<ApiResponseDto | undefined>;
+
+    /**
      * Create Record for Entity Role
      * @param dtoRecord 
      */
@@ -24,6 +29,13 @@ export interface IRoleService {
      * @param id 
      */
     Update(dtoRecord: RoleDto, id: number): Promise<RoleDto | ApiResponseDto | undefined>;
+
+    /**
+     * Update Permissions associated with Role
+     * @param rolePermissions 
+     * @param roleId 
+     */
+    UpdateRolePermission(rolePermissions: Array<number>, roleId: number): Promise<ApiResponseDto | undefined>;
 
     /**
      * Remove Record by given parameter id
@@ -61,9 +73,8 @@ export interface IRolePermissionService {
 
 export class RoleService extends BaseService implements IRoleService {
 
-
     /**
-     * Get All Records of RolePermission Entity 
+     * Get All Records of Role Entity 
      */
     public async GetRecords(): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
@@ -71,40 +82,6 @@ export class RoleService extends BaseService implements IRoleService {
             let roles: RoleDto[] | RoleDto = await Role.findAll({
                 raw: true
             });
-
-            console.log(roles)
-            if (!roles) {
-                return undefined;
-            }
-            else if (roles instanceof RoleDto) {
-                const permissionIds: [] = await RoleRolePermission.findAll({
-                    where: {
-                        roleId: roles.id
-                    },
-                    raw: true,
-                })
-                roles = {
-                    ...roles,
-                    permissions: permissionIds
-                }
-            }
-            else {
-                for (let i = 0; i < roles.length; i++) {
-                    let role = roles[i];
-                    const permissionIds: [] = await RoleRolePermission.findAll({
-                        where: {
-                            roleId: role.id
-                        }
-                    })
-
-                    role = {
-                        ...role,
-                        permissions: permissionIds
-                    }
-                    roles[i] = role
-                }
-            }
-
 
             if (roles) {
                 apiResponse = new ApiResponseDto();
@@ -119,6 +96,45 @@ export class RoleService extends BaseService implements IRoleService {
                 errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
                 apiResponse.error = errorDto;
             }
+            return apiResponse;
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
+
+    /**
+     * Get Permission detais of the role
+     */
+    public async GetRolePermissions(roleId: number): Promise<ApiResponseDto | undefined> {
+        let apiResponse!: ApiResponseDto;
+        try {
+            const roleRolePermisssions = await RoleRolePermission.findAll({
+                where: {
+                    roleId: roleId,
+                },
+                row: true
+            })
+
+            let permissions = [];
+            for (const element of roleRolePermisssions) {
+                permissions.push(
+                    await RolePermission.findOne({
+                        where: {
+                            id: element.rolePermissionId
+                        }
+                    })
+                )
+            }
+            apiResponse = new ApiResponseDto();
+            apiResponse.status = 1;
+            apiResponse.data = { permissions: permissions }
             return apiResponse;
         }
         catch (error: any) {
@@ -184,7 +200,7 @@ export class RoleService extends BaseService implements IRoleService {
                 errorMessage = EnumApiResponseMsg[EnumApiResponse.DATA_ALREADY_EXIST];
             }
 
-            //else create entry for only RoleRolePermission
+            //create entry for only RoleRolePermission
             for (const rolePermissionId of dtoRecord.rolePermissionIds) {
                 //check whether roleRolePermission already exist or not
                 const foundRoleRolePermission = await RoleRolePermission.findOne({
@@ -268,7 +284,7 @@ export class RoleService extends BaseService implements IRoleService {
                 }
             })
 
-            if (!updatedRecord) {
+            if (updatedRecord !== undefined || updatedRecord !== null) {
                 apiResponse = new ApiResponseDto()
                 apiResponse.status = 1;
                 apiResponse.data = { status: parseInt(updatedRecord[0]), message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
@@ -287,6 +303,75 @@ export class RoleService extends BaseService implements IRoleService {
             apiResponse.error = errorDto;
             return apiResponse;
         }
+    }
+
+    /**
+     * Update Permissions associated with Role
+     * @param rolePermissions 
+     * @param roleId 
+     * @returns 
+     */
+    public async UpdateRolePermission(rolePermissions: number[], roleId: number): Promise<ApiResponseDto | undefined> {
+        let apiResponse!: ApiResponseDto;
+
+        try {
+            let resp = await RoleRolePermission.destroy({
+                where: {
+                    roleId: roleId,
+                },
+            })
+
+            if (resp === undefined || resp === null) {
+                return undefined
+            }
+            else {
+                const recordCreatedInfo = this.SetRecordCreatedInfo({
+                    createdAt : new Date(),
+                    createdById : 0,
+                });
+                const recordModifiedInfo = this.SetRecordModifiedInfo({
+                    updatedAt : new Date(),
+                    updatedById : 0,
+                });
+
+                let list: any[] = [];
+
+                for(let i=0;i<rolePermissions.length;i++){
+                    list.push({
+                        roleId: roleId,
+                        rolePermissionId: rolePermissions[i] as number,
+                        createdAt: recordCreatedInfo.createdAt,
+                        createdById: recordCreatedInfo.createdById,
+                        updatedAt: recordModifiedInfo.updatedAt,
+                        updatedById: recordModifiedInfo.updatedById,
+                        disabled: false,
+                        enabledDisabledOn: new Date(),
+                    })
+                }
+                //Bulk Create
+                resp = await RoleRolePermission.bulkCreate(list, {fields : ['roleId','rolePermissionId','createdAt','updatedAt','createdById','updatedById','disabled','enabledDisabledOn']});
+
+                if (resp === undefined || resp === null) {
+                    return undefined
+                }
+
+                apiResponse = new ApiResponseDto();
+                apiResponse.status = 1;
+                apiResponse.data = {status : '200', message : EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS]};
+                return apiResponse;
+
+            }
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+
     }
 
     /**
@@ -317,7 +402,7 @@ export class RoleService extends BaseService implements IRoleService {
                         cascade: true,
                     })
 
-                    if (!resp) {
+                    if (resp === undefined || resp === null) {
                         apiResponse = new ApiResponseDto()
                         apiResponse.status = 0;
                         let errorDto = new ErrorDto();
@@ -481,7 +566,7 @@ export class RolePermissionService extends BaseService implements IRolePermissio
                 }
             })
 
-            if (updatedRecord) {
+            if (updatedRecord !== undefined || updatedRecord !== null) {
                 apiResponse = new ApiResponseDto()
                 apiResponse.status = 1;
                 apiResponse.data = { status: parseInt(updatedRecord[0]), message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
