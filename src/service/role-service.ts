@@ -13,6 +13,11 @@ export interface IRoleService {
     GetRecords(): Promise<ApiResponseDto | undefined>;
 
     /**
+     * Get Record of Role by Id
+     * @param id 
+     */
+    GetRecordById(id: number): Promise<ApiResponseDto | undefined>
+    /**
      * Get Permission detais of the role
      */
     GetRolePermissions(roleId: number): Promise<ApiResponseDto | undefined>;
@@ -51,6 +56,11 @@ export interface IRolePermissionService {
      */
     GetRecords(): Promise<ApiResponseDto | undefined>;
 
+    /**
+     * Get Record of Role Entity by Id
+     * @param id 
+     */
+    GetRecordById(id:number) : Promise<ApiResponseDto | undefined >;
     /**
      * Create Record for Entity RolePermission
      * @param dtoRecord typeof PermissionDto
@@ -95,6 +105,46 @@ export class RoleService extends BaseService implements IRoleService {
                 errorDto.errorCode = '200';
                 errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
                 apiResponse.error = errorDto;
+            }
+            return apiResponse;
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
+
+    /**
+     * Get Record of Role Entity by Id
+     * @param id 
+     */
+    public async GetRecordById(id: number): Promise<ApiResponseDto | undefined> {
+        let apiResponse!: ApiResponseDto;
+        try {
+            let role: RoleDto = await Role.findOne({
+                where: {
+                    id: id
+                }
+            });
+
+            if(role){
+                apiResponse = new ApiResponseDto();
+                apiResponse.status = 1;
+                apiResponse.data = { roles: role }
+            }
+            else{
+                apiResponse = new ApiResponseDto();
+                let errorDto = new ErrorDto();
+                apiResponse.status = 0;
+                errorDto.errorCode = '200';
+                errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                apiResponse.error = errorDto;
+                
             }
             return apiResponse;
         }
@@ -272,11 +322,10 @@ export class RoleService extends BaseService implements IRoleService {
 
         try {
             const roleDto = new RoleDto();
-            roleDto.id = dtoRecord.id;
             roleDto.name = dtoRecord.name;
             roleDto.description = dtoRecord.description;
             roleDto.updatedAt = recordModifiedInfo.updatedAt;
-            roleDto.updatedById = recordModifiedInfo.updatedById as number;
+            roleDto.updatedById = recordModifiedInfo.updatedById;
 
             let updatedRecord = await Role.update(roleDto, {
                 where: {
@@ -326,20 +375,20 @@ export class RoleService extends BaseService implements IRoleService {
             }
             else {
                 const recordCreatedInfo = this.SetRecordCreatedInfo({
-                    createdAt : new Date(),
-                    createdById : 0,
+                    createdAt: new Date(),
+                    createdById: 0,
                 });
                 const recordModifiedInfo = this.SetRecordModifiedInfo({
-                    updatedAt : new Date(),
-                    updatedById : 0,
+                    updatedAt: new Date(),
+                    updatedById: 0,
                 });
 
                 let list: any[] = [];
 
-                for(let i=0;i<rolePermissions.length;i++){
+                for (const element of rolePermissions) {
                     list.push({
                         roleId: roleId,
-                        rolePermissionId: rolePermissions[i] as number,
+                        rolePermissionId: element,
                         createdAt: recordCreatedInfo.createdAt,
                         createdById: recordCreatedInfo.createdById,
                         updatedAt: recordModifiedInfo.updatedAt,
@@ -349,7 +398,7 @@ export class RoleService extends BaseService implements IRoleService {
                     })
                 }
                 //Bulk Create
-                resp = await RoleRolePermission.bulkCreate(list, {fields : ['roleId','rolePermissionId','createdAt','updatedAt','createdById','updatedById','disabled','enabledDisabledOn']});
+                resp = await RoleRolePermission.bulkCreate(list, { fields: ['roleId', 'rolePermissionId', 'createdAt', 'updatedAt', 'createdById', 'updatedById', 'disabled', 'enabledDisabledOn'] });
 
                 if (resp === undefined || resp === null) {
                     return undefined
@@ -357,7 +406,7 @@ export class RoleService extends BaseService implements IRoleService {
 
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                apiResponse.data = {status : '200', message : EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS]};
+                apiResponse.data = { status: '200', message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
                 return apiResponse;
 
             }
@@ -491,6 +540,45 @@ export class RolePermissionService extends BaseService implements IRolePermissio
 
     }
 
+    /**
+     * Get Record of Role Entity by Id
+     * @param id 
+     */
+    public async GetRecordById(id:number) : Promise<ApiResponseDto | undefined >{
+        let apiResponse!: ApiResponseDto;
+        try {
+
+            const permission: PermissionListDto = await RolePermission.findOne({
+                where : {
+                    id:id
+                }
+            });
+
+            if (permission) {
+                apiResponse = new ApiResponseDto();
+                apiResponse.status = 1;
+                apiResponse.data = { permission: permission }
+            }
+            else {
+                apiResponse = new ApiResponseDto();
+                let errorDto = new ErrorDto();
+                apiResponse.status = 0;
+                errorDto.errorCode = '200';
+                errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                apiResponse.error = errorDto;
+            }
+            return apiResponse;
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            apiResponse.status = 0;
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
     /**
      * Create Record for Entity RolePermission
      * @param dtoRecord 

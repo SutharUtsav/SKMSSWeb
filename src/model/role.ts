@@ -15,7 +15,7 @@ export const Role = sequelize.define('Role',{
      * Role Description
      */
     description :{
-        type : DataTypes.STRING,
+        type : DataTypes.TEXT,
         allowNull: false,
     },
     /**

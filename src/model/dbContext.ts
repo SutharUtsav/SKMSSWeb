@@ -1,4 +1,5 @@
 import { Role, RolePermission, RoleRolePermission } from "./role"
+import { User } from "./user";
 
 export const dbContext = () => {
 
@@ -17,5 +18,11 @@ export const dbContext = () => {
     RoleRolePermission.belongsTo(RolePermission,{
         foreignKey : 'rolePermissionId'
     });
-    
+
+    Role.hasMany(User, {
+        foreignKey : 'id'
+    })
+    User.belongsTo(Role,{
+        foreignKey : 'roleId'
+    })
 }

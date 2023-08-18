@@ -3,11 +3,11 @@ import { BaseDto, BaseDtoWithCommonFields } from "./base-dto";
 import { PermissionDto, RoleLookUpDto } from "./role-dto";
 
 //#region User detail page Dto.
-export class UserDto extends BaseDto{
+export class UserDto extends BaseDtoWithCommonFields{
     username!:string;
     userType!:EnumUserStatus;
     isImageAvailable!:boolean;
-    roles!: Array<RoleLookUpDto>;
+
 }
 //#endregion
 

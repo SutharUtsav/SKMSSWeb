@@ -12,9 +12,30 @@ const router = express.Router();
 
 //#region CRUD operation on Role Entity
 
+/**
+ * Get All Records of Role
+ */
 router.get('/', async (req: any, res: any) => {
     const roleService: IRoleService = new RoleService();
     const response = await roleService.GetRecords();
+
+    if (!response) {
+        res.status(400).send({
+            status: 0,
+            message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+        })
+    }
+    else {
+        res.send(response)
+    }
+})
+/**
+* Get Record of Role Entity by Id
+*/
+router.get('/:id', async (req: any, res: any) => {
+    const id = req.params.id;
+    const roleService: IRoleService = new RoleService();
+    const response = await roleService.GetRecordById(id);
 
     if (!response) {
         res.status(400).send({
@@ -135,7 +156,7 @@ router.put('/role-permission-by-role', async (req: any, res: any) => {
     const body = req.body.permissions;
 
     const roleService: IRoleService = new RoleService();
-    const response = await roleService.UpdateRolePermission(body,id);
+    const response = await roleService.UpdateRolePermission(body, id);
 
     if (!response) {
         res.status(400).send({
@@ -157,6 +178,25 @@ router.put('/role-permission-by-role', async (req: any, res: any) => {
 router.get('/role-permission', async (req: any, res: any) => {
     const rolePermissionService: IRolePermissionService = new RolePermissionService();
     const response = await rolePermissionService.GetRecords();
+
+    if (!response) {
+        res.status(400).send({
+            status: 0,
+            message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+        })
+    }
+    else {
+        res.send(response)
+    }
+})
+
+/**
+* Get Record of RolePErmission Entity by Id
+*/
+router.get('/role-permission/:id', async (req: any, res: any) => {
+    const id = req.params.id;
+    const rolePermissionService: IRolePermissionService = new RolePermissionService();
+    const response = await rolePermissionService.GetRecordById(id);
 
     if (!response) {
         res.status(400).send({
