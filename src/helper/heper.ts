@@ -12,12 +12,12 @@ export const areAllFieldsFilled = <T>(obj: T, allowNullFields: Record<keyof T, b
     }
     for(const key in obj){
         if(allowNullFields){
-            if(!allowNullFields[key] && ( obj[key] === null || obj[key] === undefined)){
+            if(!allowNullFields[key] && ( obj[key] === null || obj[key] === undefined ||  (typeof obj[key] === 'string' && String(obj[key]).trim() === ''))){
                 return false;
             }
         }
         else{
-            if( obj[key] === null || obj[key] === undefined){
+            if( obj[key] === null || obj[key] === undefined ||  (typeof obj[key] === 'string' && String(obj[key]).trim() === '')){
                 return false;
             }
         }

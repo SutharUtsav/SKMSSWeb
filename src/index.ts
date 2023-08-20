@@ -29,9 +29,13 @@ const initApp = async () => {
         //routes
         const personController = require('./controller/person-controller');
         const roleController = require('./controller/role-controller')
+        const rolePermissionController = require('./controller/role-permission-controller');
+        const userController = require('./controller/user-controller');
 
         app.use(`${commonURL}/person`, personController);
         app.use(`${commonURL}/role`, roleController);
+        app.use(`${commonURL}/role-permission`, rolePermissionController);
+        app.use(`${commonURL}/user`, userController);
 
 
         if (process.env['NODE_ENV'] === "production") {

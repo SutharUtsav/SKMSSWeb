@@ -1,13 +1,13 @@
 import { EnumUserStatus } from "../consts/enumUserStatus";
 import { BaseDto, BaseDtoWithCommonFields } from "./base-dto";
-import { PermissionDto, RoleLookUpDto } from "./role-dto";
+import { PermissionDto, RoleDto, RoleLookUpDto } from "./role-dto";
 
 //#region User detail page Dto.
 export class UserDto extends BaseDtoWithCommonFields{
     username!:string;
-    userType!:EnumUserStatus;
+    userType!:string;
     isImageAvailable!:boolean;
-
+    roleId!:RoleDto;
 }
 //#endregion
 
@@ -24,7 +24,7 @@ export class UserWithPermissionsDto extends UserDto{
 /**
  * Dto for User profile page.
  */
-export class UserProfileDto extends BaseDto{
+export class UserProfileDto extends UserDto{
     name!: string;
     surname!:string;
     wifeSurname!:string;

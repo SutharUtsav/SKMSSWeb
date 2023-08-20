@@ -2,7 +2,6 @@ export enum EnumErrorMsg {
     API_BAD_REQUEST,
     API_SOMETHING_WENT_WRONG,
     API_RECORD_NOT_FOUND,
-
 }
 
 export const EnumErrorMsgText : Record <EnumErrorMsg,string> = {
