@@ -50,19 +50,23 @@ router.get('/:id', async (req: any, res: any) => {
  * Add User Detail
  */
 router.post('/', async (req: any, res: any) => {
-    let userDto: UserProfileDto | ErrorDto | undefined = validateUser(req.body);
+    let userDto: UserDto | ErrorDto | undefined = validateUser(req.body);
+    let userProfileDto : UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
 
     console.log(userDto)
-    if (!userDto) {
+    console.log(userProfileDto)
+    if (!userDto || !userProfileDto) {
         res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
     }
     else if (userDto instanceof ErrorDto) {
         res.status(parseInt(userDto.errorCode)).send(userDto);
     }
+    else if (userProfileDto instanceof ErrorDto) {
+        res.status(parseInt(userProfileDto.errorCode)).send(userProfileDto);
+    }
     else {
         const userService: IUserService = new UserService();
-        // const response = await userService.Create(userDto);
-        const response = {};
+        const response = await userService.Create(userDto, userProfileDto);
 
         if (!response) {
             res.status(400).send({
@@ -73,7 +77,6 @@ router.post('/', async (req: any, res: any) => {
         else if (response instanceof ApiResponseDto) {
             res.send(response)
         }
-        res.send(response)
 
     }
 });
@@ -83,15 +86,15 @@ router.post('/', async (req: any, res: any) => {
 
 //#region ValidationCheck Function
 
-const validateUser = (body: UserProfileDto): UserProfileDto | ErrorDto | undefined => {
-    let userDto: UserProfileDto = new UserProfileDto();
+const validateUser = (body: UserDto): UserDto | ErrorDto | undefined => {
+    let userDto: UserDto = new UserDto();
 
     if (!areAllFieldsFilled(body)) {
         return undefined;
     }
     else {
         //check all requeried fields
-        if (!body.username || !body.name || !body.surname || !body.wifeSurname || !body.city || !body.currResidency || !body.marriedStatus || !body.birthDate || !body.weddingDate || !body.education || !body.occupation || !body.mobileNumber || !body.email || !body.isImageAvailable || !body.roleId) {
+        if (!body.username || !body.isImageAvailable || !body.roleId) {
             let errorDto = new ErrorDto();
             errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
             errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
@@ -103,11 +106,37 @@ const validateUser = (body: UserProfileDto): UserProfileDto | ErrorDto | undefin
             errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
             return errorDto;
         }
+
+        //set fields of UserDto
+        userDto.username = body.username;
+        userDto.userType = body.userType;
+        userDto.isImageAvailable = body.isImageAvailable;
+        userDto.roleId = body.roleId;
+
+    }
+
+    return userDto;
+}
+
+const validateUserProfile = (body : UserProfileDto) : UserProfileDto | ErrorDto | undefined => {
+    let userDto: UserProfileDto = new UserProfileDto();
+
+    if (!areAllFieldsFilled(body)) {
+        return undefined;
+    }
+    else {
+        if ( !body.name || !body.surname || !body.wifeSurname || !body.city || !body.currResidency || !body.marriedStatus || !body.birthDate || !body.weddingDate || !body.education || !body.occupation || !body.countryCode || !body.mobileNumber || !body.email ) {
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+            errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+            return errorDto;
+        }
+
         //validate mobile number
         const regexMobile = /^[7-9]\d{9}$/;
         const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
    
-        if (!regexMobile.test(body.mobileNumber) || !regexEmail.test(body.email)) {
+        if (!regexMobile.test(body.mobileNumber) || !regexEmail.test(body.email) ) {
             let errorDto = new ErrorDto();
             errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
             errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
@@ -115,7 +144,6 @@ const validateUser = (body: UserProfileDto): UserProfileDto | ErrorDto | undefin
         }
 
         //set fields of UserDto
-        userDto.username = body.username;
         userDto.name = body.name;
         userDto.surname = body.surname;
         userDto.wifeSurname = body.wifeSurname;
@@ -127,12 +155,9 @@ const validateUser = (body: UserProfileDto): UserProfileDto | ErrorDto | undefin
         userDto.education = body.education;
         userDto.occupation = body.occupation;
         userDto.mobileNumber = body.mobileNumber;
+        userDto.countryCode = body.countryCode;
         userDto.email = body.email;
-        userDto.isImageAvailable = body.isImageAvailable;
-        userDto.roleId = body.roleId;
-
     }
-
     return userDto;
 }
 //#endregion

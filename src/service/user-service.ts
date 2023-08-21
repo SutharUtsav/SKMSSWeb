@@ -1,7 +1,7 @@
 import { EnumApiResponse, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
-import { UserDto } from "../dtos/user-dto";
+import { UserDto, UserProfileDto } from "../dtos/user-dto";
 import { User } from "../model/user";
 import { BaseService } from "./base-service";
 
@@ -22,7 +22,7 @@ export interface IUserService {
      * Create Record for Entity User
      * @param dtoRecord 
      */
-    Create(dtoRecord: UserDto): Promise<UserDto | ApiResponseDto | undefined>;
+    Create(dtoRecord: UserDto, dtoProfileRecord : UserProfileDto): Promise< ApiResponseDto | undefined>;
 }
 
 export class UserService extends BaseService implements IUserService {
@@ -105,16 +105,14 @@ export class UserService extends BaseService implements IUserService {
      * Create Record for Entity User
      * @param dtoRecord 
      */
-    public async Create(dtoRecord: UserDto): Promise<ApiResponseDto | UserDto | undefined> {
+    public async Create(dtoRecord: UserDto, dtoProfileRecord : UserProfileDto): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
         try {
             const recordCreatedInfo = this.SetRecordCreatedInfo(dtoRecord);
             const recordModifiedInfo = this.SetRecordModifiedInfo(dtoRecord);
 
             const user = await User.create({
-                username: dtoRecord.username,
-                userType: dtoRecord.userType,
-                roleId: dtoRecord.roleId,
+                ...dtoRecord,
                 createdAt: recordCreatedInfo.createdAt,
                 createdById: recordCreatedInfo.createdById,
                 updatedAt: recordModifiedInfo.updatedAt,
@@ -122,6 +120,8 @@ export class UserService extends BaseService implements IUserService {
                 disabled: false,
                 enabledDisabledOn: new Date(),
             })
+
+            
 
             if (!user) {
                 apiResponse = new ApiResponseDto();

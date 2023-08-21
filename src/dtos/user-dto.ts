@@ -24,7 +24,7 @@ export class UserWithPermissionsDto extends UserDto{
 /**
  * Dto for User profile page.
  */
-export class UserProfileDto extends UserDto{
+export class UserProfileDto extends BaseDtoWithCommonFields{
     name!: string;
     surname!:string;
     wifeSurname!:string;
@@ -36,6 +36,7 @@ export class UserProfileDto extends UserDto{
     education!:string;
     occupation!:string;
     mobileNumber!:string;
+    countryCode!:string;
     email!:string;
 }
 //#endregion

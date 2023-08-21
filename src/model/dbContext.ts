@@ -19,8 +19,9 @@ export const dbContext = () => {
         foreignKey : 'rolePermissionId'
     });
 
-    Role.hasMany(User, {
-        foreignKey : 'id'
+    Role.hasMany(User,{
+        foreignKey : 'id',
+        as : 'UserRoleId'
     })
     User.belongsTo(Role,{
         foreignKey : 'roleId'

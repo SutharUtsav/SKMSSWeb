@@ -14,4 +14,4 @@ export const User = sequelize.define('User',{
         type : DataTypes.BOOLEAN
     },
     ...ModelBaseWithCommonFields
-})
+},{tableName : 'User'})

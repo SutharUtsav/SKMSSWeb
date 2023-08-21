@@ -81,6 +81,13 @@ export const UserProfile = sequelize.define('UserProfile', {
 
     },
     /**
+     * Country Code of Person's mobile number
+     */
+    countryCode : {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    /**
      * Person's email address
      */
     email :{
