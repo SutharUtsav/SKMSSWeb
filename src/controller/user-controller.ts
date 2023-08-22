@@ -53,8 +53,6 @@ router.post('/', async (req: any, res: any) => {
     let userDto: UserDto | ErrorDto | undefined = validateUser(req.body);
     let userProfileDto : UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
 
-    console.log(userDto)
-    console.log(userProfileDto)
     if (!userDto || !userProfileDto) {
         res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
     }
@@ -81,6 +79,51 @@ router.post('/', async (req: any, res: any) => {
     }
 });
 
+/**
+ * Update User Detail
+ */
+router.put('/', async (req: any, res: any) => {
+    const id = req.query.id;
+    let userDto: UserDto | ErrorDto | undefined = validateUser(req.body);
+    if (!userDto) {
+        res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
+    }
+    else if (userDto instanceof ErrorDto) {
+        res.status(parseInt(userDto.errorCode)).send(userDto);
+    }
+    else {
+        const userService: IUserService = new UserService();
+        const response = await userService.Update(userDto, id);
+
+        if (!response) {
+            res.status(400).send({
+                status: 0,
+                message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+            })
+        }
+        else {
+            res.send(response)
+        }
+    }
+})
+
+router.delete('/', async (req:any, res : any) => {
+    const id = req.query.id;
+
+    const userService: IUserService = new UserService();
+    const response = await userService.Remove(id);
+
+    if (!response) {
+        res.status(404).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+        })
+    }
+    else {
+        res.send(response)
+    }
+})
+
 //#endregion
 
 
@@ -93,7 +136,7 @@ const validateUser = (body: UserDto): UserDto | ErrorDto | undefined => {
         return undefined;
     }
     else {
-        //check all requeried fields
+        //check all required fields
         if (!body.username || !body.isImageAvailable || !body.roleId) {
             let errorDto = new ErrorDto();
             errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
@@ -143,6 +186,13 @@ const validateUserProfile = (body : UserProfileDto) : UserProfileDto | ErrorDto 
             return errorDto;
         }
 
+        if(new Date(body.birthDate).toString() === "Invalid Date" || new Date(body.weddingDate).toString() === "Invalid Date"){
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+            errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+            return errorDto;
+        }
+        
         //set fields of UserDto
         userDto.name = body.name;
         userDto.surname = body.surname;
@@ -150,8 +200,8 @@ const validateUserProfile = (body : UserProfileDto) : UserProfileDto | ErrorDto 
         userDto.city = body.city;
         userDto.currResidency = body.currResidency;
         userDto.marriedStatus = body.marriedStatus;
-        userDto.birthDate = body.birthDate;
-        userDto.weddingDate = body.weddingDate;
+        userDto.birthDate = new Date(body.birthDate);
+        userDto.weddingDate = new Date(body.weddingDate);
         userDto.education = body.education;
         userDto.occupation = body.occupation;
         userDto.mobileNumber = body.mobileNumber;

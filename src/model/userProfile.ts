@@ -97,4 +97,4 @@ export const UserProfile = sequelize.define('UserProfile', {
      * Common Fields
      */
     ...ModelBaseWithCommonFields
-})
+},{tableName : 'UserProfile'})

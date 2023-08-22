@@ -1,5 +1,6 @@
 import { Role, RolePermission, RoleRolePermission } from "./role"
 import { User } from "./user";
+import { UserProfile } from "./userProfile";
 
 export const dbContext = () => {
 
@@ -25,5 +26,13 @@ export const dbContext = () => {
     })
     User.belongsTo(Role,{
         foreignKey : 'roleId'
+    })
+
+    User.hasOne(UserProfile, { 
+        foreignKey : 'id',
+        as : 'UserProfileId'
+    })
+    UserProfile.belongsTo(User,{
+        foreignKey : 'userId'
     })
 }

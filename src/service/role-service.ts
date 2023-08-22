@@ -407,8 +407,8 @@ export class RoleService extends BaseService implements IRoleService {
                 }
             });
 
+            //No entry in roleRolePermission is found, then continue; else remove all those entries
             if (roleRolePermissions.length !== 0) {
-                //No entry in roleRolePermission is found, then continue; else remove all those entries
 
                 for (const element of roleRolePermissions) {
                     let rolePermission = element
