@@ -83,7 +83,7 @@ router.put('/', async (req: any, res: any) => {
 
     let permissionDto: PermissionDto | ErrorDto | undefined = validateRolePermission(req.body);
 
-    if (!permissionDto) {
+    if (!permissionDto || !id) {
         res.send(EnumErrorMsg.API_SOMETHING_WENT_WRONG);
     }
     else if (permissionDto instanceof ErrorDto) {

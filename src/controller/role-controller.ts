@@ -85,7 +85,7 @@ router.put('/', async (req: any, res: any) => {
 
     let roleDto: RoleDto | ErrorDto | undefined = validateRole(req.body);
 
-    if (!roleDto) {
+    if (!roleDto || !id) {
         res.send(EnumErrorMsg.API_SOMETHING_WENT_WRONG);
     }
     else if (roleDto instanceof ErrorDto) {
@@ -154,6 +154,13 @@ router.get('/role-permission-by-role', async (req: any, res: any) => {
 router.put('/role-permission-by-role', async (req: any, res: any) => {
     const id = req.query.id;
     const body = req.body.permissions;
+
+    if( !id){
+        res.status(400).send({
+            status: 0,
+            message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+        })
+    }
 
     const roleService: IRoleService = new RoleService();
     const response = await roleService.UpdateRolePermission(body, id);

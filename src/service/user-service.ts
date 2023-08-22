@@ -38,9 +38,17 @@ export interface IUserService {
      * @param id 
      */
     Remove(id: number): Promise<ApiResponseDto | undefined>;
+
+    /**
+     * Update User's Profile detail
+     * @param dtoRecord 
+     * @param id User's Id
+     */
+    UpdateUserProfile(dtoRecord : UserProfileDto, id :number) : Promise<UserProfileDto | ApiResponseDto | undefined>;
 }
 
 export class UserService extends BaseService implements IUserService {
+    
 
     /**
      * Get All Records of User Entity 
@@ -322,6 +330,47 @@ export class UserService extends BaseService implements IUserService {
             let errorDto = new ErrorDto();
             errorDto.errorCode = '400';
             errorDto.errorMsg = error.toString();
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
+
+    /**
+     * Update User's Profile detail
+     * @param dtoRecord 
+     * @param id User's Id
+     */
+    public async UpdateUserProfile(dtoRecord: UserProfileDto, id: number): Promise<UserProfileDto | ApiResponseDto | undefined> {
+        let apiResponse!: ApiResponseDto;
+        const recordModifiedInfo = this.SetRecordModifiedInfo(dtoRecord);
+
+        try {
+            let updatedRecord = await UserProfile.update({
+                ...dtoRecord,
+                updatedAt: recordModifiedInfo.updatedAt,
+                updatedById: recordModifiedInfo.updatedById
+            }, {
+                where: {
+                    userId: id
+                }
+            })
+
+            if (updatedRecord !== undefined || updatedRecord !== null) {
+                apiResponse = new ApiResponseDto()
+                apiResponse.status = 1;
+                apiResponse.data = { status: parseInt(updatedRecord[0]), message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
+                return apiResponse;
+            }
+            else {
+                return undefined
+            }
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
             apiResponse.error = errorDto;
             return apiResponse;
         }

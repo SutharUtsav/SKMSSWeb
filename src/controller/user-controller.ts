@@ -8,6 +8,36 @@ import { IUserService, UserService } from "../service/user-service";
 const express = require('express');
 const router = express.Router();
 
+//#region Specfic Event on User Entity
+
+router.put('/user-profile', async (req: any, res: any) => {
+    const id = req.query.id;
+    let userProfileDto: UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
+
+    if ( !userProfileDto || !id) {
+        res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
+    }
+    else if (userProfileDto instanceof ErrorDto) {
+        res.status(parseInt(userProfileDto.errorCode)).send(userProfileDto);
+    }
+    else {
+        const userService: IUserService = new UserService();
+        const response = await userService.UpdateUserProfile(userProfileDto,id);
+
+        if (!response) {
+            res.status(400).send({
+                status: 0,
+                message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+            })
+        }
+        else  {
+            res.send(response)
+        }
+    }
+})
+
+//#endregion
+
 //#region CRUD operation on User Entity
 
 /**
@@ -53,6 +83,7 @@ router.post('/', async (req: any, res: any) => {
     let userDto: UserDto | ErrorDto | undefined = validateUser(req.body);
     let userProfileDto : UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
 
+    console.log(userProfileDto)
     if (!userDto || !userProfileDto) {
         res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
     }
@@ -85,7 +116,7 @@ router.post('/', async (req: any, res: any) => {
 router.put('/', async (req: any, res: any) => {
     const id = req.query.id;
     let userDto: UserDto | ErrorDto | undefined = validateUser(req.body);
-    if (!userDto) {
+    if (!userDto || !id) {
         res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
     }
     else if (userDto instanceof ErrorDto) {
