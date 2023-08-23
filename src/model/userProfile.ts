@@ -98,3 +98,15 @@ export const UserProfile = sequelize.define('UserProfile', {
      */
     ...ModelBaseWithCommonFields
 },{tableName : 'UserProfile'})
+
+
+export const UserProfileImage = sequelize.define('UserProfileImage', {
+    /**
+     * Image Url of User Profile
+     */
+    imageURL : {
+        type : DataTypes.TEXT,
+        allowNull: false
+    },
+    ...ModelBaseWithCommonFields
+},{tableName : 'UserProfileImage'})

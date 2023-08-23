@@ -8,6 +8,7 @@ export class UserDto extends BaseDtoWithCommonFields{
     userType!:string;
     isImageAvailable!:boolean;
     roleId!:RoleDto;
+    imageUrl!:string;
 }
 //#endregion
 

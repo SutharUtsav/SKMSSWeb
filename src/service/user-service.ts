@@ -45,10 +45,16 @@ export interface IUserService {
      * @param id User's Id
      */
     UpdateUserProfile(dtoRecord: UserProfileDto, id: number): Promise<UserProfileDto | ApiResponseDto | undefined>;
+
+    /**
+     * Get User Details based on userId
+     * @param id UserId
+     */
+    GetUserProfile(id:number) : Promise<ApiResponseDto | undefined>;
 }
 
 export class UserService extends BaseService implements IUserService {
-
+    
 
     /**
      * Get All Records of User Entity 
@@ -85,7 +91,7 @@ export class UserService extends BaseService implements IUserService {
     }
 
     /**
-     * Get Record of Role Entity by Id
+     * Get Record of User Entity by Id
      * @param id 
      */
     public async GetRecordById(id: number): Promise<ApiResponseDto | undefined> {
@@ -123,6 +129,47 @@ export class UserService extends BaseService implements IUserService {
             return apiResponse;
         }
     }
+
+    /**
+     * Get User Details based on userId
+     * @param id UserId
+     */
+    public async GetUserProfile(id: number): Promise<ApiResponseDto | undefined> {
+        let apiResponse!: ApiResponseDto;
+        try {
+            let userProfile: UserProfileDto = await UserProfile.findOne({
+                where: {
+                    userId: id
+                }
+            });
+
+            if (userProfile) {
+                apiResponse = new ApiResponseDto();
+                apiResponse.status = 1;
+                apiResponse.data = { userProfile: userProfile }
+            }
+            else {
+                apiResponse = new ApiResponseDto();
+                let errorDto = new ErrorDto();
+                apiResponse.status = 0;
+                errorDto.errorCode = '200';
+                errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                apiResponse.error = errorDto;
+
+            }
+            return apiResponse;
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
+
 
     /**
      * Create Record for Entity User

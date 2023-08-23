@@ -11,11 +11,14 @@ const router = express.Router();
 
 //#region specific Event on User Entity
 
+/**
+ * Update UserProfile Details based on userId
+ */
 router.put('/user-profile', async (req: any, res: any) => {
     const id = req.query.userid;
     let userProfileDto: UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
 
-    if ( !userProfileDto || !id) {
+    if (!userProfileDto || !id) {
         res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
     }
     else if (userProfileDto instanceof ErrorDto) {
@@ -23,7 +26,7 @@ router.put('/user-profile', async (req: any, res: any) => {
     }
     else {
         const userService: IUserService = new UserService();
-        const response = await userService.UpdateUserProfile(userProfileDto,id);
+        const response = await userService.UpdateUserProfile(userProfileDto, id);
 
         if (!response) {
             res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
@@ -31,12 +34,30 @@ router.put('/user-profile', async (req: any, res: any) => {
                 message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
             })
         }
-        else  {
+        else {
             res.send(response)
         }
     }
 })
 
+/**
+ * Get UserProfile Details based on userId
+ */
+router.get('/user-profile', async (req: any, res: any) => {
+    const id = req.query.userid;
+    const userService: IUserService = new UserService();
+    const response = await userService.GetUserProfile(id);
+
+    if (!response) {
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+        })
+    }
+    else {
+        res.send(response)
+    }
+})
 //#endregion
 
 //#region CRUD operation on User Entity
@@ -81,34 +102,38 @@ router.get('/:id', async (req: any, res: any) => {
  * Add User Detail
  */
 router.post('/', async (req: any, res: any) => {
+    console.log(req.body)   
     let userDto: UserDto | ErrorDto | undefined = validateUser(req.body);
-    let userProfileDto : UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
+    let userProfileDto: UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
 
+    console.log(userDto)
     console.log(userProfileDto)
-    if (!userDto || !userProfileDto) {
-        res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
-    }
-    else if (userDto instanceof ErrorDto) {
-        res.status(parseInt(userDto.errorCode)).send(userDto);
-    }
-    else if (userProfileDto instanceof ErrorDto) {
-        res.status(parseInt(userProfileDto.errorCode)).send(userProfileDto);
-    }
-    else {
-        const userService: IUserService = new UserService();
-        const response = await userService.Create(userDto, userProfileDto);
 
-        if (!response) {
-            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
-                status: 0,
-                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
-            })
-        }
-        else if (response instanceof ApiResponseDto) {
-            res.send(response)
-        }
+    res.send("{}")
+    // if (!userDto || !userProfileDto) {
+    //     res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
+    // }
+    // else if (userDto instanceof ErrorDto) {
+    //     res.status(parseInt(userDto.errorCode)).send(userDto);
+    // }
+    // else if (userProfileDto instanceof ErrorDto) {
+    //     res.status(parseInt(userProfileDto.errorCode)).send(userProfileDto);
+    // }
+    // else {
+    //     const userService: IUserService = new UserService();
+    //     const response = await userService.Create(userDto, userProfileDto);
 
-    }
+    //     if (!response) {
+    //         res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+    //             status: 0,
+    //             message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+    //         })
+    //     }
+    //     else if (response instanceof ApiResponseDto) {
+    //         res.send(response)
+    //     }
+
+    // }
 });
 
 /**
@@ -139,7 +164,7 @@ router.put('/', async (req: any, res: any) => {
     }
 })
 
-router.delete('/', async (req:any, res : any) => {
+router.delete('/', async (req: any, res: any) => {
     const id = req.query.id;
 
     const userService: IUserService = new UserService();
@@ -164,11 +189,27 @@ router.delete('/', async (req:any, res : any) => {
 const validateUser = (body: UserDto): UserDto | ErrorDto | undefined => {
     let userDto: UserDto = new UserDto();
 
-    if (!areAllFieldsFilled(body)) {
+    const allowNullFieldsConfig: Record<keyof UserDto, boolean> = {
+        imageUrl: true,
+        username: false,
+        userType: false,
+        isImageAvailable: false,
+        roleId: false,
+        createdAt: true,
+        updatedAt: true,
+        createdById: true,
+        updatedById: true,
+        rowVersion: true,
+        id: true
+    };
+
+
+    if (!areAllFieldsFilled(body, allowNullFieldsConfig)) {
         return undefined;
     }
     else {
         //check all required fields
+
         if (!body.username || !body.isImageAvailable || !body.roleId) {
             let errorDto = new ErrorDto();
             errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
@@ -181,26 +222,48 @@ const validateUser = (body: UserDto): UserDto | ErrorDto | undefined => {
             errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
             return errorDto;
         }
+        //check imageUrl present or not if isImageUrl id true
+        if (String(body.isImageAvailable) === 'true' && !body.imageUrl) {
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+            errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+            return errorDto;
+        }
 
         //set fields of UserDto
         userDto.username = body.username;
         userDto.userType = body.userType;
         userDto.isImageAvailable = body.isImageAvailable;
         userDto.roleId = body.roleId;
-
+        userDto.imageUrl = String(body.isImageAvailable) === 'true' ? body.imageUrl : '';
     }
 
     return userDto;
 }
 
-const validateUserProfile = (body : UserProfileDto) : UserProfileDto | ErrorDto | undefined => {
+const validateUserProfile = (body: UserProfileDto): UserProfileDto | ErrorDto | undefined => {
     let userDto: UserProfileDto = new UserProfileDto();
 
+    const allowNullFieldsConfig: Record<keyof UserDto, boolean> = {
+        imageUrl: true,
+        username: false,
+        userType: false,
+        isImageAvailable: false,
+        roleId: false,
+        createdAt: true,
+        updatedAt: true,
+        createdById: true,
+        updatedById: true,
+        rowVersion: true,
+        id: true
+    };
+    
+    console.log(areAllFieldsFilled(body))
     if (!areAllFieldsFilled(body)) {
         return undefined;
     }
     else {
-        if ( !body.name || !body.surname || !body.wifeSurname || !body.city || !body.currResidency || !body.marriedStatus || !body.birthDate || !body.weddingDate || !body.education || !body.occupation || !body.countryCode || !body.mobileNumber || !body.email ) {
+        if (!body.name || !body.surname || !body.wifeSurname || !body.city || !body.currResidency || !body.marriedStatus || !body.birthDate || !body.weddingDate || !body.education || !body.occupation || !body.countryCode || !body.mobileNumber || !body.email) {
             let errorDto = new ErrorDto();
             errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
             errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
@@ -210,21 +273,21 @@ const validateUserProfile = (body : UserProfileDto) : UserProfileDto | ErrorDto 
         //validate mobile number
         const regexMobile = /^[7-9]\d{9}$/;
         const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-   
-        if (!regexMobile.test(body.mobileNumber) || !regexEmail.test(body.email) ) {
+
+        if (!regexMobile.test(body.mobileNumber) || !regexEmail.test(body.email)) {
             let errorDto = new ErrorDto();
             errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
             errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
             return errorDto;
         }
 
-        if(new Date(body.birthDate).toString() === "Invalid Date" || new Date(body.weddingDate).toString() === "Invalid Date"){
+        if (new Date(body.birthDate).toString() === "Invalid Date" || new Date(body.weddingDate).toString() === "Invalid Date") {
             let errorDto = new ErrorDto();
             errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
             errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
             return errorDto;
         }
-        
+
         //set fields of UserDto
         userDto.name = body.name;
         userDto.surname = body.surname;
