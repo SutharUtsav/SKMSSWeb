@@ -8,10 +8,11 @@ import { IUserService, UserService } from "../service/user-service";
 const express = require('express');
 const router = express.Router();
 
-//#region Specfic Event on User Entity
+
+//#region specific Event on User Entity
 
 router.put('/user-profile', async (req: any, res: any) => {
-    const id = req.query.id;
+    const id = req.query.userid;
     let userProfileDto: UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
 
     if ( !userProfileDto || !id) {
@@ -25,9 +26,9 @@ router.put('/user-profile', async (req: any, res: any) => {
         const response = await userService.UpdateUserProfile(userProfileDto,id);
 
         if (!response) {
-            res.status(400).send({
+            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
                 status: 0,
-                message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
             })
         }
         else  {
@@ -48,9 +49,9 @@ router.get('/', async (req: any, res: any) => {
     const response = await userService.GetRecords();
 
     if (!response) {
-        res.status(400).send({
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
             status: 0,
-            message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
         })
     }
     else {
@@ -66,9 +67,9 @@ router.get('/:id', async (req: any, res: any) => {
     const response = await userService.GetRecordById(id);
 
     if (!response) {
-        res.status(400).send({
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
             status: 0,
-            message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
         })
     }
     else {
@@ -98,9 +99,9 @@ router.post('/', async (req: any, res: any) => {
         const response = await userService.Create(userDto, userProfileDto);
 
         if (!response) {
-            res.status(400).send({
+            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
                 status: 0,
-                message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
             })
         }
         else if (response instanceof ApiResponseDto) {
@@ -127,9 +128,9 @@ router.put('/', async (req: any, res: any) => {
         const response = await userService.Update(userDto, id);
 
         if (!response) {
-            res.status(400).send({
+            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
                 status: 0,
-                message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
             })
         }
         else {
@@ -145,7 +146,7 @@ router.delete('/', async (req:any, res : any) => {
     const response = await userService.Remove(id);
 
     if (!response) {
-        res.status(404).send({
+        res.status(EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
             status: 0,
             message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
         })

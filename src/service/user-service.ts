@@ -44,11 +44,11 @@ export interface IUserService {
      * @param dtoRecord 
      * @param id User's Id
      */
-    UpdateUserProfile(dtoRecord : UserProfileDto, id :number) : Promise<UserProfileDto | ApiResponseDto | undefined>;
+    UpdateUserProfile(dtoRecord: UserProfileDto, id: number): Promise<UserProfileDto | ApiResponseDto | undefined>;
 }
 
 export class UserService extends BaseService implements IUserService {
-    
+
 
     /**
      * Get All Records of User Entity 
@@ -235,25 +235,46 @@ export class UserService extends BaseService implements IUserService {
         const recordModifiedInfo = this.SetRecordModifiedInfo(dtoRecord);
 
         try {
-            let updatedRecord = await User.update({
-                ...dtoRecord,
-                updatedAt: recordModifiedInfo.updatedAt,
-                updatedById: recordModifiedInfo.updatedById
-            }, {
+            //check whether user exist or not
+            let isUser = await User.findOne({
                 where: {
-                    id: id
+                    id: id,
                 }
             })
 
-            if (updatedRecord !== undefined || updatedRecord !== null) {
-                apiResponse = new ApiResponseDto()
-                apiResponse.status = 1;
-                apiResponse.data = { status: parseInt(updatedRecord[0]), message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
-                return apiResponse;
+            if (isUser) {
+
+                let updatedRecord = await User.update({
+                    ...dtoRecord,
+                    updatedAt: recordModifiedInfo.updatedAt,
+                    updatedById: recordModifiedInfo.updatedById
+                }, {
+                    where: {
+                        id: id
+                    }
+                })
+
+
+                if (updatedRecord !== undefined || updatedRecord !== null) {
+                    apiResponse = new ApiResponseDto()
+                    apiResponse.status = 1;
+                    apiResponse.data = { status: parseInt(updatedRecord[0]), message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
+                    return apiResponse;
+                }
+                else {
+                    return undefined
+                }
             }
             else {
-                return undefined
+                apiResponse = new ApiResponseDto()
+                apiResponse.status = 0;
+                let errorDto = new ErrorDto();
+                errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_RECORD_NOT_FOUND].toString();
+                errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_RECORD_NOT_FOUND]
+                apiResponse.error = errorDto;
+                return apiResponse;
             }
+
         }
         catch (error: any) {
             apiResponse = new ApiResponseDto();
@@ -345,24 +366,43 @@ export class UserService extends BaseService implements IUserService {
         const recordModifiedInfo = this.SetRecordModifiedInfo(dtoRecord);
 
         try {
-            let updatedRecord = await UserProfile.update({
-                ...dtoRecord,
-                updatedAt: recordModifiedInfo.updatedAt,
-                updatedById: recordModifiedInfo.updatedById
-            }, {
+
+            //check whether user exist or not
+            let isUserProfile = await UserProfile.findOne({
                 where: {
-                    userId: id
+                    userId: id,
                 }
             })
+            if (isUserProfile) {
 
-            if (updatedRecord !== undefined || updatedRecord !== null) {
-                apiResponse = new ApiResponseDto()
-                apiResponse.status = 1;
-                apiResponse.data = { status: parseInt(updatedRecord[0]), message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
-                return apiResponse;
+                let updatedRecord = await UserProfile.update({
+                    ...dtoRecord,
+                    updatedAt: recordModifiedInfo.updatedAt,
+                    updatedById: recordModifiedInfo.updatedById
+                }, {
+                    where: {
+                        userId: id
+                    }
+                })
+
+                if (updatedRecord !== undefined || updatedRecord !== null) {
+                    apiResponse = new ApiResponseDto()
+                    apiResponse.status = 1;
+                    apiResponse.data = { status: parseInt(updatedRecord[0]), message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
+                    return apiResponse;
+                }
+                else {
+                    return undefined
+                }
             }
             else {
-                return undefined
+                apiResponse = new ApiResponseDto()
+                apiResponse.status = 0;
+                let errorDto = new ErrorDto();
+                errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_RECORD_NOT_FOUND].toString();
+                errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_RECORD_NOT_FOUND]
+                apiResponse.error = errorDto;
+                return apiResponse;
             }
         }
         catch (error: any) {
