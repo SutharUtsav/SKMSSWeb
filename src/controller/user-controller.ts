@@ -6,10 +6,11 @@ import { areAllFieldsFilled } from "../helper/heper";
 import { IUserService, UserService } from "../service/user-service";
 
 const express = require('express');
+const multer = require('multer')
 const router = express.Router();
 
 
-//#region specific Event on User Entity
+//#region specific Event on UserProfile Entity
 
 /**
  * Update UserProfile Details based on userId
@@ -60,6 +61,25 @@ router.get('/user-profile', async (req: any, res: any) => {
 })
 //#endregion
 
+
+//#region Specific Event on UserProfileImage Entity
+/**
+ * Upload User Profile Image based on User's Image 
+ */
+// Multer setup for image upload
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+router.post('/user-profile-image',async (req:any, res:any) => {
+    const id = req.query.userId;
+    console.log(req);
+    const image = req.file;
+
+    res.set('Content-Type', 'image/jpeg'); // Set appropriate content type
+    res.send(image.buffer);
+})
+//#endregion
+
 //#region CRUD operation on User Entity
 
 /**
@@ -106,34 +126,30 @@ router.post('/', async (req: any, res: any) => {
     let userDto: UserDto | ErrorDto | undefined = validateUser(req.body);
     let userProfileDto: UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
 
-    console.log(userDto)
-    console.log(userProfileDto)
+    if (!userDto || !userProfileDto) {
+        res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
+    }
+    else if (userDto instanceof ErrorDto) {
+        res.status(parseInt(userDto.errorCode)).send(userDto);
+    }
+    else if (userProfileDto instanceof ErrorDto) {
+        res.status(parseInt(userProfileDto.errorCode)).send(userProfileDto);
+    }
+    else {
+        const userService: IUserService = new UserService();
+        const response = await userService.Create(userDto, userProfileDto);
 
-    res.send("{}")
-    // if (!userDto || !userProfileDto) {
-    //     res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
-    // }
-    // else if (userDto instanceof ErrorDto) {
-    //     res.status(parseInt(userDto.errorCode)).send(userDto);
-    // }
-    // else if (userProfileDto instanceof ErrorDto) {
-    //     res.status(parseInt(userProfileDto.errorCode)).send(userProfileDto);
-    // }
-    // else {
-    //     const userService: IUserService = new UserService();
-    //     const response = await userService.Create(userDto, userProfileDto);
+        if (!response) {
+            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                status: 0,
+                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+            })
+        }
+        else if (response instanceof ApiResponseDto) {
+            res.send(response)
+        }
 
-    //     if (!response) {
-    //         res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
-    //             status: 0,
-    //             message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
-    //         })
-    //     }
-    //     else if (response instanceof ApiResponseDto) {
-    //         res.send(response)
-    //     }
-
-    // }
+    }
 });
 
 /**
@@ -189,28 +205,15 @@ router.delete('/', async (req: any, res: any) => {
 const validateUser = (body: UserDto): UserDto | ErrorDto | undefined => {
     let userDto: UserDto = new UserDto();
 
-    const allowNullFieldsConfig: Record<keyof UserDto, boolean> = {
-        imageUrl: true,
-        username: false,
-        userType: false,
-        isImageAvailable: false,
-        roleId: false,
-        createdAt: true,
-        updatedAt: true,
-        createdById: true,
-        updatedById: true,
-        rowVersion: true,
-        id: true
-    };
 
 
-    if (!areAllFieldsFilled(body, allowNullFieldsConfig)) {
+    if (!areAllFieldsFilled(body)) {
         return undefined;
     }
     else {
         //check all required fields
 
-        if (!body.username || !body.isImageAvailable || !body.roleId) {
+        if (!body.username || !body.roleId) {
             let errorDto = new ErrorDto();
             errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
             errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
@@ -222,20 +225,12 @@ const validateUser = (body: UserDto): UserDto | ErrorDto | undefined => {
             errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
             return errorDto;
         }
-        //check imageUrl present or not if isImageUrl id true
-        if (String(body.isImageAvailable) === 'true' && !body.imageUrl) {
-            let errorDto = new ErrorDto();
-            errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
-            errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
-            return errorDto;
-        }
+        
 
         //set fields of UserDto
         userDto.username = body.username;
         userDto.userType = body.userType;
-        userDto.isImageAvailable = body.isImageAvailable;
         userDto.roleId = body.roleId;
-        userDto.imageUrl = String(body.isImageAvailable) === 'true' ? body.imageUrl : '';
     }
 
     return userDto;
@@ -244,19 +239,6 @@ const validateUser = (body: UserDto): UserDto | ErrorDto | undefined => {
 const validateUserProfile = (body: UserProfileDto): UserProfileDto | ErrorDto | undefined => {
     let userDto: UserProfileDto = new UserProfileDto();
 
-    const allowNullFieldsConfig: Record<keyof UserDto, boolean> = {
-        imageUrl: true,
-        username: false,
-        userType: false,
-        isImageAvailable: false,
-        roleId: false,
-        createdAt: true,
-        updatedAt: true,
-        createdById: true,
-        updatedById: true,
-        rowVersion: true,
-        id: true
-    };
     
     console.log(areAllFieldsFilled(body))
     if (!areAllFieldsFilled(body)) {
