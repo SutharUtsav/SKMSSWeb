@@ -6,9 +6,7 @@ import { PermissionDto, RoleDto, RoleLookUpDto } from "./role-dto";
 export class UserDto extends BaseDtoWithCommonFields{
     username!:string;
     userType!:string;
-    isImageAvailable!:boolean;
     roleId!:RoleDto;
-    imageUrl!:string;
 }
 //#endregion
 
