@@ -105,7 +105,7 @@ export const UserProfileImage = sequelize.define('UserProfileImage', {
      * Image Url of User Profile
      */
     image : {
-        type : DataTypes.BLOB,
+        type : DataTypes.STRING,
         allowNull: false
     },
     ...ModelBaseWithCommonFields

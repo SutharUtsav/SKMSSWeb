@@ -26,6 +26,10 @@ const initApp = async () => {
         app.use(bodyParser.json())
         app.use(upload.array())
 
+
+        //static Images folder
+        app.use('/Images', express.static('./Images'))   
+
         //routes
         const personController = require('./controller/person-controller');
         const roleController = require('./controller/role-controller')

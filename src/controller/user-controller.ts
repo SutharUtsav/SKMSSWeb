@@ -6,8 +6,9 @@ import { areAllFieldsFilled } from "../helper/heper";
 import { IUserService, UserService } from "../service/user-service";
 
 const express = require('express');
-const multer = require('multer')
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 
 
 //#region specific Event on UserProfile Entity
@@ -67,16 +68,35 @@ router.get('/user-profile', async (req: any, res: any) => {
  * Upload User Profile Image based on User's Image 
  */
 // Multer setup for image upload
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const profilePictureStorage = multer.diskStorage({
+    destination: (req: any, file: any, cb: any) => {
+        cb(null, 'Images/Profile')
+    },
+    filename: (req: any, file: any, cb: any) => {
+        cb(null, Date.now() + path.extname(file.originalname))
+    }
+});
+const upload = multer({
+    storage: profilePictureStorage,
+    limits: { fileSize: "10000000" }, //10 MB
+    fileFilter: (req: any, file: any, cb: any) => {
+        const fileTypes = /jpeg|png|jpg|gif/
+        const mimeType = fileTypes.test(file.mimeType)
+        const extname = fileTypes.test(path.extname(file.originalname))
 
-router.post('/user-profile-image',async (req:any, res:any) => {
+        if (mimeType && extname) {
+            return cb(null, true)
+        }
+        cb('Give proper file format to upload')
+    }
+}).single('image');
+
+router.post('/user-profile-image', upload, async (req: any, res: any) => {
     const id = req.query.userId;
     console.log(req);
-    const image = req.file;
+    const image = req.file.path;
 
-    res.set('Content-Type', 'image/jpeg'); // Set appropriate content type
-    res.send(image.buffer);
+    res.send("{}");
 })
 //#endregion
 
@@ -122,7 +142,7 @@ router.get('/:id', async (req: any, res: any) => {
  * Add User Detail
  */
 router.post('/', async (req: any, res: any) => {
-    console.log(req.body)   
+    console.log(req.body)
     let userDto: UserDto | ErrorDto | undefined = validateUser(req.body);
     let userProfileDto: UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
 
@@ -225,7 +245,7 @@ const validateUser = (body: UserDto): UserDto | ErrorDto | undefined => {
             errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
             return errorDto;
         }
-        
+
 
         //set fields of UserDto
         userDto.username = body.username;
@@ -239,7 +259,7 @@ const validateUser = (body: UserDto): UserDto | ErrorDto | undefined => {
 const validateUserProfile = (body: UserProfileDto): UserProfileDto | ErrorDto | undefined => {
     let userDto: UserProfileDto = new UserProfileDto();
 
-    
+
     console.log(areAllFieldsFilled(body))
     if (!areAllFieldsFilled(body)) {
         return undefined;
