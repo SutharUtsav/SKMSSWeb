@@ -1,9 +1,7 @@
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
-import { EnumPermission, EnumPermissionName } from "../consts/enumPermission";
-import { EnumPermissionFor, EnumPermissionForName } from "../consts/enumPermissionFor";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { PermissionDto } from "../dtos/role-dto";
-import { areAllFieldsFilled } from "../helper/heper";
+import { validateRolePermission } from "../helper/validationCheck";
 import { IRolePermissionService, RolePermissionService } from "../service/role-permission-service";
 
 const express = require('express');
@@ -126,41 +124,6 @@ router.delete('/', async (req: any, res: any) => {
 
 })
 
-//#endregion
-
-
-//#region ValidationCheck Function
-const validateRolePermission = (body: PermissionDto): PermissionDto | ErrorDto | undefined => {
-    let permissionDto: PermissionDto = new PermissionDto();
-
-    if (!areAllFieldsFilled(body)) {
-        return undefined;
-    }
-    else {
-        //set permissionFor field
-        if (EnumPermissionFor[body.permissionFor as keyof typeof EnumPermissionFor] === undefined) {
-            let errorDto = new ErrorDto();
-            errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
-            errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
-            return errorDto;
-        }
-        else {
-            permissionDto.permissionFor = EnumPermissionForName[EnumPermissionFor[body.permissionFor as keyof typeof EnumPermissionFor]];
-        }
-
-        //set permissions field
-        if (EnumPermission[body.permissions as keyof typeof EnumPermission] === undefined) {
-            let errorDto = new ErrorDto();
-            errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
-            errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
-            return errorDto;
-        }
-        else {
-            permissionDto.permissions = EnumPermissionName[EnumPermission[body.permissions as keyof typeof EnumPermission]];
-        }
-    }
-    return permissionDto;
-}
 //#endregion
 
 module.exports = router

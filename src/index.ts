@@ -24,7 +24,7 @@ const initApp = async () => {
         console.log("Connection has been established successfully")
         //Middleware
         app.use(bodyParser.json())
-        app.use(upload.array())
+        // app.use(upload.array())
 
 
         //static Images folder
@@ -35,11 +35,13 @@ const initApp = async () => {
         const roleController = require('./controller/role-controller')
         const rolePermissionController = require('./controller/role-permission-controller');
         const userController = require('./controller/user-controller');
+        const userProfileController = require('./controller/user-profile-controller');
 
         app.use(`${commonURL}/person`, personController);
         app.use(`${commonURL}/role`, roleController);
         app.use(`${commonURL}/role-permission`, rolePermissionController);
         app.use(`${commonURL}/user`, userController);
+        app.use(`${commonURL}/user-profile`, userProfileController);
 
 
         if (process.env['NODE_ENV'] === "production") {

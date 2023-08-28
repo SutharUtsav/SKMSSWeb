@@ -1,10 +1,7 @@
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
-import { EnumPermission, EnumPermissionName } from "../consts/enumPermission";
-import { EnumPermissionFor, EnumPermissionForName } from "../consts/enumPermissionFor";
-import { EnumRoleType, EnumRoleTypeName } from "../consts/enumRoleType";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
-import { PermissionDto, RoleDto } from "../dtos/role-dto";
-import { areAllFieldsFilled } from "../helper/heper";
+import {  RoleDto } from "../dtos/role-dto";
+import { validateRole } from "../helper/validationCheck";
 import { IRoleService, RoleService } from "../service/role-service";
 
 const express = require('express');
@@ -177,38 +174,5 @@ router.put('/role-permission-by-role', async (req: any, res: any) => {
 })
 //#endregion
 
-
-//#region ValidationCheck Function
-
-const validateRole = (body: RoleDto): RoleDto | ErrorDto | undefined => {
-    let roleDto: RoleDto = new RoleDto();
-
-    if (!areAllFieldsFilled(body)) {
-        return undefined;
-    }
-    else {
-
-        //set fields of RoleDto
-        roleDto.name = body.name;
-        roleDto.description = body.description;
-        if (body.rolePermissionIds)
-            roleDto.rolePermissionIds = body.rolePermissionIds;
-        //set roleType Field
-        if (EnumRoleType[body.roleType as keyof typeof EnumRoleType] === undefined) {
-            let errorDto = new ErrorDto();
-            errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
-            errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
-            return errorDto;
-        }
-        else {
-            roleDto.roleType = EnumRoleTypeName[EnumRoleType[body.roleType as keyof typeof EnumRoleType]];
-        }
-    }
-
-    return roleDto;
-}
-
-
-//#endregion
 
 module.exports = router
