@@ -1,10 +1,10 @@
 import { EnumApiResponse, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
-import { UserDto, UserProfileDto } from "../dtos/user-dto";
+import { UserDto, UserProfileDto, UserProfileImageDto } from "../dtos/user-dto";
 import { Role } from "../model/role";
 import { User } from "../model/user";
-import { UserProfile } from "../model/userProfile";
+import { UserProfile, UserProfileImage } from "../model/userProfile";
 import { BaseService } from "./base-service";
 
 export interface IUserService {
@@ -50,11 +50,25 @@ export interface IUserService {
      * Get User Details based on userId
      * @param id UserId
      */
-    GetUserProfile(id:number) : Promise<ApiResponseDto | undefined>;
+    GetUserProfile(id: number): Promise<ApiResponseDto | undefined>;
+
+    /**
+     * Get User Profile Picture based on userId
+     * @param id 
+     */
+    GetUserProfileImage(id: number): Promise<ApiResponseDto | undefined>;
+
+    /**
+     * Store User's Profile Picture
+     * @param id User Id
+     * @param dtoRecord User's Profile Picture
+     */
+    UploadUserProfileImage(id: number, dtoRecord: UserProfileImageDto | ErrorDto | undefined): Promise<ApiResponseDto | undefined>;
+
 }
 
 export class UserService extends BaseService implements IUserService {
-    
+
 
     /**
      * Get All Records of User Entity 
@@ -170,6 +184,45 @@ export class UserService extends BaseService implements IUserService {
         }
     }
 
+    /**
+     * Get User Profile Picture based on userId
+     * @param id 
+     */
+    public async GetUserProfileImage(id: number): Promise<ApiResponseDto | undefined> {
+        let apiResponse!: ApiResponseDto;
+        try {
+            let userProfileImage = await UserProfileImage.findOne({
+                where: {
+                    userId: id
+                }
+            });
+
+            if (userProfileImage) {
+                apiResponse = new ApiResponseDto();
+                apiResponse.status = 1;
+                apiResponse.data = { userProfileImage: userProfileImage }
+            }
+            else {
+                apiResponse = new ApiResponseDto();
+                let errorDto = new ErrorDto();
+                apiResponse.status = 0;
+                errorDto.errorCode = '200';
+                errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                apiResponse.error = errorDto;
+
+            }
+            return apiResponse;
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
 
     /**
      * Create Record for Entity User
@@ -450,6 +503,107 @@ export class UserService extends BaseService implements IUserService {
                 errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_RECORD_NOT_FOUND]
                 apiResponse.error = errorDto;
                 return apiResponse;
+            }
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
+
+
+    /**
+     * Store User's Profile Picture
+     * @param id User Id
+     * @param image User's Profile Picture
+     */
+    public async UploadUserProfileImage(id: number, dtoRecord: UserProfileImageDto | ErrorDto | undefined): Promise<ApiResponseDto | undefined> {
+        let apiResponse!: ApiResponseDto;
+        try {
+            //check whether user exist or not
+            let user: UserDto = await User.findOne({
+                where: {
+                    id: id
+                }
+            });
+
+            if (user) {
+                //if user exist, check whether user's profile image is already exist or not
+
+                let record = await UserProfileImage.findOne({
+                    where: {
+                        userId: id
+                    }
+                });
+                const recordCreatedInfo = this.SetRecordCreatedInfo(dtoRecord);
+                const recordModifiedInfo = this.SetRecordModifiedInfo(dtoRecord);
+
+                if (record) {
+                    //if userprofileImage already exist then update it
+
+                    let updatedRecord = await UserProfileImage.update({
+                        ...dtoRecord,
+                        userId: id,
+                        updatedAt: recordModifiedInfo.updatedAt,
+                        updatedById: recordModifiedInfo.updatedById
+                    }, {
+                        where: {
+                            userId: id
+                        }
+                    })
+
+                    if (updatedRecord !== undefined || updatedRecord !== null) {
+                        apiResponse = new ApiResponseDto()
+                        apiResponse.status = 1;
+                        apiResponse.data = { status: parseInt(updatedRecord[0]), message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
+                        return apiResponse;
+                    }
+                    else {
+                        return undefined
+                    }
+
+                }
+                else {
+                    //else insert new entry for userProfileImage
+
+                    let userProfileImage = UserProfileImage.create({
+                        ...dtoRecord,
+                        userId: id,
+                        createdAt: recordCreatedInfo.createdAt,
+                        createdById: recordCreatedInfo.createdById,
+                        updatedAt: recordModifiedInfo.updatedAt,
+                        updatedById: recordModifiedInfo.updatedById,
+                        disabled: false,
+                        enabledDisabledOn: new Date(),
+                    });
+
+                    if (userProfileImage) {
+                        apiResponse = new ApiResponseDto();
+                        apiResponse.status = 1;
+                        apiResponse.data = {
+                            userProfileImage: userProfileImage
+                        }
+                        return apiResponse;
+                    }
+
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 0;
+                    let errorDto = new ErrorDto();
+                    errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG].toString();
+                    errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG];
+                    apiResponse.error = errorDto;
+                    return apiResponse;
+
+                }
+            }
+            else {
+                return undefined;
+
             }
         }
         catch (error: any) {

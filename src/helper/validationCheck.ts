@@ -7,7 +7,7 @@ import { EnumRoleType, EnumRoleTypeName } from "../consts/enumRoleType";
 import { EnumUserStatus } from "../consts/enumUserStatus";
 import { ErrorDto } from "../dtos/api-response-dto";
 import { PermissionDto, RoleDto } from "../dtos/role-dto";
-import { UserDto, UserProfileDto } from "../dtos/user-dto";
+import { UserDto, UserProfileDto, UserProfileImageDto } from "../dtos/user-dto";
 import { areAllFieldsFilled } from "./heper";
 
 
@@ -177,3 +177,4 @@ export const validateRolePermission = (body: PermissionDto): PermissionDto | Err
     }
     return permissionDto;
 }
+

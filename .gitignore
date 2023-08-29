@@ -31,3 +31,5 @@ dist/*
 src/env.ts
 
 .vscode
+
+/Images

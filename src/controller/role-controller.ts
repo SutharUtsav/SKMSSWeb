@@ -31,6 +31,12 @@ router.get('/', async (req: any, res: any) => {
 */
 router.get('/:id', async (req: any, res: any) => {
     const id = req.params.id;
+    if(id===undefined || id===null){
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
     const roleService: IRoleService = new RoleService();
     const response = await roleService.GetRecordById(id);
 
@@ -79,7 +85,12 @@ router.post('/', async (req: any, res: any) => {
  */
 router.put('/', async (req: any, res: any) => {
     const id = req.query.id;
-
+    if(id===undefined || id===null){
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
     let roleDto: RoleDto | ErrorDto | undefined = validateRole(req.body);
 
     if (!roleDto || !id) {
@@ -109,7 +120,12 @@ router.put('/', async (req: any, res: any) => {
  */
 router.delete('/', async (req: any, res: any) => {
     const id = req.query.id;
-
+    if(id===undefined || id===null){
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
     const roleService: IRoleService = new RoleService();
     const response = await roleService.Remove(id);
 
@@ -132,7 +148,12 @@ router.delete('/', async (req: any, res: any) => {
  */
 router.get('/role-permission-by-role', async (req: any, res: any) => {
     const id = req.query.id;
-
+    if(id===undefined || id===null){
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
     const roleService: IRoleService = new RoleService();
     const response = await roleService.GetRolePermissions(id);
 
@@ -151,11 +172,10 @@ router.get('/role-permission-by-role', async (req: any, res: any) => {
 router.put('/role-permission-by-role', async (req: any, res: any) => {
     const id = req.query.id;
     const body = req.body.permissions;
-
-    if( !id){
-        res.status(400).send({
+    if(id===undefined || id===null){
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
             status: 0,
-            message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
         })
     }
 

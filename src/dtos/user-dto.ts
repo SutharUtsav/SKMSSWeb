@@ -38,4 +38,11 @@ export class UserProfileDto extends BaseDtoWithCommonFields{
     countryCode!:string;
     email!:string;
 }
+
+/**
+ * Dto for User profile Image
+ */
+export class UserProfileImageDto extends BaseDtoWithCommonFields{
+    image!: string; 
+}
 //#endregion

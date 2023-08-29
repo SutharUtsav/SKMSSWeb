@@ -33,6 +33,12 @@ router.get('/', async (req: any, res: any) => {
 */
 router.get('/:id', async (req: any, res: any) => {
     const id = req.params.id;
+    if(id===undefined || id===null){
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
     const userService: IUserService = new UserService();
     const response = await userService.GetRecordById(id);
 
@@ -51,7 +57,6 @@ router.get('/:id', async (req: any, res: any) => {
  * Add User Detail
  */
 router.post('/', async (req: any, res: any) => {
-    console.log(req.body)
     let userDto: UserDto | ErrorDto | undefined = validateUser(req.body);
     let userProfileDto: UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
 
@@ -86,6 +91,13 @@ router.post('/', async (req: any, res: any) => {
  */
 router.put('/', async (req: any, res: any) => {
     const id = req.query.id;
+    if(id===undefined || id===null){
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
+
     let userDto: UserDto | ErrorDto | undefined = validateUser(req.body);
     if (!userDto || !id) {
         res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
@@ -111,7 +123,12 @@ router.put('/', async (req: any, res: any) => {
 
 router.delete('/', async (req: any, res: any) => {
     const id = req.query.id;
-
+    if(id===undefined || id===null){
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
     const userService: IUserService = new UserService();
     const response = await userService.Remove(id);
 
@@ -128,7 +145,4 @@ router.delete('/', async (req: any, res: any) => {
 
 //#endregion
 
-
-
-
-module.exports = {router}
+module.exports = router

@@ -32,6 +32,12 @@ router.get('/', async (req: any, res: any) => {
 */
 router.get('/:id', async (req: any, res: any) => {
     const id = req.params.id;
+    if(id===undefined || id===null){
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
     const rolePermissionService: IRolePermissionService = new RolePermissionService();
     const response = await rolePermissionService.GetRecordById(id);
 
@@ -78,7 +84,12 @@ router.post('/', async (req: any, res: any) => {
  */
 router.put('/', async (req: any, res: any) => {
     const id = req.query.id;
-
+    if(id===undefined || id===null){
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
     let permissionDto: PermissionDto | ErrorDto | undefined = validateRolePermission(req.body);
 
     if (!permissionDto || !id) {
@@ -108,7 +119,12 @@ router.put('/', async (req: any, res: any) => {
  */
 router.delete('/', async (req: any, res: any) => {
     const id = req.query.id;
-
+    if(id===undefined || id===null){
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
     const rolePermissionService: IRolePermissionService = new RolePermissionService();
     const response = await rolePermissionService.Remove(id);
 
