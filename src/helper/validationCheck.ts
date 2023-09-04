@@ -11,6 +11,13 @@ import { UserDto, UserProfileDto, UserProfileImageDto } from "../dtos/user-dto";
 import { areAllFieldsFilled } from "./heper";
 
 
+//#region Regex validations
+
+export const regexMobile =  /^[7-9]\d{9}$/;        
+export const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+//#endregion
+
 /**
  * Validation Check function for User-profile Entity
  * @param body 
@@ -31,10 +38,6 @@ export const validateUserProfile = (body: UserProfileDto): UserProfileDto | Erro
             errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
             return errorDto;
         }
-
-        //validate mobile number
-        const regexMobile = /^[7-9]\d{9}$/;
-        const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
         if (!regexMobile.test(body.mobileNumber) || !regexEmail.test(body.email)) {
             let errorDto = new ErrorDto();

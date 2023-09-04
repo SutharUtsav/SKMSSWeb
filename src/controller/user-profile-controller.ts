@@ -135,7 +135,7 @@ router.post('/upload-image', upload, async (req: any, res: any) => {
 })
 
 /**
- * 
+ * get user's profile picture
  */
 router.get('/profile-image', async (req: any, res: any) => {
     const id = req.query.userId;

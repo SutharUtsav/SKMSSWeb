@@ -1,5 +1,5 @@
 import { Role, RolePermission, RoleRolePermission } from "./role"
-import { User } from "./user";
+import { User, UserRefreshToken } from "./user";
 import { UserProfile, UserProfileImage } from "./userProfile";
 
 export const dbContext = () => {
@@ -45,6 +45,16 @@ export const dbContext = () => {
         as : 'UserProfileImageId'
     })
     UserProfileImage.belongsTo(User,{
+        foreignKey : 'userId'
+    })
+
+
+    //One to One relationship between User and UserRefreshToken
+    User.hasOne(UserRefreshToken,{
+        foreignKey : 'id',
+        as : 'UserRefreshTokenId' 
+    })
+    UserRefreshToken.belongsTo(User, {
         foreignKey : 'userId'
     })
 }
