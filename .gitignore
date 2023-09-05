@@ -28,8 +28,8 @@ dist
 dist/*
 
 .env
-src/env.ts
+backend/src/env.ts
 
 .vscode
 
-/Images
+Images
