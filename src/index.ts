@@ -4,8 +4,6 @@ dotenv.config();
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
-const multer = require('multer')
-const upload = multer()
 const db = require('./config/db')
 
 import { dbContext } from "./model/dbContext";
@@ -25,7 +23,6 @@ const initApp = async () => {
         //Middleware
         app.use(bodyParser.json())
         app.use(bodyParser.urlencoded({ extended: true }));
-        // app.use(upload.array())
 
 
         //static Images folder

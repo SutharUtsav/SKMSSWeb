@@ -1,3 +1,4 @@
+import { upload } from "../config/multer";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { regexMobile } from "../helper/validationCheck";
 import { AuthService } from "../service/auth-service";
@@ -7,7 +8,7 @@ const router = express.Router();
 
 //#region Handle Authentication Apis
 
-router.post('/', async (req:any, res:any) => {
+router.post('/', upload, async (req:any, res:any) => {
 
     const mobileNumber = req.body.mobileNumber;
     

@@ -1,3 +1,4 @@
+import { upload } from "../config/multer";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ErrorDto } from "../dtos/api-response-dto";
 import { UserProfileDto, UserProfileImageDto } from "../dtos/user-dto";
@@ -13,7 +14,7 @@ const path = require('path');
 /**
  * Update UserProfile Details based on userId
  */
-router.put('/', async (req: any, res: any) => {
+router.put('/', upload, async (req: any, res: any) => {
     const id = req.query.userid;
     let userProfileDto: UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
 
@@ -81,7 +82,7 @@ const profilePictureStorage = multer.diskStorage({
         cb(null, Date.now() + path.extname(file.originalname))
     }
 });
-const upload = multer({
+const uploadProfilePicture = multer({
     storage: profilePictureStorage,
     limits: { fileSize: "10000000" }, //10 MB
     fileFilter: (req: any, file: any, cb: any) => {
@@ -101,8 +102,10 @@ const upload = multer({
 /**
  * Upload User Profile Image based on User's Image 
  */
-router.post('/upload-image', upload, async (req: any, res: any) => {
+router.post('/upload-image', uploadProfilePicture, async (req: any, res: any) => {
     const id = req.query.userId;
+
+    console.log( req.body.name)
     if (id === undefined || id === null) {
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
             status: 0,

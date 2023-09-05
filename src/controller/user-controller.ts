@@ -1,7 +1,9 @@
+import { upload } from "../config/multer";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { UserDto, UserProfileDto } from "../dtos/user-dto";
 import { validateUser, validateUserProfile } from "../helper/validationCheck";
+import { authMiddleware } from "../middleware/auth-middleware";
 import { IUserService, UserService } from "../service/user-service";
 
 const express = require('express');
@@ -14,7 +16,7 @@ const router = express.Router();
 /**
  * Get All Records of Role
  */
-router.get('/', async (req: any, res: any) => {
+router.get('/', authMiddleware , async (req: any, res: any) => {
     const userService: IUserService = new UserService();
     const response = await userService.GetRecords();
 
@@ -56,7 +58,7 @@ router.get('/:id', async (req: any, res: any) => {
 /**
  * Add User Detail
  */
-router.post('/', async (req: any, res: any) => {
+router.post('/', upload, authMiddleware,async (req: any, res: any) => {
     let userDto: UserDto | ErrorDto | undefined = validateUser(req.body);
     let userProfileDto: UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
 
@@ -89,7 +91,7 @@ router.post('/', async (req: any, res: any) => {
 /**
  * Update User Detail
  */
-router.put('/', async (req: any, res: any) => {
+router.put('/', upload, async (req: any, res: any) => {
     const id = req.query.id;
     if(id===undefined || id===null){
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({

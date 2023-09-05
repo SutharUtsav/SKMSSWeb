@@ -1,3 +1,4 @@
+import { upload } from "../config/multer";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { PermissionDto } from "../dtos/role-dto";
@@ -55,7 +56,7 @@ router.get('/:id', async (req: any, res: any) => {
 /**
  * Add RolePermission Detail
  */
-router.post('/', async (req: any, res: any) => {
+router.post('/', upload, async (req: any, res: any) => {
     let permissionDto: PermissionDto | ErrorDto | undefined = validateRolePermission(req.body);
 
     if (!permissionDto) {
@@ -82,7 +83,7 @@ router.post('/', async (req: any, res: any) => {
 /**
  * Update RolePermission Detail
  */
-router.put('/', async (req: any, res: any) => {
+router.put('/', upload, async (req: any, res: any) => {
     const id = req.query.id;
     if(id===undefined || id===null){
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({

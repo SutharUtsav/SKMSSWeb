@@ -3,7 +3,8 @@ export enum EnumApiResponse {
     REMOVE_SUCCESS,
     DATA_ALREADY_EXIST,
     NO_DATA_FOUND,
-    UNAUTHORIZED
+    UNAUTHORIZED,
+    USER_EXIST
 }
 
 
@@ -13,4 +14,5 @@ export const EnumApiResponseMsg : Record <EnumApiResponse,string> = {
     [EnumApiResponse.DATA_ALREADY_EXIST] : "Data Already Exist!",
     [EnumApiResponse.NO_DATA_FOUND] : "No Data Found!",
     [EnumApiResponse.UNAUTHORIZED] : "UnAuthorized!",
+    [EnumApiResponse.USER_EXIST] : "User Already Exist!",
 }

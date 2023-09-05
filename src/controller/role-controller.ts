@@ -1,3 +1,4 @@
+import { upload } from "../config/multer";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import {  RoleDto } from "../dtos/role-dto";
@@ -54,7 +55,7 @@ router.get('/:id', async (req: any, res: any) => {
 /**
  * Add Role Detail
  */
-router.post('/', async (req: any, res: any) => {
+router.post('/', upload, async (req: any, res: any) => {
     let roleDto: RoleDto | ErrorDto | undefined = validateRole(req.body);
 
     if (!roleDto) {
@@ -83,7 +84,7 @@ router.post('/', async (req: any, res: any) => {
 /**
  * Update Role Detail
  */
-router.put('/', async (req: any, res: any) => {
+router.put('/', upload, async (req: any, res: any) => {
     const id = req.query.id;
     if(id===undefined || id===null){
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
@@ -169,7 +170,7 @@ router.get('/role-permission-by-role', async (req: any, res: any) => {
 })
 
 
-router.put('/role-permission-by-role', async (req: any, res: any) => {
+router.put('/role-permission-by-role', upload, async (req: any, res: any) => {
     const id = req.query.id;
     const body = req.body.permissions;
     if(id===undefined || id===null){

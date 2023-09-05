@@ -27,7 +27,6 @@ export const validateUserProfile = (body: UserProfileDto): UserProfileDto | Erro
     let userDto: UserProfileDto = new UserProfileDto();
 
 
-    console.log(areAllFieldsFilled(body))
     if (!areAllFieldsFilled(body)) {
         return undefined;
     }

@@ -241,6 +241,8 @@ export class UserService extends BaseService implements IUserService {
                 }
             })
 
+            
+
             if (!role) {
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 0;
@@ -248,6 +250,24 @@ export class UserService extends BaseService implements IUserService {
                 errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
                 errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST];
                 apiResponse.error = errorDto;
+                return apiResponse;
+            }
+
+            //check if user already exist with that same phone number
+            const userWithSameNumber =  await UserProfile.findOne({
+                where: {
+                    mobileNumber : dtoProfileRecord.mobileNumber,
+                    countryCode : dtoProfileRecord.countryCode
+                }
+            })
+
+            if(userWithSameNumber){
+                apiResponse = new ApiResponseDto();
+                apiResponse.status = 1;
+                apiResponse.data = {
+                    status: 0,
+                    message : EnumApiResponseMsg[EnumApiResponse.USER_EXIST]
+                }
                 return apiResponse;
             }
 
