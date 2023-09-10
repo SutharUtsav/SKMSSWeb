@@ -39,10 +39,28 @@
     "build": "tsc && cd frontend && react-scripts build",
     "start": "concurrently \"cd frontend && serve -s build\" \"node dist/index.js\"",
     "build-frontend":"cd frontend && react-scripts build",
-    "start-frontend":"cd frontend && react-scripts start",
+    "start-frontend":"react-scripts start",
     "build-backend":"tsc",
     "start-backend":"nodemon dist/index.js",
     "serve": "nodemon dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

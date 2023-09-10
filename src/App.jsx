@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Header from "./components/shared/Header/Header";
 import Navbar from "./components/shared/Navbar/Navbar";
 import Home from "./components/Home/Home";
@@ -10,9 +10,6 @@ import Event from "./components/Events/Event";
 import NotFound from "./components/NotFound/NotFound";
 import Contact from "./components/contact/Contact";
 import { HomeAdmin } from "./admin/master/home/Home";
-import { AdminRoute } from "./admin/Route";
-import { Dashboard } from "./admin/master/dashboard/Dashboard";
-import User from "./admin/admin/user/User";
 
 function App() {
   return (
