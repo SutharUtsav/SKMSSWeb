@@ -1,3 +1,13 @@
+.admin-panel{
+    width: 100%;
+}
+
 .data-wrapper{
     background-color: var(--body-background);
+}
+
+.admin-panel .layout-wrapper{
+    display: flex;
+    flex-direction: column;
+    /* flex-grow: 1; */
 }

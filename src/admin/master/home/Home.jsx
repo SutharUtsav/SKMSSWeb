@@ -8,10 +8,8 @@ import User from "../../admin/user/User";
 import './Home.css'
 export const HomeAdmin = () => {
   return (
-    <div className="d-flex">
-      <div className="">
+    <div className="admin-panel d-flex">
         <Sidebar />
-      </div>
       <div className="layout-wrapper">
         <Header />
 

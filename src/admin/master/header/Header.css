@@ -1,0 +1,15 @@
+.admin-panel .header{
+    display: flex;
+    flex-direction: row;
+    background-color: #fff;
+    margin-left: auto;
+}
+
+.admin-panel .header img.avatar{
+    width: 60px;
+    aspect-ratio: 1;
+    object-fit: contain;
+    border-radius: 50%;
+    border: 1px solid; 
+    margin: 0 5px;
+}
