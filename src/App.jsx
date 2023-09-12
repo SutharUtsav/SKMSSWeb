@@ -11,25 +11,39 @@ import NotFound from "./components/NotFound/NotFound";
 import Contact from "./components/contact/Contact";
 import { HomeAdmin } from "./admin/master/home/Home";
 
+const Layout = (Component) => {
+  return (
+    <>
+
+      <Header />
+      <Navbar />
+
+      <Component.Component />
+      <Footer />
+
+    </>
+  );
+};
+
 function App() {
   return (
     <BrowserRouter>
-      <div>
+      {/* <div>
         <Header />
         <Navbar />
-      </div>
+      </div> */}
 
       <Routes>
-        <Route path="/" exact={true} element={<Home />} />
-        <Route path="/events" element={<Events />}></Route>
-        <Route path="/events/:id" element={<Event />}></Route>
-        <Route path="/trustees" element={<Trustees />}></Route>
-        <Route path="/contact" element={<Contact />}></Route>
-        <Route path="/admin/*" element={<HomeAdmin/>}></Route>
-        <Route path="*" element={<NotFound />}></Route>
+        <Route path="/" exact={true} element={<Layout Component={Home}/>} />
+        <Route path="/events" element={<Layout Component={Events} />}></Route>
+        <Route path="/events/:id" element={<Layout Component={Event} />}></Route>
+        <Route path="/trustees" element={<Layout Component={Trustees} />}></Route>
+        <Route path="/contact" element={<Layout Component={Contact} />}></Route>
+        <Route path="/admin/*" element={<HomeAdmin />}></Route>
+        <Route path="*" element={<Layout Component={NotFound} />}></Route>
       </Routes>
 
-      <Footer />
+      {/* <Footer /> */}
     </BrowserRouter>
   );
 }
