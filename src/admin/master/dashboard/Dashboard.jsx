@@ -1,7 +1,8 @@
-import React from 'react'
+import React from "react";
+import './Dashboard.css';
 
 export const Dashboard = () => {
   return (
-    <div>Dashboard works</div>
-  )
-}
+    <div className="dashboard">Dashboard works</div>
+  );
+};

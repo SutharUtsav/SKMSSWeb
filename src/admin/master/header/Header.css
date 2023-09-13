@@ -1,15 +1,55 @@
 .admin-panel .header{
     display: flex;
     flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     background-color: #fff;
+}
+
+.admin-panel .profile{
     margin-left: auto;
+    border-radius: 8px;
+}
+
+.admin-panel .profile button{
+    outline: none;
+    background: none;
+}
+.admin-panel .profile button:focus{
+    outline: none   
+}
+
+.admin-panel .profile:hover {
+    background-color: var(--secondary-color);
+}
+
+
+.admin-panel .profile:hover img.avatar{
+    border: 2px solid #fff;
+    border-radius: 50%;
 }
 
 .admin-panel .header img.avatar{
-    width: 60px;
+    width: 40px;
     aspect-ratio: 1;
-    object-fit: contain;
+    object-fit: cover;
     border-radius: 50%;
-    border: 1px solid; 
+    border: 2px solid #ddd; 
     margin: 0 5px;
+}
+
+
+.admin-panel .profile .profile-dropdown{
+    transition: none;
+    width: 140px;
+}
+
+.admin-panel .profile .profile-dropdown li{
+    font-size: 1.565rem;
+    
+    padding: 5px;
+}
+
+.admin-panel .profile .profile-dropdown li *{
+    font-weight: 400;
 }

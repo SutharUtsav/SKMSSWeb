@@ -4,10 +4,12 @@
 
 .data-wrapper{
     background-color: var(--body-background);
+    overflow-y: auto;
+    padding-left: calc(280px + 10px);
+    padding-right: 10px;
 }
 
 .admin-panel .layout-wrapper{
-    display: flex;
-    flex-direction: column;
+    flex: 1;
     /* flex-grow: 1; */
 }

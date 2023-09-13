@@ -4,7 +4,7 @@ import './Sidebar.css'
 import { NavLink } from 'react-router-dom'
 export const Sidebar = () => {
   return (
-    <div className='sidebar flex-column flex-shrink-0 py-3 px-4 bg-light' >
+    <div className='sidebar flex-column flex-shrink-0 py-3 px-4 bg-light shadow' >
       <a href='/' className='d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none'>
         <div className='logo'>
           <img src={logo} alt="logo" />

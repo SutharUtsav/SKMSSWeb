@@ -1,0 +1,4 @@
+.admin-panel .dashboard{
+    height: 100vh;
+    overflow-y: auto;
+}

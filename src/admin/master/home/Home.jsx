@@ -10,10 +10,10 @@ export const HomeAdmin = () => {
   return (
     <div className="admin-panel d-flex">
         <Sidebar />
-      <div className="layout-wrapper">
+      <div className="layout-wrapper ">
         <Header />
 
-        <div className="data-wrapper">
+        <div className="data-wrapper py-3">
           <Routes>
             <Route path="/" element={<Dashboard />}></Route>
             <Route path="/user" element={<User />}></Route>
