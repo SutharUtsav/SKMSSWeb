@@ -20,8 +20,14 @@ export const Sidebar = () => {
 
 
         <li>
-          <NavLink end to='/admin/user' className='nav-link link-dark'>
+          <NavLink end to='/admin/users' className='nav-link link-dark'>
             User
+          </NavLink>
+        </li>
+
+        <li>
+          <NavLink end to='/admin/roles' className='nav-link link-dark'>
+            Role
           </NavLink>
         </li>
       </ul>

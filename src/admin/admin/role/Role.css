@@ -1,0 +1,12 @@
+.content-header{
+    margin-top: 30px;
+}
+
+.admin-panel .content{
+    padding: 20px;
+}
+
+.breadcrumb a{
+    color: var(--secondary-color);
+    text-decoration: none;
+}
