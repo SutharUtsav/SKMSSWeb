@@ -13,10 +13,10 @@ export const UserProfile = sequelize.define('UserProfile', {
     /**
      * Person's Surname
      */
-    surname: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
+    // surname: {
+    //     type: DataTypes.STRING,
+    //     allowNull: false
+    // },
     /**
      * Surname of Person's Wife  
      */
@@ -26,17 +26,17 @@ export const UserProfile = sequelize.define('UserProfile', {
     /**
      * City/Village
      */
-    city:{
-        type: DataTypes.STRING,
-        allowNull: false
-    },
+    // city:{
+    //     type: DataTypes.STRING,
+    //     allowNull: false
+    // },
     /**
      * Current Residency
      */
-    currResidency: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
+    // currResidency: {
+    //     type: DataTypes.STRING,
+    //     allowNull: false
+    // },
     /**
      * Person's Married Status
      */
@@ -92,6 +92,54 @@ export const UserProfile = sequelize.define('UserProfile', {
      */
     email :{
         type : DataTypes.STRING,
+    },
+    /**
+     * Person's gender
+     */
+    gender :{
+        type: DataTypes.STRING
+    },
+    /**
+     * True if Person is main member of family else False
+     */
+    isMainFamilyMember: {
+        type: DataTypes.BOOLEAN
+    },
+    /**
+     * Id of Main Family Member
+     */
+    mainFamilyMemberId: {
+        type: DataTypes.BIGINT
+    },
+    /**
+     * Person's relation to Main Family Member
+     */
+    mainFamilyMemberRelation :{
+        type: DataTypes.STRING
+    },
+    /**
+     * Mother's Id
+     */
+    motherId: {
+        type: DataTypes.BIGINT
+    },
+    /**
+     * Mother's Name
+     */
+    motherName: {
+        type: DataTypes.TEXT
+    },
+    /**
+     * Father's Id
+     */
+    fatherId :{
+        type: DataTypes.BIGINT
+    },
+    /**
+     * Father's Name
+     */
+    fatherName: { 
+        type: DataTypes.TEXT
     },
     /**
      * Common Fields

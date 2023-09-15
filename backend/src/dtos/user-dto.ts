@@ -27,7 +27,7 @@ export class UserProfileDto extends BaseDtoWithCommonFields{
     name!: string;
     surname!:string;
     wifeSurname!:string;
-    city!:string;
+    village!:string;
     currResidency!:string;
     marriedStatus!:string;
     birthDate!:Date;
