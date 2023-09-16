@@ -25,10 +25,10 @@ export class UserWithPermissionsDto extends UserDto{
  */
 export class UserProfileDto extends BaseDtoWithCommonFields{
     name!: string;
-    surname!:string;
+    //surname!:string;
     wifeSurname!:string;
-    village!:string;
-    currResidency!:string;
+    // village!:string;
+    // currResidency!:string;
     marriedStatus!:string;
     birthDate!:Date;
     weddingDate!:Date;
@@ -37,6 +37,22 @@ export class UserProfileDto extends BaseDtoWithCommonFields{
     mobileNumber!:string;
     countryCode!:string;
     email!:string;
+    gender!:string;
+    isFamilyMember!:boolean;
+    mainFamilyMemberId!:number;
+    mainFamilyMemberSurname!:string;
+    mainFamilyMemberName!:string;
+    mainFamilyMemberVillage!:string;
+    mainFamilyMemberRelation!:string;
+    motherId!:number;
+    motherName!:string;
+    motherSurname!:string;
+    motherVillage!:string;
+    fatherId!:number;
+    fatherName!:string;
+    fatherSurname!:string;
+    fatherVillage!:string;
+    familyId!:number;
 }
 
 /**

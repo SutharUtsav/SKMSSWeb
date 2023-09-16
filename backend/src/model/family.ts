@@ -13,7 +13,7 @@ export const Family = sequelize.define('Family', {
     villageGuj: {
         type: DataTypes.TEXT
     },
-    currentResidency: {
+    currResidency: {
         type: DataTypes.TEXT
     },
     adobeOfGod: {

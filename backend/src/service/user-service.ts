@@ -1,7 +1,10 @@
 import { EnumApiResponse, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
+import { EnumFamilyMemberRelation, EnumFamilyMemberRelationName } from "../consts/enumFamilyMemberRelation";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
+import { FamilyDto } from "../dtos/family-dto";
 import { UserDto, UserProfileDto, UserProfileImageDto } from "../dtos/user-dto";
+import { Family } from "../model/family";
 import { Role } from "../model/role";
 import { User } from "../model/user";
 import { UserProfile, UserProfileImage } from "../model/userProfile";
@@ -24,7 +27,7 @@ export interface IUserService {
      * Create Record for Entity User
      * @param dtoRecord 
      */
-    Create(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto): Promise<ApiResponseDto | undefined>;
+    Create(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto, dtoFamilyRecord: FamilyDto): Promise<ApiResponseDto | undefined>;
 
     /**
      * Update Record in User
@@ -65,6 +68,13 @@ export interface IUserService {
      */
     UploadUserProfileImage(id: number, dtoRecord: UserProfileImageDto | ErrorDto | undefined): Promise<ApiResponseDto | undefined>;
 
+    /**
+     * Find User Id by User's details
+     * @param name 
+     * @param village 
+     * @param surname 
+     */
+    findUserIdByDetails(name: string, village: string, surname: string): Promise<ApiResponseDto | undefined>;
 }
 
 export class UserService extends BaseService implements IUserService {
@@ -228,7 +238,7 @@ export class UserService extends BaseService implements IUserService {
      * Create Record for Entity User
      * @param dtoRecord 
      */
-    public async Create(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto): Promise<ApiResponseDto | undefined> {
+    public async Create(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto, dtoFamilyRecord: FamilyDto): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
         try {
             const recordCreatedInfo = this.SetRecordCreatedInfo(dtoRecord);
@@ -241,8 +251,6 @@ export class UserService extends BaseService implements IUserService {
                 }
             })
 
-            
-
             if (!role) {
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 0;
@@ -254,22 +262,52 @@ export class UserService extends BaseService implements IUserService {
             }
 
             //check if user already exist with that same phone number
-            const userWithSameNumber =  await UserProfile.findOne({
+            const userWithSameDetails = await UserProfile.findOne({
                 where: {
-                    mobileNumber : dtoProfileRecord.mobileNumber,
-                    countryCode : dtoProfileRecord.countryCode
+                    name: dtoProfileRecord.name,
+                    mobileNumber: dtoProfileRecord.mobileNumber,
+                    countryCode: dtoProfileRecord.countryCode
                 }
             })
 
-            if(userWithSameNumber){
+            if (userWithSameDetails) {
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
                 apiResponse.data = {
                     status: 0,
-                    message : EnumApiResponseMsg[EnumApiResponse.USER_EXIST]
+                    message: EnumApiResponseMsg[EnumApiResponse.USER_EXIST]
                 }
                 return apiResponse;
             }
+
+            //Check if Family not exist then Create Entry for Family
+            let family = await Family.findOne({
+                where: {
+                    surname: dtoFamilyRecord.surname,
+                    village: dtoFamilyRecord.village,
+                    currResidency: dtoFamilyRecord.currResidency,
+                    adobeOfGod: dtoFamilyRecord.adobeOfGod,
+                    goddess: dtoFamilyRecord.goddess
+                }
+            })
+
+            if (!family) {
+                family = await Family.create({
+                    ...dtoFamilyRecord,
+                    createdAt: recordCreatedInfo.createdAt,
+                    createdById: recordCreatedInfo.createdById,
+                    updatedAt: recordModifiedInfo.updatedAt,
+                    updatedById: recordModifiedInfo.updatedById,
+                    disabled: false,
+                    enabledDisabledOn: new Date(),
+                })
+
+                dtoProfileRecord.familyId = family.id;
+            }
+            else {
+                dtoProfileRecord.familyId = family.id;
+            }
+
 
             const user = await User.create({
                 ...dtoRecord,
@@ -292,6 +330,52 @@ export class UserService extends BaseService implements IUserService {
                 apiResponse.error = errorDto;
                 return apiResponse;
             }
+
+            //set mainFamilyMemberId
+            if (dtoProfileRecord.mainFamilyMemberRelation = EnumFamilyMemberRelationName[EnumFamilyMemberRelation.SELF]) {
+                dtoProfileRecord.mainFamilyMemberId = user.id;
+            }
+            else {
+                const maniFamilyMember = await this.findUserIdByDetails(dtoProfileRecord.mainFamilyMemberName, dtoProfileRecord.mainFamilyMemberVillage, dtoProfileRecord.mainFamilyMemberSurname);
+
+                if (maniFamilyMember?.status === 0) {
+                    return maniFamilyMember
+                }
+                else if (maniFamilyMember?.data?.status === 0) {
+                    dtoProfileRecord.mainFamilyMemberId = Number(null);
+                }
+                else {
+                    dtoProfileRecord.mainFamilyMemberId = maniFamilyMember?.data.userId;
+                }
+            }
+
+            //set mother Id
+            const motherId = await this.findUserIdByDetails(dtoProfileRecord.motherName, dtoProfileRecord.motherVillage, dtoProfileRecord.motherSurname);
+
+            if (motherId?.status === 0) {
+                return motherId
+            }
+            else if (motherId?.data?.status === 0) {
+                dtoProfileRecord.motherId = Number(null);
+            }
+            else {
+                dtoProfileRecord.motherId = motherId?.data.userId;
+            }
+
+            //set father Id
+            const fatherId = await this.findUserIdByDetails(dtoProfileRecord.fatherName, dtoProfileRecord.fatherVillage, dtoProfileRecord.fatherSurname);
+
+            if (fatherId?.status === 0) {
+                return fatherId
+            }
+            else if (fatherId?.data?.status === 0) {
+                dtoProfileRecord.fatherId = Number(null);
+            }
+            else {
+                dtoProfileRecord.fatherId = motherId?.data.userId;
+            }
+
+            // console.log("UserProfileDto:", dtoProfileRecord)
 
             const userProfile = await UserProfile.create({
                 ...dtoProfileRecord,
@@ -625,6 +709,79 @@ export class UserService extends BaseService implements IUserService {
                 return undefined;
 
             }
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
+
+    /**
+     * Find User Id by User's details
+     * @param name 
+     * @param village 
+     * @param surname 
+     */
+    public async findUserIdByDetails(name: string, village: string | undefined, surname: string | undefined, familyId: number | null = null): Promise<ApiResponseDto | undefined> {
+        let apiResponse!: ApiResponseDto;
+
+        try {
+
+            let userProfile = null;
+
+            if (!name || !surname || !village) {
+                return undefined;
+            }
+
+            //find family Id if not exist
+            if (familyId == null) {
+
+                familyId = await Family.findOne({
+                    where: {
+                        surname: surname,
+                        village: village
+                    }
+                })
+
+                console.log(familyId);
+
+                if (!familyId) {
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 1;
+                    apiResponse.data = {
+                        status: 0,
+                        message: EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND] + ' username: ' + name
+                    }
+                    return apiResponse;
+                }
+            }
+
+            userProfile = await UserProfile.findOne({
+                where: {
+                    name: name,
+                    familyId: familyId
+                }
+            })
+
+            apiResponse = new ApiResponseDto();
+            apiResponse.status = 1;
+            if (userProfile) {
+                apiResponse.data = {
+                    userId: userProfile.userId,
+                }
+            }
+            else {
+                apiResponse.data = {
+                    status: 0,
+                    message: EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND] + 'for username: ' + name
+                }
+            }
+            return apiResponse;
         }
         catch (error: any) {
             apiResponse = new ApiResponseDto();
