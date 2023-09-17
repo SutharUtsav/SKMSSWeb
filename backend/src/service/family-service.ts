@@ -130,7 +130,7 @@ export class FamilyService extends BaseService implements IFamilyService {
 
 
             //check if family already exist
-            const fountFamily = await Family.findAll({
+            const foundFamily = await Family.findOne({
                 where: {
                     surname: dtoRecord.surname,
                     village: dtoRecord.village,
@@ -140,7 +140,7 @@ export class FamilyService extends BaseService implements IFamilyService {
                 }
             });
 
-            if (fountFamily) {
+            if (foundFamily) {
                 apiResponse.status = 0;
                 let errorDto = new ErrorDto();
                 errorDto.errorCode = "403";
@@ -281,7 +281,7 @@ export class FamilyService extends BaseService implements IFamilyService {
                     const users = findAllUsers[i];
 
                     const userService: IUserService = new UserService();
-                    apiResponse = await userService.Remove(users.id);
+                    apiResponse = await userService.Remove(users.userId);
 
                     if (!apiResponse || apiResponse.status === 0) {
                         return apiResponse;

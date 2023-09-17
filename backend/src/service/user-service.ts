@@ -375,7 +375,6 @@ export class UserService extends BaseService implements IUserService {
                 dtoProfileRecord.fatherId = motherId?.data.userId;
             }
 
-            // console.log("UserProfileDto:", dtoProfileRecord)
 
             const userProfile = await UserProfile.create({
                 ...dtoProfileRecord,
@@ -748,7 +747,6 @@ export class UserService extends BaseService implements IUserService {
                     }
                 })
 
-                console.log(familyId);
 
                 if (!familyId) {
                     apiResponse = new ApiResponseDto();

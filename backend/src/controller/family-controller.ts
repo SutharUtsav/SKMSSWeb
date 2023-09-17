@@ -1,3 +1,4 @@
+import { upload } from "../config/multer";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { FamilyDto } from "../dtos/family-dto";
@@ -55,7 +56,7 @@ router.get('/:id', async (req: any, res: any) => {
 /**
  * Add Family Detail
  */
-router.post('/',async (req: any, res: any) => {
+router.post('/', upload, async (req: any, res: any) => {
     let familyDto: FamilyDto | ErrorDto | undefined = validateFamily(req.body);
 
 
@@ -85,7 +86,7 @@ router.post('/',async (req: any, res: any) => {
 /**
  * Update Family Detail
  */
-router.put('/', async (req: any, res: any) => {
+router.put('/', upload, async (req: any, res: any) => {
     const id = req.query.id;
     if(id===undefined || id===null){
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
@@ -145,3 +146,5 @@ router.delete('/', async (req: any, res: any) => {
 })
 
 //#endregion
+
+module.exports = router;
