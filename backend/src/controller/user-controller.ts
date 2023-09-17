@@ -53,7 +53,7 @@ router.get('/findid', async (req: any, res: any)=> {
 /**
  * Get All Records of User
  */
-router.get('/', authMiddleware , async (req: any, res: any) => {
+router.get('/' , async (req: any, res: any) => {
     const userService: IUserService = new UserService();
     const response = await userService.GetRecords();
 

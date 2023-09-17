@@ -156,5 +156,8 @@ export const UserProfileImage = sequelize.define('UserProfileImage', {
         type : DataTypes.STRING,
         allowNull: false
     },
+    originalImage :{ 
+        type : DataTypes.STRING
+    },
     ...ModelBaseWithCommonFields
 },{tableName : 'UserProfileImage'})

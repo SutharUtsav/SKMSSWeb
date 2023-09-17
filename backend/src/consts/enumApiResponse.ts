@@ -4,7 +4,8 @@ export enum EnumApiResponse {
     DATA_ALREADY_EXIST,
     NO_DATA_FOUND,
     UNAUTHORIZED,
-    USER_EXIST
+    USER_EXIST,
+    IMG_UPLOAD_SUCCESS
 }
 
 
@@ -15,4 +16,5 @@ export const EnumApiResponseMsg : Record <EnumApiResponse,string> = {
     [EnumApiResponse.NO_DATA_FOUND] : "No Data Found!",
     [EnumApiResponse.UNAUTHORIZED] : "UnAuthorized!",
     [EnumApiResponse.USER_EXIST] : "User Already Exist!",
+    [EnumApiResponse.IMG_UPLOAD_SUCCESS] : "Image Uploaded Successfully",
 }

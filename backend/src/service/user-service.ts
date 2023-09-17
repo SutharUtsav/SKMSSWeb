@@ -10,6 +10,7 @@ import { User } from "../model/user";
 import { UserProfile, UserProfileImage } from "../model/userProfile";
 import { BaseService } from "./base-service";
 
+
 export interface IUserService {
 
     /**
@@ -69,6 +70,12 @@ export interface IUserService {
     UploadUserProfileImage(id: number, dtoRecord: UserProfileImageDto | ErrorDto | undefined): Promise<ApiResponseDto | undefined>;
 
     /**
+     * Remove User's Profile Picture 
+     * @param id 
+     */
+    RemoveUserProfileImage(id: number): Promise<ApiResponseDto | undefined>;
+
+    /**
      * Find User Id by User's details
      * @param name 
      * @param village 
@@ -79,6 +86,39 @@ export interface IUserService {
 
 export class UserService extends BaseService implements IUserService {
 
+    fs = require('fs');
+    path = require('path');
+
+
+    //#region spicific services
+
+    /**
+     * Function to remove file from specific path
+     * @param filePath 
+     * @returns 
+     */
+    private RemoveImageFile(filePath: string) {
+        const absoluteFilePath = this.path.resolve(filePath);
+
+        // Check if the file exists before attempting to delete it
+        if (this.fs.existsSync(absoluteFilePath)) {
+            this.fs.unlink(absoluteFilePath, (err: any) => {
+                if (err) {
+                    return {
+                        status: 0,
+                        message: err
+                    };
+                }
+                else {
+                    return { status: 1 };
+                }
+            });
+        }
+
+        return { status: 1 }
+    }
+
+    //#endregion
 
     /**
      * Get All Records of User Entity 
@@ -507,13 +547,20 @@ export class UserService extends BaseService implements IUserService {
 
             //No entry of userProfile is found, then continue; else remove all those entries
             if (userProfile) {
+                const respRemoveImg = await UserProfileImage.destroy({
+                    where: {
+                        userId: id
+                    }
+                })
+
                 const resp = await UserProfile.destroy({
                     where: {
                         userId: id,
                     },
                 })
 
-                if (resp === undefined || resp === null) {
+
+                if (resp === undefined || resp === null || respRemoveImg === null || respRemoveImg === undefined) {
                     apiResponse = new ApiResponseDto()
                     apiResponse.status = 0;
                     let errorDto = new ErrorDto();
@@ -660,7 +707,16 @@ export class UserService extends BaseService implements IUserService {
                         }
                     })
 
-                    if (updatedRecord !== undefined || updatedRecord !== null) {
+                    //update isImageAvailable field in User Table
+                    let updateUser = await User.update({
+                        isImageAvailable: true
+                    }, {
+                        where: {
+                            id: id
+                        }
+                    })
+
+                    if (updatedRecord !== undefined || updatedRecord !== null || updateUser !== undefined || updateUser !== null) {
                         apiResponse = new ApiResponseDto()
                         apiResponse.status = 1;
                         apiResponse.data = { status: parseInt(updatedRecord[0]), message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
@@ -685,11 +741,23 @@ export class UserService extends BaseService implements IUserService {
                         enabledDisabledOn: new Date(),
                     });
 
-                    if (userProfileImage) {
+                    //update isImageAvailable field in User Table
+                    let updateUser = await User.update({
+                        isImageAvailable: true
+                    }, {
+                        where: {
+                            id: id
+                        }
+                    })
+
+                    if (userProfileImage !== undefined || userProfileImage !== null || updateUser !== undefined || updateUser !== null) {
                         apiResponse = new ApiResponseDto();
                         apiResponse.status = 1;
                         apiResponse.data = {
-                            userProfileImage: userProfileImage
+                            userProfileImage: {
+                                status : 1,
+                                message : EnumApiResponseMsg[EnumApiResponse.IMG_UPLOAD_SUCCESS]
+                            }
                         }
                         return apiResponse;
                     }
@@ -706,7 +774,6 @@ export class UserService extends BaseService implements IUserService {
             }
             else {
                 return undefined;
-
             }
         }
         catch (error: any) {
@@ -720,6 +787,89 @@ export class UserService extends BaseService implements IUserService {
         }
     }
 
+
+    /**
+     * Remove User's Profile Picture
+     * @param id 
+     */
+    public async RemoveUserProfileImage(id: number): Promise<ApiResponseDto | undefined> {
+        let apiResponse!: ApiResponseDto;
+        try {
+
+            const foundUserProfile: UserProfileImageDto = await UserProfileImage.findOne({
+                where: {
+                    userId: id
+                }
+            })
+
+            if (!foundUserProfile) {
+                apiResponse = new ApiResponseDto();
+                let errorDto = new ErrorDto();
+                errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+                errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST];
+                apiResponse.status = 0;
+                apiResponse.error = errorDto;
+                return apiResponse;
+            }
+
+            const fileRemoveResp : any = await this.RemoveImageFile(foundUserProfile.image);
+            const originalFileRemoveResp : any = await this.RemoveImageFile(foundUserProfile.originalImage);
+
+            if (fileRemoveResp.status === 0 || originalFileRemoveResp.status === 0) {
+                apiResponse = new ApiResponseDto();
+                let errorDto = new ErrorDto();
+                errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG].toString();
+                errorDto.errorMsg = fileRemoveResp?.message || originalFileRemoveResp?.message;
+                apiResponse.status = 0;
+                apiResponse.error = errorDto;
+                return apiResponse;
+            }
+
+            const resp = await UserProfileImage.destroy({
+                where: {
+                    userId: id
+                }
+            })
+    
+            const respUpdateUserField = await User.update({
+                isImageAvailable: false
+            }, {
+                where: {
+                    id: id
+                }
+            })
+    
+            if (!resp || !respUpdateUserField) {
+                apiResponse = new ApiResponseDto();
+                let errorDto = new ErrorDto();
+                errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+                errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST];
+                apiResponse.status = 0;
+                apiResponse.error = errorDto;
+                return apiResponse;
+            }
+    
+            apiResponse = new ApiResponseDto();
+            apiResponse.status = 1;
+            apiResponse.data = {
+                status: 1,
+                message: EnumApiResponseMsg[EnumApiResponse.REMOVE_SUCCESS]
+            };
+            return apiResponse;
+
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
+
+    
     /**
      * Find User Id by User's details
      * @param name 

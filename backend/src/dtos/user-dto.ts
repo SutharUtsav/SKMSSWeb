@@ -60,5 +60,6 @@ export class UserProfileDto extends BaseDtoWithCommonFields{
  */
 export class UserProfileImageDto extends BaseDtoWithCommonFields{
     image!: string; 
+    originalImage!: string;
 }
 //#endregion
