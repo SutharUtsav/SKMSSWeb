@@ -4,3 +4,7 @@ export enum EnumUserStatus{
      */
     ADMINCREATED = 0,
 }
+
+export const EnumUserStatusText : Record <EnumUserStatus,string> = {
+    [EnumUserStatus.ADMINCREATED] : "ADMINCREATED"
+}

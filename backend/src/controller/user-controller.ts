@@ -3,36 +3,38 @@ import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enum
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { FamilyDto } from "../dtos/family-dto";
 import { UserDto, UserProfileDto } from "../dtos/user-dto";
-import { validateFamily, validateUser, validateUserProfile } from "../helper/validationCheck";
+import { validateBulkEntries, validateFamily, validateUser, validateUserProfile } from "../helper/validationCheck";
 import { authMiddleware } from "../middleware/auth-middleware";
 import { IUserService, UserService } from "../service/user-service";
 
 const express = require('express');
 const router = express.Router();
-
-
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const exceljs = require('exceljs')
 
 //#region Specific operations
 
 /**
  * Find User's Id by User's Details
  */
-router.get('/findid', async (req: any, res: any)=> {
+router.get('/findid', async (req: any, res: any) => {
     console.log("FindId")
     const name = req.query.name;
     const surname = req.query.surname;
     const village = req.query.village;
 
-    if( name===undefined || name===null || surname===undefined || surname===null || village===undefined || village===null){
+    if (name === undefined || name === null || surname === undefined || surname === null || village === undefined || village === null) {
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
             status: 0,
             message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
         })
     }
-    else{
+    else {
         const userService: IUserService = new UserService();
         const response = await userService.findUserIdByDetails(name, surname, village);
-    
+
         if (!response) {
             res.status(EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
                 status: 0,
@@ -41,8 +43,69 @@ router.get('/findid', async (req: any, res: any)=> {
         }
         else {
             res.send(response)
-        } 
+        }
     }
+})
+
+
+
+// Multer setup for excel sheet upload
+const excelSheetStorage = multer.diskStorage({
+    destination: (req: any, file: any, cb: any) => {
+        const outputDir = `VastiPatrak/Data`;
+
+        // Ensure the output directory exists
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, { recursive: true });
+        }
+
+        cb(null, outputDir)
+    },
+    filename: (req: any, file: any, cb: any) => {
+        cb(null, Date.now() + path.extname(file.originalname))
+    }
+});
+const uploadExcelSheet = multer({
+    storage: excelSheetStorage,
+    limits: { fileSize: "10000000" }, //10 MB
+    fileFilter: (req: any, file: any, cb: any) => {
+        const fileTypes = /excel|xls|xlsx|sheet/
+        const mimeType = fileTypes.test(file.mimetype)
+        const extname = fileTypes.test(path.extname(file.originalname))
+
+        if (mimeType && extname) {
+            return cb(null, true)
+        }
+        cb('Give proper file format to upload')
+    }
+}).single('excelSheet');
+
+/**
+ * Bulk Insert of Users by excel sheet
+ */
+router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
+    const workbook = new exceljs.Workbook();
+    await workbook.xlsx.readFile(req.file.path);
+    const worksheet = workbook.getWorksheet('Sheet1');
+
+    // const userDtos : Array<UserDto> = [];
+    worksheet.eachRow((row: any, rowNumber: number) => {
+        if(rowNumber!==0){
+            var { userDto, userProfileDto, familyDto } = validateBulkEntries(row.values);
+            console.log(userDto);
+            console.log(userProfileDto);
+            console.log(familyDto)
+        }
+    })
+    
+    const data = worksheet.eachRow((row: any, rnumber: number) => {
+        return {
+            name: row[0],
+            age: row[1]
+        };
+    })
+
+    res.send({ data: data });
 })
 
 //#endregion
@@ -53,7 +116,7 @@ router.get('/findid', async (req: any, res: any)=> {
 /**
  * Get All Records of User
  */
-router.get('/' , async (req: any, res: any) => {
+router.get('/', async (req: any, res: any) => {
     const userService: IUserService = new UserService();
     const response = await userService.GetRecords();
 
@@ -72,7 +135,7 @@ router.get('/' , async (req: any, res: any) => {
 */
 router.get('/:id', async (req: any, res: any) => {
     const id = req.params.id;
-    if(id===undefined || id===null){
+    if (id === undefined || id === null) {
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
             status: 0,
             message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
@@ -96,7 +159,7 @@ router.get('/:id', async (req: any, res: any) => {
  * Add User Detail
  */
 //authMiddleware
-router.post('/', upload,async (req: any, res: any) => {
+router.post('/', upload, async (req: any, res: any) => {
     let userDto: UserDto | ErrorDto | undefined = validateUser(req.body);
     let userProfileDto: UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
     let familyDto: FamilyDto | ErrorDto | undefined = validateFamily(req.body);
@@ -111,7 +174,7 @@ router.post('/', upload,async (req: any, res: any) => {
     else if (userProfileDto instanceof ErrorDto) {
         res.status(parseInt(userProfileDto.errorCode)).send(userProfileDto);
     }
-    else if(familyDto instanceof ErrorDto){
+    else if (familyDto instanceof ErrorDto) {
         res.status(parseInt(familyDto.errorCode)).send(familyDto);
     }
     else {
@@ -136,7 +199,7 @@ router.post('/', upload,async (req: any, res: any) => {
  */
 router.put('/', upload, async (req: any, res: any) => {
     const id = req.query.id;
-    if(id===undefined || id===null){
+    if (id === undefined || id === null) {
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
             status: 0,
             message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
@@ -168,16 +231,16 @@ router.put('/', upload, async (req: any, res: any) => {
 
 router.delete('/', async (req: any, res: any) => {
     const id = req.query.id;
-    if(id===undefined || id===null){
+    if (id === undefined || id === null) {
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
             status: 0,
             message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
         })
     }
-    else{
+    else {
         const userService: IUserService = new UserService();
         const response = await userService.Remove(id);
-    
+
         if (!response) {
             res.status(EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
                 status: 0,

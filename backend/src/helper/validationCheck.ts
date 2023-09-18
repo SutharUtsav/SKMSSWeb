@@ -4,7 +4,7 @@ import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enum
 import { EnumPermission, EnumPermissionName } from "../consts/enumPermission";
 import { EnumPermissionFor, EnumPermissionForName } from "../consts/enumPermissionFor";
 import { EnumRoleType, EnumRoleTypeName } from "../consts/enumRoleType";
-import { EnumUserStatus } from "../consts/enumUserStatus";
+import { EnumUserStatus, EnumUserStatusText } from "../consts/enumUserStatus";
 import { ErrorDto } from "../dtos/api-response-dto";
 import { FamilyDto } from "../dtos/family-dto";
 import { PermissionDto, RoleDto } from "../dtos/role-dto";
@@ -233,3 +233,47 @@ export const validateRolePermission = (body: PermissionDto): PermissionDto | Err
     return permissionDto;
 }
 
+
+//#region Validation Function for Bulk User Insert
+
+
+export const validateBulkEntries = (row: any):any=> {
+    let userProfileDto: UserProfileDto = new UserProfileDto();
+    let userDto : UserDto = new UserDto();
+    let familyDto : FamilyDto = new FamilyDto();
+
+    userDto.userType = EnumUserStatusText[EnumUserStatus.ADMINCREATED];
+    userDto.username = row[1];
+
+    userProfileDto.name = row[1];
+    userProfileDto.wifeSurname = row[10];
+    userProfileDto.marriedStatus = row[11];
+    userProfileDto.birthDate = row[12];
+    userProfileDto.weddingDate = row[13];
+    userProfileDto.education = row[14];
+    userProfileDto.occupation = row[15];
+    userProfileDto.countryCode = row[16];
+    userProfileDto.mobileNumber = row[17];
+    userProfileDto.email = row[18].text ? row[18].text : row[18]
+    userProfileDto.gender = String(row[19]).toUpperCase();
+    userProfileDto.mainFamilyMemberRelation = row[20];
+    
+
+    familyDto.surname = row[2];
+    familyDto.village = row[3];
+    familyDto.villageGuj = row[4];
+    familyDto.currResidency = row[5];
+    familyDto.adobeOfGod = row[6];
+    familyDto.goddess = row[7];
+    familyDto.lineage = row[8];
+    familyDto.residencyAddress = row[9];
+
+    
+    return {
+        userDto : userDto, 
+        userProfileDto: userProfileDto, 
+        familyDto :familyDto
+    };
+}
+
+//#endregion
