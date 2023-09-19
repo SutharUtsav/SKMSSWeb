@@ -1,6 +1,7 @@
 //this file includes all functions that checks validation for incoming req in api
 
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
+import { EnumFamilyMemberRelation, EnumFamilyMemberRelationName } from "../consts/enumFamilyMemberRelation";
 import { EnumPermission, EnumPermissionName } from "../consts/enumPermission";
 import { EnumPermissionFor, EnumPermissionForName } from "../consts/enumPermissionFor";
 import { EnumRoleType, EnumRoleTypeName } from "../consts/enumRoleType";
@@ -244,12 +245,15 @@ export const validateBulkEntries = (row: any):any=> {
 
     userDto.userType = EnumUserStatusText[EnumUserStatus.ADMINCREATED];
     userDto.username = row[1];
+    userDto.surname = row[2];
+    userDto.village = row[3];
+    userDto.currResidency = row[5];
 
     userProfileDto.name = row[1];
     userProfileDto.wifeSurname = row[10];
     userProfileDto.marriedStatus = row[11];
-    userProfileDto.birthDate = row[12];
-    userProfileDto.weddingDate = row[13];
+    userProfileDto.birthDate = new Date(row[12]);
+    userProfileDto.weddingDate = new Date(row[13]);
     userProfileDto.education = row[14];
     userProfileDto.occupation = row[15];
     userProfileDto.countryCode = row[16];
@@ -257,6 +261,18 @@ export const validateBulkEntries = (row: any):any=> {
     userProfileDto.email = row[18].text ? row[18].text : row[18]
     userProfileDto.gender = String(row[19]).toUpperCase();
     userProfileDto.mainFamilyMemberRelation = row[20];
+    userProfileDto.surname = row[2];
+    userProfileDto.village = row[3];
+    userProfileDto.currResidency = row[5];
+    userProfileDto.mainFamilyMemberName = row[21];
+    userProfileDto.mainFamilyMemberSurname = row[22];
+    userProfileDto.mainFamilyMemberVillage = row[23];
+    userProfileDto.motherName = row[24];
+    userProfileDto.motherSurname = row[25];
+    userProfileDto.motherVillage = row[26];
+    userProfileDto.fatherName = row[27];
+    userProfileDto.fatherSurname = row[28];
+    userProfileDto.fatherVillage = row[29];    
     
 
     familyDto.surname = row[2];

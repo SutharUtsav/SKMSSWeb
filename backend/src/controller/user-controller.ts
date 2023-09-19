@@ -103,22 +103,26 @@ router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
             })
         }
         else {
-
+            const roleId = response?.data.id;
             let userDtos: Array<UserDto> = [];
             let familyDtos: Array<FamilyDto> = [];
             let userProfileDtos: Array<UserProfileDto> = [];
 
             await worksheet.eachRow((row: any, rowNumber: number) => {
-                if (rowNumber !== 0) {
+                // rowNumber starts with 1
+                if (rowNumber !== 1) {
                     let { userDto, userProfileDto, familyDto } = validateBulkEntries(row.values);
+                    userDto.roleId = roleId;
 
                     userDtos.push(userDto);
                     userProfileDtos.push(userProfileDto);
                     familyDtos.push(familyDto);
                 }
             })
+
+            console.log(userProfileDtos)
             const userService: IUserService = new UserService();
-            const response = await userService.BulkInsert(userDtos, userProfileDtos, familyDtos);
+            response = await userService.BulkInsert(userDtos, userProfileDtos, familyDtos);
 
             if (!response) {
                 res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({

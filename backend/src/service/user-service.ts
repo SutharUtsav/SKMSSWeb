@@ -138,9 +138,44 @@ export class UserService extends BaseService implements IUserService {
         try{
             const families = await Family.bulkCreate(dtoFamiliesRecord, {fields: ['surname','village','currResidency','adobeOfGod','goddess','lineage', 'residencyAddress', 'villageGuj']})
 
-            const ids = await Family.findAll({ attributes: ['id'] })
+            // console.log(families)
+            const familyArray = families.map((family : any) => family.dataValues)
+            // const ids = await Family.findAll({ attributes: ['id'] })
 
-            console.log("ids: ", ids)
+            console.log(familyArray)
+            // console.log("ids: ", ids)
+
+            const users = await User.bulkCreate(dtoUsersRecord, {fields : ['username', 'userType', 'isImageAvailable','roleId']})
+
+            const userArray = users.map((user :any)=>user.dataValues);
+            console.log(userArray);
+
+            dtoProfilesRecord.forEach((profileRecord : UserProfileDto) => {
+                profileRecord.familyId  = familyArray.find((family : FamilyDto)=> family.surname === profileRecord.surname && family.village === profileRecord.village && family.currResidency === profileRecord.currResidency)?.id;
+                
+                if(profileRecord.mainFamilyMemberRelation.toUpperCase() !== EnumFamilyMemberRelationName[EnumFamilyMemberRelation.SELF]){
+                    profileRecord.isMainFamilyMember = false;
+                    const mainFamilyMemberUserId = userArray.find ( (user: UserDto)=> user.username === profileRecord.mainFamilyMemberName && user.surname === profileRecord.mainFamilyMemberSurname && user.village === profileRecord.mainFamilyMemberVillage)?.id;
+                    profileRecord.mainFamilyMemberId = mainFamilyMemberUserId;
+                }
+                else{ 
+                    profileRecord.isMainFamilyMember = true;
+                }
+
+                profileRecord.userId = userArray.find((user: UserDto)=> user.username === profileRecord.name && user.surname === profileRecord.surname && user.village === profileRecord.village && user.currResidency === profileRecord.currResidency)?.id
+                
+                profileRecord.fatherId = userArray.find((user: UserDto)=> user.username === profileRecord.fatherName && user.surname === profileRecord.fatherSurname && user.village === profileRecord.fatherVillage)?.id
+
+                profileRecord.motherId = userArray.find((user: UserDto)=> user.username === profileRecord.motherName && user.surname === profileRecord.motherSurname && user.village === profileRecord.motherVillage)?.id
+                
+            })
+
+            console.log("dtoProfilesRecord:",dtoProfilesRecord);
+
+            const userProfiles = await UserProfile.bulkCreate(dtoProfilesRecord, {fields : ['userId','name','wifeSurname','marriedStatus','birthDate','weddingDate','education','occupation','mobileNumber','email','countryCode','familyId','gender','isMainFamilyMember','mainFamilyMemberRelation','motherId','motherName','fatherId','fatherName']})
+
+            console.log(userProfiles)
+
             return apiResponse;
         }
         catch (error: any) {

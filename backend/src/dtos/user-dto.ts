@@ -5,6 +5,9 @@ import { PermissionDto, RoleDto, RoleLookUpDto } from "./role-dto";
 //#region User detail page Dto.
 export class UserDto extends BaseDtoWithCommonFields{
     username!:string;
+    surname!:string;
+    village!:string;
+    currResidency!:string
     userType!:string;
     roleId!:RoleDto;
 }
@@ -25,10 +28,10 @@ export class UserWithPermissionsDto extends UserDto{
  */
 export class UserProfileDto extends BaseDtoWithCommonFields{
     name!: string;
-    //surname!:string;
+    surname!:string;
     wifeSurname!:string;
-    // village!:string;
-    // currResidency!:string;
+    village!:string;
+    currResidency!:string;
     marriedStatus!:string;
     birthDate!:Date;
     weddingDate!:Date;
@@ -38,7 +41,7 @@ export class UserProfileDto extends BaseDtoWithCommonFields{
     countryCode!:string;
     email!:string;
     gender!:string;
-    isFamilyMember!:boolean;
+    isMainFamilyMember!:boolean;
     mainFamilyMemberId!:number;
     mainFamilyMemberSurname!:string;
     mainFamilyMemberName!:string;
@@ -53,6 +56,7 @@ export class UserProfileDto extends BaseDtoWithCommonFields{
     fatherSurname!:string;
     fatherVillage!:string;
     familyId!:number;
+    userId!:number;
 }
 
 /**
