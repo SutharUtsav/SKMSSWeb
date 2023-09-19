@@ -18,3 +18,13 @@ export const EnumApiResponseMsg : Record <EnumApiResponse,string> = {
     [EnumApiResponse.USER_EXIST] : "User Already Exist!",
     [EnumApiResponse.IMG_UPLOAD_SUCCESS] : "Image Uploaded Successfully",
 }
+
+export const EnumApiResponseCode : Record <EnumApiResponse, string> = {
+    [EnumApiResponse.UPDATED_SUCCESS] : "200",
+    [EnumApiResponse.REMOVE_SUCCESS] : "200",
+    [EnumApiResponse.DATA_ALREADY_EXIST] : "409",
+    [EnumApiResponse.NO_DATA_FOUND] : "503",
+    [EnumApiResponse.UNAUTHORIZED] : '401',
+    [EnumApiResponse.USER_EXIST] :'409',
+    [EnumApiResponse.IMG_UPLOAD_SUCCESS] : '200',
+}

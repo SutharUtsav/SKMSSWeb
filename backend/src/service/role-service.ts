@@ -1,4 +1,4 @@
-import { EnumApiResponse, EnumApiResponseMsg } from "../consts/enumApiResponse";
+import { EnumApiResponse, EnumApiResponseCode, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { PermissionDto, PermissionListDto, RoleDto } from "../dtos/role-dto";
@@ -17,6 +17,13 @@ export interface IRoleService {
      * @param id 
      */
     GetRecordById(id: number): Promise<ApiResponseDto | undefined>
+
+    /**
+     * Get Id of a role from role type
+     * @param roleType 
+     */
+    GetIdByRoleType(roleType: string): Promise<ApiResponseDto | undefined>;
+
     /**
      * Get Permission detais of the role
      */
@@ -101,23 +108,65 @@ export class RoleService extends BaseService implements IRoleService {
                 }
             });
 
-            if(role){
+            if (role) {
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
                 apiResponse.data = { roles: role }
             }
-            else{
+            else {
                 apiResponse = new ApiResponseDto();
                 let errorDto = new ErrorDto();
                 apiResponse.status = 0;
                 errorDto.errorCode = '200';
                 errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
                 apiResponse.error = errorDto;
-                
+
             }
             return apiResponse;
         }
         catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
+
+    /**
+    * Get Id of a role from role type
+    * @param roleType 
+    */
+    public async GetIdByRoleType(roleType: string): Promise<ApiResponseDto | undefined> {
+        let apiResponse = new ApiResponseDto();
+
+        try {
+            let roleId = await Role.findOne({
+                where: {
+                    roleType: roleType
+                },
+                attributes: ['id']
+            })
+
+            if (!roleId) {
+                apiResponse = new ApiResponseDto();
+                let errorDto = new ErrorDto();
+                errorDto.errorCode = EnumApiResponseCode[EnumApiResponse.NO_DATA_FOUND];
+                errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND];
+                apiResponse.status = 0;
+                apiResponse.error = errorDto;
+                return apiResponse;
+            }
+
+            apiResponse.status = 1;
+            apiResponse.data = {
+                id : roleId.dataValues.id
+            }
+
+            return apiResponse
+        } catch (error: any) {
             apiResponse = new ApiResponseDto();
             let errorDto = new ErrorDto();
             errorDto.errorCode = '400';

@@ -1,10 +1,13 @@
 import { upload } from "../config/multer";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
+import { EnumRoleType, EnumRoleTypeName } from "../consts/enumRoleType";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { FamilyDto } from "../dtos/family-dto";
 import { UserDto, UserProfileDto } from "../dtos/user-dto";
+import { createTable } from "../helper/stagingTable";
 import { validateBulkEntries, validateFamily, validateUser, validateUserProfile } from "../helper/validationCheck";
 import { authMiddleware } from "../middleware/auth-middleware";
+import { IRoleService, RoleService } from "../service/role-service";
 import { IUserService, UserService } from "../service/user-service";
 
 const express = require('express');
@@ -62,7 +65,8 @@ const excelSheetStorage = multer.diskStorage({
         cb(null, outputDir)
     },
     filename: (req: any, file: any, cb: any) => {
-        cb(null, Date.now() + path.extname(file.originalname))
+        const date = new Date();
+        cb(null, `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}-${date.getTime()}`)
     }
 });
 const uploadExcelSheet = multer({
@@ -84,28 +88,61 @@ const uploadExcelSheet = multer({
  * Bulk Insert of Users by excel sheet
  */
 router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
-    const workbook = new exceljs.Workbook();
-    await workbook.xlsx.readFile(req.file.path);
-    const worksheet = workbook.getWorksheet('Sheet1');
+    try {
+        const workbook = new exceljs.Workbook();
+        await workbook.xlsx.readFile(req.file.path);
+        const worksheet = workbook.getWorksheet('Sheet1');
 
-    // const userDtos : Array<UserDto> = [];
-    worksheet.eachRow((row: any, rowNumber: number) => {
-        if(rowNumber!==0){
-            var { userDto, userProfileDto, familyDto } = validateBulkEntries(row.values);
-            console.log(userDto);
-            console.log(userProfileDto);
-            console.log(familyDto)
+        const roleService: IRoleService = new RoleService();
+        let response = await roleService.GetIdByRoleType(EnumRoleTypeName[EnumRoleType.CustomRole]);
+
+        if (!response || response?.status === 0) {
+            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                status: 0,
+                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+            })
         }
-    })
-    
-    const data = worksheet.eachRow((row: any, rnumber: number) => {
-        return {
-            name: row[0],
-            age: row[1]
-        };
-    })
+        else {
 
-    res.send({ data: data });
+            let userDtos: Array<UserDto> = [];
+            let familyDtos: Array<FamilyDto> = [];
+            let userProfileDtos: Array<UserProfileDto> = [];
+
+            await worksheet.eachRow((row: any, rowNumber: number) => {
+                if (rowNumber !== 0) {
+                    let { userDto, userProfileDto, familyDto } = validateBulkEntries(row.values);
+
+                    userDtos.push(userDto);
+                    userProfileDtos.push(userProfileDto);
+                    familyDtos.push(familyDto);
+                }
+            })
+            const userService: IUserService = new UserService();
+            const response = await userService.BulkInsert(userDtos, userProfileDtos, familyDtos);
+
+            if (!response) {
+                res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                    status: 0,
+                    message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+                })
+            }
+            else {
+                res.send(response)
+            }
+        }
+    }
+    catch (err: any) {
+        let apiResponse = new ApiResponseDto();
+        let errorDto = new ErrorDto();
+        errorDto.errorCode = '404';
+        errorDto.errorMsg = err.toString();
+        apiResponse.status = 0;
+        apiResponse.error = errorDto;
+        res.status(404).send(apiResponse)
+    }
+
+
+
 })
 
 //#endregion

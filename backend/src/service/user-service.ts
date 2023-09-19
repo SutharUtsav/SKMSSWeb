@@ -31,6 +31,14 @@ export interface IUserService {
     Create(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto, dtoFamilyRecord: FamilyDto): Promise<ApiResponseDto | undefined>;
 
     /**
+     * Create Bulk Record for entity Family, User, UserProfile 
+     * @param dtoUsersRecord 
+     * @param dtoProfilesRecord 
+     * @param dtoFamiliesRecord 
+     */
+    BulkInsert(dtoUsersRecord: Array<UserDto>, dtoProfilesRecord: Array<UserProfileDto>, dtoFamiliesRecord: Array<FamilyDto>) : Promise<ApiResponseDto | undefined>;
+    
+    /**
      * Update Record in User
      * @param dtoRecord 
      * @param id 
@@ -117,6 +125,35 @@ export class UserService extends BaseService implements IUserService {
 
         return { status: 1 }
     }
+
+    /**
+     * Create Bulk Record for entity Family, User, UserProfile 
+     * @param dtoUsersRecord 
+     * @param dtoProfilesRecord 
+     * @param dtoFamiliesRecord 
+     */
+    public async BulkInsert(dtoUsersRecord: Array<UserDto>, dtoProfilesRecord: Array<UserProfileDto>, dtoFamiliesRecord: Array<FamilyDto>) : Promise<ApiResponseDto | undefined>{
+        let apiResponse !:ApiResponseDto;
+
+        try{
+            const families = await Family.bulkCreate(dtoFamiliesRecord, {fields: ['surname','village','currResidency','adobeOfGod','goddess','lineage', 'residencyAddress', 'villageGuj']})
+
+            const ids = await Family.findAll({ attributes: ['id'] })
+
+            console.log("ids: ", ids)
+            return apiResponse;
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
+    
 
     //#endregion
 
