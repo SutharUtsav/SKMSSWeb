@@ -18,6 +18,11 @@ export const Sidebar = () => {
           <NavLink end to='/admin' className='nav-link link-dark'>Dashboard</NavLink>
         </li>
 
+        <li>
+          <NavLink end to='/admin/families' className='nav-link link-dark'>
+            Family
+          </NavLink>
+        </li>
 
         <li>
           <NavLink end to='/admin/users' className='nav-link link-dark'>

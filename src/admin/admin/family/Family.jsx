@@ -1,16 +1,25 @@
 import React from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
-export const User = () => {
-  return (
-    <div className='users content'>
+const Family = () => {
+
+    //load Family Records on Page Load 
+    useEffect(() => {
+
+        
+
+    }, [])
+
+    return (
+        <div className='families content'>
             <div className='content-header d-flex flex-row justify-content-between align-items-center'>
-                <h3 className='fs-1'>User</h3>
+                <h3 className='fs-1'>Family</h3>
 
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item fs-3"><Link to="/admin" >Dashboard</Link></li>
-                        <li class="breadcrumb-item active fs-3  " aria-current="page" >User</li>
+                        <li class="breadcrumb-item active fs-3  " aria-current="page" >Family</li>
                     </ol>
                 </nav>
 
@@ -18,7 +27,7 @@ export const User = () => {
 
             <div className='card content-main'>
                 <div className='card-header content-title'>
-                    <h4>User</h4>
+                    <h4>Family</h4>
                     <span className="pull-right">
                         <button>Add New</button>
 
@@ -51,7 +60,7 @@ export const User = () => {
                                         <div>Name</div>
                                         {/* <span className='sr-only'> (Click to sort ascending) </span> */}
                                     </th>
-                                
+
                                     <th className="position-relative text-center" role='columnheader' scope='col' tabIndex='0' aria-colindex='3' aria-sort="none">
                                         <div>Description</div>
                                         {/* <span className='sr-only'> (Click to sort ascending) </span> */}
@@ -95,7 +104,7 @@ export const User = () => {
 
             </div>
         </div>
-  )
+    )
 }
 
-export default User
+export default Family

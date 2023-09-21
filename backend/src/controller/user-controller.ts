@@ -124,6 +124,10 @@ router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
                 }
             })
 
+            // console.log("FamilyDtos:", familyDtos)
+            // console.log("UserDtos:", userDtos)
+            // console.log("UserProfileDtos:", userProfileDtos)
+
             
             const userService: IUserService = new UserService();
             response = await userService.BulkInsert(userDtos, userProfileDtos, familyDtos);
@@ -139,11 +143,8 @@ router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
                 if(response.status === 0){
                     RemoveFile(req.file.path);
                 }
-                res.send(response)
+                res.status(200).send(response)
             }
-
-
-
         }
     }
     catch (err: any) {

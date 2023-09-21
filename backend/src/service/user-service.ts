@@ -173,6 +173,7 @@ export class UserService extends BaseService implements IUserService {
 
             await transaction.commit();
 
+            apiResponse = new ApiResponseDto()
             apiResponse.status = 1;
             apiResponse.data = {
                 status : EnumApiResponseCode[EnumApiResponse.DATA_UPLOAD_SUCCESS],
@@ -181,6 +182,7 @@ export class UserService extends BaseService implements IUserService {
             return apiResponse;
         }
         catch (error: any) {
+            
             await transaction.rollback();
             apiResponse = new ApiResponseDto();
             let errorDto = new ErrorDto();
