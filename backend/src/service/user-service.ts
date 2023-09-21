@@ -1,15 +1,17 @@
-import { EnumApiResponse, EnumApiResponseMsg } from "../consts/enumApiResponse";
+import { EnumApiResponse, EnumApiResponseCode, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { EnumFamilyMemberRelation, EnumFamilyMemberRelationName } from "../consts/enumFamilyMemberRelation";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { FamilyDto } from "../dtos/family-dto";
 import { UserDto, UserProfileDto, UserProfileImageDto } from "../dtos/user-dto";
+import { RemoveFile } from "../helper/file-handling";
 import { Family } from "../model/family";
 import { Role } from "../model/role";
 import { User } from "../model/user";
 import { UserProfile, UserProfileImage } from "../model/userProfile";
 import { BaseService } from "./base-service";
 
+const sequelize = require('../config/db')
 
 export interface IUserService {
 
@@ -36,8 +38,8 @@ export interface IUserService {
      * @param dtoProfilesRecord 
      * @param dtoFamiliesRecord 
      */
-    BulkInsert(dtoUsersRecord: Array<UserDto>, dtoProfilesRecord: Array<UserProfileDto>, dtoFamiliesRecord: Array<FamilyDto>) : Promise<ApiResponseDto | undefined>;
-    
+    BulkInsert(dtoUsersRecord: Array<UserDto>, dtoProfilesRecord: Array<UserProfileDto>, dtoFamiliesRecord: Array<FamilyDto>): Promise<ApiResponseDto | undefined>;
+
     /**
      * Update Record in User
      * @param dtoRecord 
@@ -101,84 +103,85 @@ export class UserService extends BaseService implements IUserService {
     //#region spicific services
 
     /**
-     * Function to remove file from specific path
-     * @param filePath 
-     * @returns 
-     */
-    private RemoveImageFile(filePath: string) {
-        const absoluteFilePath = this.path.resolve(filePath);
-
-        // Check if the file exists before attempting to delete it
-        if (this.fs.existsSync(absoluteFilePath)) {
-            this.fs.unlink(absoluteFilePath, (err: any) => {
-                if (err) {
-                    return {
-                        status: 0,
-                        message: err
-                    };
-                }
-                else {
-                    return { status: 1 };
-                }
-            });
-        }
-
-        return { status: 1 }
-    }
-
-    /**
      * Create Bulk Record for entity Family, User, UserProfile 
      * @param dtoUsersRecord 
      * @param dtoProfilesRecord 
      * @param dtoFamiliesRecord 
      */
-    public async BulkInsert(dtoUsersRecord: Array<UserDto>, dtoProfilesRecord: Array<UserProfileDto>, dtoFamiliesRecord: Array<FamilyDto>) : Promise<ApiResponseDto | undefined>{
-        let apiResponse !:ApiResponseDto;
+    public async BulkInsert(dtoUsersRecord: Array<UserDto>, dtoProfilesRecord: Array<UserProfileDto>, dtoFamiliesRecord: Array<FamilyDto>): Promise<ApiResponseDto | undefined> {
+        let apiResponse !: ApiResponseDto;
 
-        try{
-            const families = await Family.bulkCreate(dtoFamiliesRecord, {fields: ['surname','village','currResidency','adobeOfGod','goddess','lineage', 'residencyAddress', 'villageGuj']})
+        const transaction = await sequelize.transaction();
+        try {
+            const families = await Family.bulkCreate(dtoFamiliesRecord, { fields: ['surname', 'village', 'currResidency', 'adobeOfGod', 'goddess', 'lineage', 'residencyAddress', 'villageGuj', 'mainFamilyMemberName'], transaction })
 
-            // console.log(families)
-            const familyArray = families.map((family : any) => family.dataValues)
-            // const ids = await Family.findAll({ attributes: ['id'] })
+            if (!families) {
+                throw new Error("Error Occurs while Inserting Into Family Entity")
+            }
+            const familyArray = families.map((family: any) => family.dataValues)
 
-            console.log(familyArray)
-            // console.log("ids: ", ids)
 
-            const users = await User.bulkCreate(dtoUsersRecord, {fields : ['username', 'userType', 'isImageAvailable','roleId']})
+            const users = await User.bulkCreate(dtoUsersRecord, { fields: ['username', 'userType', 'isImageAvailable', 'roleId', 'surname', 'village'], transaction })
+            if (!users) {
+                throw new Error("Error Occurs while Inserting Into User Entity")
+            }
+            const userArray = users.map((user: any) => user.dataValues);
 
-            const userArray = users.map((user :any)=>user.dataValues);
-            console.log(userArray);
 
-            dtoProfilesRecord.forEach((profileRecord : UserProfileDto) => {
-                profileRecord.familyId  = familyArray.find((family : FamilyDto)=> family.surname === profileRecord.surname && family.village === profileRecord.village && family.currResidency === profileRecord.currResidency)?.id;
-                
-                if(profileRecord.mainFamilyMemberRelation.toUpperCase() !== EnumFamilyMemberRelationName[EnumFamilyMemberRelation.SELF]){
+            dtoProfilesRecord.forEach((profileRecord: UserProfileDto) => {
+                profileRecord.familyId = familyArray.find((family: FamilyDto) => family.surname === profileRecord.surname && family.village === profileRecord.village && family.currResidency === profileRecord.currResidency)?.id;
+
+                if (profileRecord.mainFamilyMemberRelation.toUpperCase() !== EnumFamilyMemberRelationName[EnumFamilyMemberRelation.SELF]) {
                     profileRecord.isMainFamilyMember = false;
-                    const mainFamilyMemberUserId = userArray.find ( (user: UserDto)=> user.username === profileRecord.mainFamilyMemberName && user.surname === profileRecord.mainFamilyMemberSurname && user.village === profileRecord.mainFamilyMemberVillage)?.id;
-                    profileRecord.mainFamilyMemberId = mainFamilyMemberUserId;
+
                 }
-                else{ 
+                else {
                     profileRecord.isMainFamilyMember = true;
                 }
 
-                profileRecord.userId = userArray.find((user: UserDto)=> user.username === profileRecord.name && user.surname === profileRecord.surname && user.village === profileRecord.village && user.currResidency === profileRecord.currResidency)?.id
-                
-                profileRecord.fatherId = userArray.find((user: UserDto)=> user.username === profileRecord.fatherName && user.surname === profileRecord.fatherSurname && user.village === profileRecord.fatherVillage)?.id
+                const mainFamilyMemberUserId = userArray.find((user: UserDto) => user.username === profileRecord.mainFamilyMemberName && user.surname === profileRecord.mainFamilyMemberSurname && user.village === profileRecord.mainFamilyMemberVillage)?.id;
+                profileRecord.mainFamilyMemberId = mainFamilyMemberUserId;
 
-                profileRecord.motherId = userArray.find((user: UserDto)=> user.username === profileRecord.motherName && user.surname === profileRecord.motherSurname && user.village === profileRecord.motherVillage)?.id
-                
+                profileRecord.userId = userArray.find((user: UserDto) => user.username === profileRecord.name && user.surname === profileRecord.surname && user.village === profileRecord.village)?.id
+
+                const father: UserDto = userArray.find((user: UserDto) => user.username === profileRecord.fatherName && user.surname === profileRecord.fatherSurname && user.village === profileRecord.fatherVillage);
+                if (father) {
+                    profileRecord.fatherId = father.id;
+                    profileRecord.fatherName = father.username;
+                }
+                else {
+                    profileRecord.fatherId = null;
+                    profileRecord.fatherName = null;
+                }
+
+                const mother = userArray.find((user: UserDto) => user.username === profileRecord.motherName && user.surname === profileRecord.motherSurname && user.village === profileRecord.motherVillage)?.id
+                if (mother) {
+                    profileRecord.motherId = mother.id;
+                    profileRecord.motherName = mother.name;
+                }
+                else {
+                    profileRecord.motherId = null;
+                    profileRecord.motherName = null;
+                }
             })
 
-            console.log("dtoProfilesRecord:",dtoProfilesRecord);
+            const userProfiles = await UserProfile.bulkCreate(dtoProfilesRecord, { fields: ['userId', 'name', 'wifeSurname', 'marriedStatus', 'birthDate', 'weddingDate', 'education', 'occupation', 'mobileNumber', 'email', 'countryCode', 'familyId', 'gender', 'isMainFamilyMember', 'mainFamilyMemberRelation', 'motherId', 'motherName', 'fatherId', 'fatherName'], transaction })
+            if (!userProfiles) {
+                throw new Error("Error Occurs while Inserting Into UserProfile Entity")
+            }
 
-            const userProfiles = await UserProfile.bulkCreate(dtoProfilesRecord, {fields : ['userId','name','wifeSurname','marriedStatus','birthDate','weddingDate','education','occupation','mobileNumber','email','countryCode','familyId','gender','isMainFamilyMember','mainFamilyMemberRelation','motherId','motherName','fatherId','fatherName']})
 
-            console.log(userProfiles)
+            await transaction.commit();
 
+            apiResponse.status = 1;
+            apiResponse.data = {
+                status : EnumApiResponseCode[EnumApiResponse.DATA_UPLOAD_SUCCESS],
+                message : EnumApiResponseMsg[EnumApiResponse.DATA_UPLOAD_SUCCESS]
+            }
             return apiResponse;
         }
         catch (error: any) {
+            await transaction.rollback();
             apiResponse = new ApiResponseDto();
             let errorDto = new ErrorDto();
             errorDto.errorCode = '400';
@@ -188,7 +191,7 @@ export class UserService extends BaseService implements IUserService {
             return apiResponse;
         }
     }
-    
+
 
     //#endregion
 
@@ -444,7 +447,7 @@ export class UserService extends BaseService implements IUserService {
             }
 
             //set mainFamilyMemberId
-            if (dtoProfileRecord.mainFamilyMemberRelation = EnumFamilyMemberRelationName[EnumFamilyMemberRelation.SELF]) {
+            if (dtoProfileRecord.mainFamilyMemberRelation === EnumFamilyMemberRelationName[EnumFamilyMemberRelation.SELF]) {
                 dtoProfileRecord.mainFamilyMemberId = user.id;
             }
             else {
@@ -827,8 +830,8 @@ export class UserService extends BaseService implements IUserService {
                         apiResponse.status = 1;
                         apiResponse.data = {
                             userProfileImage: {
-                                status : 1,
-                                message : EnumApiResponseMsg[EnumApiResponse.IMG_UPLOAD_SUCCESS]
+                                status: 1,
+                                message: EnumApiResponseMsg[EnumApiResponse.IMG_UPLOAD_SUCCESS]
                             }
                         }
                         return apiResponse;
@@ -884,8 +887,8 @@ export class UserService extends BaseService implements IUserService {
                 return apiResponse;
             }
 
-            const fileRemoveResp : any = await this.RemoveImageFile(foundUserProfile.image);
-            const originalFileRemoveResp : any = await this.RemoveImageFile(foundUserProfile.originalImage);
+            const fileRemoveResp: any = await RemoveFile(foundUserProfile.image);
+            const originalFileRemoveResp: any = await RemoveFile(foundUserProfile.originalImage);
 
             if (fileRemoveResp.status === 0 || originalFileRemoveResp.status === 0) {
                 apiResponse = new ApiResponseDto();
@@ -902,7 +905,7 @@ export class UserService extends BaseService implements IUserService {
                     userId: id
                 }
             })
-    
+
             const respUpdateUserField = await User.update({
                 isImageAvailable: false
             }, {
@@ -910,7 +913,7 @@ export class UserService extends BaseService implements IUserService {
                     id: id
                 }
             })
-    
+
             if (!resp || !respUpdateUserField) {
                 apiResponse = new ApiResponseDto();
                 let errorDto = new ErrorDto();
@@ -920,7 +923,7 @@ export class UserService extends BaseService implements IUserService {
                 apiResponse.error = errorDto;
                 return apiResponse;
             }
-    
+
             apiResponse = new ApiResponseDto();
             apiResponse.status = 1;
             apiResponse.data = {
@@ -941,14 +944,14 @@ export class UserService extends BaseService implements IUserService {
         }
     }
 
-    
+
     /**
      * Find User Id by User's details
      * @param name 
      * @param village 
      * @param surname 
      */
-    public async findUserIdByDetails(name: string, village: string | undefined, surname: string | undefined, familyId: number | null = null): Promise<ApiResponseDto | undefined> {
+    public async findUserIdByDetails(name: string | null, village: string | undefined, surname: string | undefined, familyId: number | null = null): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
 
         try {

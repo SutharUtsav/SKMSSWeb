@@ -7,7 +7,6 @@ export class UserDto extends BaseDtoWithCommonFields{
     username!:string;
     surname!:string;
     village!:string;
-    currResidency!:string
     userType!:string;
     roleId!:RoleDto;
 }
@@ -42,17 +41,17 @@ export class UserProfileDto extends BaseDtoWithCommonFields{
     email!:string;
     gender!:string;
     isMainFamilyMember!:boolean;
-    mainFamilyMemberId!:number;
+    mainFamilyMemberId!:number|null;
     mainFamilyMemberSurname!:string;
     mainFamilyMemberName!:string;
     mainFamilyMemberVillage!:string;
     mainFamilyMemberRelation!:string;
-    motherId!:number;
-    motherName!:string;
+    motherId!:number|null;
+    motherName!:string|null;
     motherSurname!:string;
     motherVillage!:string;
-    fatherId!:number;
-    fatherName!:string;
+    fatherId!:number|null;
+    fatherName!:string|null;
     fatherSurname!:string;
     fatherVillage!:string;
     familyId!:number;

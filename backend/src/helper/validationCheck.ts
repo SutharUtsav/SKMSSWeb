@@ -244,45 +244,44 @@ export const validateBulkEntries = (row: any):any=> {
     let familyDto : FamilyDto = new FamilyDto();
 
     userDto.userType = EnumUserStatusText[EnumUserStatus.ADMINCREATED];
-    userDto.username = row[1];
-    userDto.surname = row[2];
-    userDto.village = row[3];
-    userDto.currResidency = row[5];
+    userDto.username = String(row[1])?.trim();
+    userDto.surname = String(row[2])?.trim();
+    userDto.village = String(row[3])?.trim();
 
-    userProfileDto.name = row[1];
-    userProfileDto.wifeSurname = row[10];
-    userProfileDto.marriedStatus = row[11];
+    userProfileDto.name = String(row[1])?.trim();
+    userProfileDto.wifeSurname = String(row[10])?.trim();
+    userProfileDto.marriedStatus = String(row[11])?.trim();
     userProfileDto.birthDate = new Date(row[12]);
     userProfileDto.weddingDate = new Date(row[13]);
-    userProfileDto.education = row[14];
-    userProfileDto.occupation = row[15];
-    userProfileDto.countryCode = row[16];
-    userProfileDto.mobileNumber = row[17];
-    userProfileDto.email = row[18].text ? row[18].text : row[18]
-    userProfileDto.gender = String(row[19]).toUpperCase();
-    userProfileDto.mainFamilyMemberRelation = row[20];
-    userProfileDto.surname = row[2];
-    userProfileDto.village = row[3];
-    userProfileDto.currResidency = row[5];
-    userProfileDto.mainFamilyMemberName = row[21];
-    userProfileDto.mainFamilyMemberSurname = row[22];
-    userProfileDto.mainFamilyMemberVillage = row[23];
-    userProfileDto.motherName = row[24];
-    userProfileDto.motherSurname = row[25];
-    userProfileDto.motherVillage = row[26];
-    userProfileDto.fatherName = row[27];
-    userProfileDto.fatherSurname = row[28];
-    userProfileDto.fatherVillage = row[29];    
-    
+    userProfileDto.education = String(row[14])?.trim();
+    userProfileDto.occupation = String(row[15])?.trim();
+    userProfileDto.countryCode = String(row[16])?.trim();
+    userProfileDto.mobileNumber = String(row[17])?.trim();
+    userProfileDto.email = row[18].text ? row[18].text : String(row[18]).trim;
+    userProfileDto.gender = String(row[19])?.trim().toUpperCase();
+    userProfileDto.mainFamilyMemberRelation = String(row[20])?.trim();
+    userProfileDto.surname = String(row[2])?.trim();
+    userProfileDto.village = String(row[3])?.trim();
+    userProfileDto.currResidency = String(row[5])?.trim();
+    userProfileDto.mainFamilyMemberName = String(row[21])?.trim();
+    userProfileDto.mainFamilyMemberSurname = String(row[22])?.trim();
+    userProfileDto.mainFamilyMemberVillage = String(row[23])?.trim();
+    userProfileDto.motherName = String(row[24])?.trim();
+    userProfileDto.motherSurname = String(row[25])?.trim();
+    userProfileDto.motherVillage = String(row[26])?.trim();
+    userProfileDto.fatherName = String(row[27])?.trim();
+    userProfileDto.fatherSurname = String(row[28])?.trim();
+    userProfileDto.fatherVillage = String(row[29])?.trim();    
 
-    familyDto.surname = row[2];
-    familyDto.village = row[3];
-    familyDto.villageGuj = row[4];
-    familyDto.currResidency = row[5];
-    familyDto.adobeOfGod = row[6];
-    familyDto.goddess = row[7];
-    familyDto.lineage = row[8];
-    familyDto.residencyAddress = row[9];
+    familyDto.surname = String(row[2])?.trim();
+    familyDto.village = String(row[3])?.trim();
+    familyDto.villageGuj = String(row[4])?.trim();
+    familyDto.currResidency = String(row[5])?.trim();
+    familyDto.adobeOfGod = String(row[6])?.trim();
+    familyDto.goddess = String(row[7])?.trim();
+    familyDto.lineage = String(row[8])?.trim();
+    familyDto.residencyAddress = String(row[9])?.trim();
+    familyDto.mainFamilyMemberName = String(row[21])?.trim();
 
     
     return {

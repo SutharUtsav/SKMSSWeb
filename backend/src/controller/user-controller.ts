@@ -4,6 +4,7 @@ import { EnumRoleType, EnumRoleTypeName } from "../consts/enumRoleType";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { FamilyDto } from "../dtos/family-dto";
 import { UserDto, UserProfileDto } from "../dtos/user-dto";
+import { RemoveFile } from "../helper/file-handling";
 import { createTable } from "../helper/stagingTable";
 import { validateBulkEntries, validateFamily, validateUser, validateUserProfile } from "../helper/validationCheck";
 import { authMiddleware } from "../middleware/auth-middleware";
@@ -116,23 +117,33 @@ router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
 
                     userDtos.push(userDto);
                     userProfileDtos.push(userProfileDto);
-                    familyDtos.push(familyDto);
+
+                    if (!familyDtos.some((family: FamilyDto) => family.surname === familyDto.surname && family.village === familyDto.village && family.currResidency === familyDto.currResidency && family.mainFamilyMemberName === familyDto.mainFamilyMemberName)) {
+                        familyDtos.push(familyDto);
+                    }
                 }
             })
 
-            console.log(userProfileDtos)
+            
             const userService: IUserService = new UserService();
             response = await userService.BulkInsert(userDtos, userProfileDtos, familyDtos);
 
             if (!response) {
+                RemoveFile(req.file.path);
                 res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
                     status: 0,
                     message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
                 })
             }
             else {
+                if(response.status === 0){
+                    RemoveFile(req.file.path);
+                }
                 res.send(response)
             }
+
+
+
         }
     }
     catch (err: any) {
@@ -148,6 +159,8 @@ router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
 
 
 })
+
+
 
 //#endregion
 

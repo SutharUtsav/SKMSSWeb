@@ -28,5 +28,8 @@ export const Family = sequelize.define('Family', {
     residencyAddress: {
         type: DataTypes.TEXT
     },
+    mainFamilyMemberName : {
+        type : DataTypes.TEXT
+    },
     ...ModelBaseWithCommonFields
 }, { tableName: 'Family' })

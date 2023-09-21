@@ -11,6 +11,7 @@ export class FamilyDto extends BaseDtoWithCommonFields{
     lineage!:string;
     residencyAddress!:string;
     villageGuj!:string;
+    mainFamilyMemberName!:string;
 }
 
 //#endregion

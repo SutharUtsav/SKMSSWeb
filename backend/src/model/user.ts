@@ -13,6 +13,12 @@ export const User = sequelize.define('User',{
     isImageAvailable : {
         type : DataTypes.BOOLEAN
     },
+    surname : {
+        type : DataTypes.STRING
+    },
+    village: {
+        type : DataTypes.STRING
+    },
     ...ModelBaseWithCommonFields
 },{tableName : 'User'})
 

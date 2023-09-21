@@ -13,10 +13,10 @@ export const UserProfile = sequelize.define('UserProfile', {
     /**
      * Person's Surname
      */
-    // surname: {
-    //     type: DataTypes.STRING,
-    //     allowNull: false
-    // },
+    surname: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     /**
      * Surname of Person's Wife  
      */
@@ -26,10 +26,10 @@ export const UserProfile = sequelize.define('UserProfile', {
     /**
      * City/Village
      */
-    // city:{
-    //     type: DataTypes.STRING,
-    //     allowNull: false
-    // },
+    village:{
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     /**
      * Current Residency
      */
