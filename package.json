@@ -9,6 +9,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "body-parser": "^1.20.2",
+    "cheerio": "^1.0.0-rc.12",
     "concurrently": "^8.2.1",
     "dotenv": "^16.3.1",
     "exceljs": "^4.3.0",
@@ -38,8 +39,8 @@
     "nodemon": "^2.0.22"
   },
   "scripts": {
-    "build": "tsc && cd frontend && react-scripts build",
-    "start": "concurrently \"cd frontend && serve -s build\" \"node dist/index.js\"",
+    "build": "tsc && cd src && react-scripts build",
+    "start": "concurrently \"cd src && serve -s build\" \"node dist/index.js\"",
     "build-frontend": "cd frontend && react-scripts build",
     "start-frontend": "react-scripts start",
     "build-backend": "tsc",

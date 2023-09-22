@@ -1,4 +1,3 @@
-
 const dotenv = require('dotenv');
 dotenv.config();
 const express = require('express')
@@ -7,7 +6,6 @@ const bodyParser = require('body-parser')
 const db = require('./config/db')
 
 import { dbContext } from "./model/dbContext";
-
 
 const initApp = async () => {
     const PORT = process.env['PORT'] ?? 3030
@@ -36,6 +34,7 @@ const initApp = async () => {
         const userProfileController = require('./controller/user-profile-controller');
         const authController = require('./controller/auth-controller');
         const familyController = require('./controller/family-controller');
+        const vastipatrakController = require('./controller/vasti-patrak-controller');
 
         app.use(`${commonURL}/person`, personController);
         app.use(`${commonURL}/role`, roleController);
@@ -43,6 +42,7 @@ const initApp = async () => {
         app.use(`${commonURL}/family`, familyController);
         app.use(`${commonURL}/user`, userController);
         app.use(`${commonURL}/user-profile`, userProfileController);
+        app.use(`${commonURL}/vastipatrak`, vastipatrakController);
         app.use(`${commonURL}/login`,authController);
 
 
