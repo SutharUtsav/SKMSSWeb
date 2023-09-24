@@ -2,15 +2,20 @@ const path = require('path');
 const fs = require('fs');
 
 const responseMsg = {
-    FILE_NOT_EXIST : "File Doesn't Exist",
-    FILE_REMOVED : "File Removed Successfully"
+    FILE_NOT_EXIST: "File Doesn't Exist",
+    FILE_REMOVED: "File Removed Successfully"
 }
 
 const responseCode = {
-    FILE_NOT_EXIST : -1,
-    FILE_REMOVED : 1
+    FILE_NOT_EXIST: -1,
+    FILE_REMOVED: 1
 }
 
+/**
+ * Remove Specific file base on file path
+ * @param filePath 
+ * @returns 
+ */
 export const RemoveFile = async (filePath: string) => {
     const absoluteFilePath = path.resolve(filePath);
 
@@ -24,7 +29,7 @@ export const RemoveFile = async (filePath: string) => {
                 };
             }
             else {
-                return { 
+                return {
                     status: responseCode.FILE_REMOVED,
                     message: responseMsg.FILE_REMOVED
                 };
@@ -32,8 +37,47 @@ export const RemoveFile = async (filePath: string) => {
         });
     }
 
-    return { 
+    return {
         status: responseCode.FILE_NOT_EXIST,
         message: responseMsg.FILE_NOT_EXIST
-     }
+    }
+}
+
+/**
+ * Remove every files from a directory
+ * @param folderPath 
+ */
+export const RemoveFilesFromDirectory = async (directoryPath: string) => {
+
+    fs.readdir(directoryPath, (err:any, files:any) => {
+        if (err) {
+          console.error('Error reading directory:', err);
+          return;
+        }
+      
+        // Iterate over the files in the directory
+        for (const file of files) {
+          const filePath = path.join(directoryPath, file);
+      
+          // Check if the file is a regular file (not a directory)
+          fs.stat(filePath, (err:any, stats:any) => {
+            if (err) {
+              console.error('Error checking file stats:', err);
+              return;
+            }
+      
+            if (stats.isFile()) {
+              // Remove the file
+              fs.unlink(filePath, (err:any) => {
+                if (err) {
+                  console.error('Error deleting file:', err);
+                } else {
+                  console.log(`Deleted file: ${filePath}`);
+                }
+              });
+            }
+          });
+        }
+      });
+      
 }

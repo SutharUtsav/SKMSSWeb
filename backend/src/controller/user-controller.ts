@@ -8,6 +8,7 @@ import { RemoveFile } from "../helper/file-handling";
 import { createTable } from "../helper/stagingTable";
 import { validateBulkEntries, validateFamily, validateUser, validateUserProfile } from "../helper/validationCheck";
 import { authMiddleware } from "../middleware/auth-middleware";
+import { BaseService } from "../service/base-service";
 import { IRoleService, RoleService } from "../service/role-service";
 import { IUserService, UserService } from "../service/user-service";
 
@@ -24,7 +25,6 @@ const exceljs = require('exceljs')
  * Find User's Id by User's Details
  */
 router.get('/findid', async (req: any, res: any) => {
-    console.log("FindId")
     const name = req.query.name;
     const surname = req.query.surname;
     const village = req.query.village;
@@ -93,7 +93,7 @@ router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
         const workbook = new exceljs.Workbook();
         await workbook.xlsx.readFile(req.file.path);
         const worksheet = workbook.getWorksheet('Sheet1');
-
+        
         const roleService: IRoleService = new RoleService();
         let response = await roleService.GetIdByRoleType(EnumRoleTypeName[EnumRoleType.CustomRole]);
 
@@ -109,11 +109,22 @@ router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
             let familyDtos: Array<FamilyDto> = [];
             let userProfileDtos: Array<UserProfileDto> = [];
 
+            
+
+            const baseService = new BaseService();
             await worksheet.eachRow((row: any, rowNumber: number) => {
                 // rowNumber starts with 1
                 if (rowNumber !== 1) {
                     let { userDto, userProfileDto, familyDto } = validateBulkEntries(row.values);
                     userDto.roleId = roleId;
+
+                    baseService.SetRecordCreatedInfo(userDto)
+                    baseService.SetRecordCreatedInfo(userProfileDto)
+                    baseService.SetRecordCreatedInfo(familyDto)
+
+                    baseService.SetRecordModifiedInfo(userDto)
+                    baseService.SetRecordModifiedInfo(userProfileDto)
+                    baseService.SetRecordModifiedInfo(familyDto)
 
                     userDtos.push(userDto);
                     userProfileDtos.push(userProfileDto);
@@ -145,6 +156,9 @@ router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
                 }
                 res.status(200).send(response)
             }
+
+
+
         }
     }
     catch (err: any) {

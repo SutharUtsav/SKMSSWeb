@@ -34,7 +34,7 @@ export const validateFamily = (body: FamilyDto): FamilyDto | ErrorDto | undefine
     // }
 
     //check all required fields
-    if (!body.surname || !body.village || !body.currResidency || !body.adobeOfGod || !body.goddess || !body.residencyAddress || !body.villageGuj) {
+    if (!body.surname || !body.village || !body.currResidency || !body.adobeOfGod || !body.goddess || !body.residencyAddress || !body.villageGuj || !body.mainFamilyMemberName) {
         let errorDto = new ErrorDto();
         errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
         errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
@@ -50,6 +50,7 @@ export const validateFamily = (body: FamilyDto): FamilyDto | ErrorDto | undefine
     familyDto.goddess = body.goddess;
     familyDto.lineage = body.lineage;
     familyDto.residencyAddress = body.residencyAddress;
+    familyDto.mainFamilyMemberName = body.mainFamilyMemberName;
 
     return familyDto;
 }
@@ -273,15 +274,15 @@ export const validateBulkEntries = (row: any):any=> {
     userProfileDto.fatherSurname = String(row[28])?.trim();
     userProfileDto.fatherVillage = String(row[29])?.trim();    
 
-    familyDto.surname = String(row[2])?.trim();
-    familyDto.village = String(row[3])?.trim();
-    familyDto.villageGuj = String(row[4])?.trim();
-    familyDto.currResidency = String(row[5])?.trim();
-    familyDto.adobeOfGod = String(row[6])?.trim();
-    familyDto.goddess = String(row[7])?.trim();
-    familyDto.lineage = String(row[8])?.trim();
-    familyDto.residencyAddress = String(row[9])?.trim();
-    familyDto.mainFamilyMemberName = String(row[21])?.trim();
+    familyDto.surname = String(row[2])?.trim()=== "undefined" ? null : String(row[2])?.trim();
+    familyDto.village = String(row[3])?.trim()=== "undefined" ? null : String(row[3])?.trim();
+    familyDto.villageGuj = String(row[4])?.trim()=== "undefined" ? null : String(row[4])?.trim();
+    familyDto.currResidency = String(row[5])?.trim()=== "undefined" ? null : String(row[5])?.trim();;
+    familyDto.adobeOfGod = String(row[6])?.trim() === "undefined" ? null : String(row[6])?.trim();;
+    familyDto.goddess = String(row[7])?.trim()=== "undefined" ? null : String(row[7])?.trim();;
+    familyDto.lineage = String(row[8])?.trim() === "undefined" ? null : String(row[8])?.trim();
+    familyDto.residencyAddress = String(row[9])?.trim()=== "undefined" ? null : String(row[9])?.trim();
+    familyDto.mainFamilyMemberName = String(row[21])?.trim()=== "undefined" ? null : String(row[21])?.trim();
 
     
     return {

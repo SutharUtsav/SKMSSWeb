@@ -96,9 +96,6 @@ export interface IUserService {
 
 export class UserService extends BaseService implements IUserService {
 
-    fs = require('fs');
-    path = require('path');
-
 
     //#region spicific services
 
@@ -129,17 +126,19 @@ export class UserService extends BaseService implements IUserService {
 
 
             dtoProfilesRecord.forEach((profileRecord: UserProfileDto) => {
-                profileRecord.familyId = familyArray.find((family: FamilyDto) => family.surname === profileRecord.surname && family.village === profileRecord.village && family.currResidency === profileRecord.currResidency)?.id;
+                profileRecord.familyId = familyArray.find((family: FamilyDto) => family.surname === profileRecord.surname && family.village === profileRecord.village && family.currResidency === profileRecord.currResidency && profileRecord.mainFamilyMemberName === family.mainFamilyMemberName)?.id;
 
-                if (profileRecord.mainFamilyMemberRelation.toUpperCase() !== EnumFamilyMemberRelationName[EnumFamilyMemberRelation.SELF]) {
+                if (profileRecord.mainFamilyMemberRelation?.toUpperCase() !== EnumFamilyMemberRelationName[EnumFamilyMemberRelation.SELF]) {
                     profileRecord.isMainFamilyMember = false;
 
                 }
                 else {
                     profileRecord.isMainFamilyMember = true;
                 }
+                
 
                 const mainFamilyMemberUserId = userArray.find((user: UserDto) => user.username === profileRecord.mainFamilyMemberName && user.surname === profileRecord.mainFamilyMemberSurname && user.village === profileRecord.mainFamilyMemberVillage)?.id;
+
                 profileRecord.mainFamilyMemberId = mainFamilyMemberUserId;
 
                 profileRecord.userId = userArray.find((user: UserDto) => user.username === profileRecord.name && user.surname === profileRecord.surname && user.village === profileRecord.village)?.id
@@ -154,10 +153,10 @@ export class UserService extends BaseService implements IUserService {
                     profileRecord.fatherName = null;
                 }
 
-                const mother = userArray.find((user: UserDto) => user.username === profileRecord.motherName && user.surname === profileRecord.motherSurname && user.village === profileRecord.motherVillage)?.id
+                const mother = userArray.find((user: UserDto) => user.username === profileRecord.motherName && user.surname === profileRecord.motherSurname && user.village === profileRecord.motherVillage);
                 if (mother) {
                     profileRecord.motherId = mother.id;
-                    profileRecord.motherName = mother.name;
+                    profileRecord.motherName = mother.username;
                 }
                 else {
                     profileRecord.motherId = null;
@@ -165,7 +164,7 @@ export class UserService extends BaseService implements IUserService {
                 }
             })
 
-            const userProfiles = await UserProfile.bulkCreate(dtoProfilesRecord, { fields: ['userId', 'name', 'wifeSurname', 'marriedStatus', 'birthDate', 'weddingDate', 'education', 'occupation', 'mobileNumber', 'email', 'countryCode', 'familyId', 'gender', 'isMainFamilyMember', 'mainFamilyMemberRelation', 'motherId', 'motherName', 'fatherId', 'fatherName'], transaction })
+            const userProfiles = await UserProfile.bulkCreate(dtoProfilesRecord, { fields: ['userId', 'name', 'wifeSurname', 'marriedStatus', 'birthDate', 'weddingDate', 'education', 'occupation', 'mobileNumber', 'email', 'countryCode', 'familyId', 'gender', 'isMainFamilyMember', 'mainFamilyMemberRelation', 'mainFamilyMemberId', 'motherId', 'motherName', 'fatherId', 'fatherName', 'surname', 'village'], transaction })
             if (!userProfiles) {
                 throw new Error("Error Occurs while Inserting Into UserProfile Entity")
             }

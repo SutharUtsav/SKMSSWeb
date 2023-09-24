@@ -3,15 +3,15 @@ import { BaseDtoWithCommonFields } from "./base-dto";
 //#region Family Detail Dto
 
 export class FamilyDto extends BaseDtoWithCommonFields{
-    surname!:string;
-    village!:string;
-    currResidency!:string;
-    adobeOfGod!:string;
-    goddess!:string;
-    lineage!:string;
-    residencyAddress!:string;
-    villageGuj!:string;
-    mainFamilyMemberName!:string;
+    surname!:string | null;
+    village!:string | null;
+    currResidency!:string | null;
+    adobeOfGod!:string | null;
+    goddess!:string | null;
+    lineage!:string | null;
+    residencyAddress!:string | null;
+    villageGuj!:string | null;
+    mainFamilyMemberName!:string | null;
 }
 
 //#endregion

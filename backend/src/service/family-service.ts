@@ -136,7 +136,8 @@ export class FamilyService extends BaseService implements IFamilyService {
                     village: dtoRecord.village,
                     currResidency: dtoRecord.currResidency,
                     adobeOfGod: dtoRecord.adobeOfGod,
-                    goddess: dtoRecord.goddess
+                    goddess: dtoRecord.goddess,
+                    mainFamilyMemberName : dtoRecord.mainFamilyMemberName
                 }
             });
 
