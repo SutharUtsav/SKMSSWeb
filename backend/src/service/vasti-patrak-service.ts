@@ -56,7 +56,7 @@ export class VastiPatrakService implements IVastiPatrakService {
                     occupation: user.occupation,
                     email: user.email,
                     kutumb_member_no: user.kutumb_member_no,
-                    number: i,
+                    number: i+1,
                 }
 
                 return returnUser
@@ -64,17 +64,26 @@ export class VastiPatrakService implements IVastiPatrakService {
 
             const dataWithUser: any = {
                 kutumb_no: kutumbNo,
-                surname : groupedData[kutumbNo][0].surname,
+                surname: groupedData[kutumbNo][0].surname,
                 village_no: groupedData[kutumbNo][0].village_no,
                 kutumb_members: groupedData[kutumbNo][0].kutumb_members,
                 village: groupedData[kutumbNo][0].village,
+                villageGuj: groupedData[kutumbNo][0].villageGuj,
                 currResidency: groupedData[kutumbNo][0].currResidency,
                 mainFamilyMemberName: groupedData[kutumbNo][0].mainFamilyMemberName,
                 abode_of_God: groupedData[kutumbNo][0].abode_of_God,
                 goddess: groupedData[kutumbNo][0].goddess,
                 lineage: groupedData[kutumbNo][0].lineage,
                 Residency_Address: groupedData[kutumbNo][0].Residency_Address,
-                users: users
+                users: users,
+                sponsor: [
+                    {
+                        imageURL : '../sponsor/image003.jpeg'
+                    },
+                    {
+                        imageURL : '../sponsor/image003.jpeg'
+                    }
+                ]
             }
             formatedData.family.push(dataWithUser)
         }
@@ -94,28 +103,29 @@ export class VastiPatrakService implements IVastiPatrakService {
         try {
 
             const results = await sequelize.query(`
-SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS kutumb_member_no,
-	DENSE_RANK() OVER ( ORDER BY u."familyId") AS kutumb_no,
-	DENSE_RANK() OVER ( ORDER BY f."village") AS village_no,
-	COUNT(*) OVER (PARTITION BY u."familyId" ORDER BY u."familyId") AS kutumb_members,
-	f."village" as village,
-	f."currResidency" as currResidency,
-	(SELECT us."username" from "User" as us WHERE us."id"=u."mainFamilyMemberId") as mainFamilyMemberName,
-	f."adobeOfGod" as abode_of_God,
-    f."surname" as surname,
-	f."goddess" as goddess,
-	f."lineage" as lineage,
-	f."residencyAddress" as Residency_Address,
-	u."name" as name,
-	u."mobileNumber" as mobileNumber,
-	u."mainFamilyMemberRelation" as mainFamilyMemberRelation,
-	u."marriedStatus" as married,
-	u."birthDate" as birthdate,
-	u."education" as education,
-	u."occupation" as occupation,
-	u."email" as email,
-	u."motherName" as motherName,
-	u."fatherName" as fatherName
+SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS "kutumb_member_no",
+	DENSE_RANK() OVER ( ORDER BY u."familyId") AS "kutumb_no",
+	DENSE_RANK() OVER ( ORDER BY f."village") AS "village_no",
+	COUNT(*) OVER (PARTITION BY u."familyId" ORDER BY u."familyId") AS "kutumb_members",
+	f."village" as "village",
+	f."villageGuj" as "villageGuj",
+	f."currResidency" as "currResidency",
+	(SELECT us."username" from "User" as us WHERE us."id"=u."mainFamilyMemberId") as "mainFamilyMemberName",
+	f."adobeOfGod" as "abode_of_God",
+    f."surname" as "surname",
+	f."goddess" as "goddess",
+	f."lineage" as "lineage",
+	f."residencyAddress" as "Residency_Address",
+	u."name" as "name",
+	u."mobileNumber" as "mobileNumber",
+	u."mainFamilyMemberRelation" as "mainFamilyMemberRelation",
+	u."marriedStatus" as "married",
+	u."birthDate" as "birthdate",
+	u."education" as "education",
+	u."occupation" as "occupation",
+	u."email" as "email",
+	u."motherName" as "motherName",
+	u."fatherName" as "fatherName"
 	FROM "UserProfile" as u JOIN "Family" as f ON u."familyId" = f."id" ORDER BY f."village" ASC;
 `);
 
@@ -147,7 +157,7 @@ SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS kutu
         try {
 
             const response: ApiResponseDto | undefined = await this.GetRecords();
-            
+
             if (!response || response.status === 0) {
                 apiResponse = new ApiResponseDto();
                 let errorDto = new ErrorDto();
@@ -161,7 +171,7 @@ SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS kutu
 
             const data = await this.FormatDataForVastiPatrak(response.data)
 
-            
+
             const VasriPatrakFolderPath = 'VastiPatrak/pdfs';
 
             await RemoveFilesFromDirectory(VasriPatrakFolderPath);
@@ -169,17 +179,15 @@ SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS kutu
             if (!fs.existsSync(VasriPatrakFolderPath)) {
                 fs.mkdirSync(VasriPatrakFolderPath, { recursive: true });
             }
-
-            await data.family.map(async (entry: any, i: number) => {
+            
+            const browser = await puppeteer.launch({
+                headless: 'new'
+            });
+            await Promise.all(data.family.map(async (entry: any, i: number) => {
                 const template = hb.compile(htmlContent, { strict: true })
                 const result = template(entry)
 
                 const html = result;
-
-                const browser = await puppeteer.launch({
-                    headless: 'new'
-                });
-
 
                 const page = await browser.newPage();
                 await page.setContent(html);
@@ -189,18 +197,22 @@ SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS kutu
                     format: 'A4',
                     printBackground: true
                 })
-            })
 
+                await page.close()
+            }))
+
+            await browser.close()
 
             apiResponse = new ApiResponseDto();
-            apiResponse.status = 1,
-                apiResponse.data = {
-                    status: "200",
-                    message: "VastiPatrak Generated Successfully"
-                }
+            apiResponse.status = 1;
+            apiResponse.data = {
+                status: "200",
+                message: "VastiPatrak Generated Successfully"
+            }
             return apiResponse;
         }
         catch (error: any) {
+            console.log(error)
             apiResponse = new ApiResponseDto();
             let errorDto = new ErrorDto();
             errorDto.errorCode = '400';
