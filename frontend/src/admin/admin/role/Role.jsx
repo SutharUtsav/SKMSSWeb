@@ -1,10 +1,19 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import './Role.css'
 import '../Common.css'
+import { ApiService } from "../../../service/api-service";
+import { useApiCall } from "../../../hooks/useApiCall";
+
 export const Role = () => {
 
-  
+    useEffect(() => {
+        const apiService = new ApiService();
+        const { data, error } = apiService.get("/role");
+    
+        console.log(data);
+        console.log(error);
+      }, []);
 
     return (
         <div className='roles content'>

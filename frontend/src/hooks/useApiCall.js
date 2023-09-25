@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 
-export const useApiCall = (api: any) => {
+export const useApiCall = (api) => {
     const [data, setData] = useState(null);
 
     const [error, setError] = useState(null);
@@ -16,7 +16,7 @@ export const useApiCall = (api: any) => {
                     setError(response);
                 }
             }
-            catch (error: any) {
+            catch (error) {
                 setError(error);
             }
         };
