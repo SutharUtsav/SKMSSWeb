@@ -4,6 +4,7 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const db = require('./config/db')
+const cors = require('cors')
 
 import { dbContext } from "./model/dbContext";
 
@@ -18,7 +19,10 @@ const initApp = async () => {
 
         await db.authenticate();
         console.log("Connection has been established successfully")
+
+
         //Middleware
+        app.use(cors())
         app.use(bodyParser.json())
         app.use(bodyParser.urlencoded({ extended: true }));
 

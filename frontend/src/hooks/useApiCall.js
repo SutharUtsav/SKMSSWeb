@@ -21,7 +21,7 @@ export const useApiCall = (api) => {
             }
         };
         fetchData();
-    }, [api]);
+    }, []);
 
     return { data, error };
 

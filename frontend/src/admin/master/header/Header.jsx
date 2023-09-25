@@ -16,14 +16,14 @@ export const Header = () => {
           <img className="avatar" src={Profile} alt="profile-img" />
           <span className="fs-4">Admin</span>
         </button>
-        <ul class="dropdown-menu profile-dropdown" aria-labelledby="profileDropdownMenuButton">
+        <ul className="dropdown-menu profile-dropdown" aria-labelledby="profileDropdownMenuButton">
           <li>
             <a className="dropdown-item" href="/">
               View Profile
             </a>
           </li>
           <li className="border-top">
-            <a class="dropdown-item" href="/">
+            <a className="dropdown-item" href="/">
               Logout
             </a>
           </li>

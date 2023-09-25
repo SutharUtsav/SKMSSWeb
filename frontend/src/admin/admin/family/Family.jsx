@@ -17,9 +17,9 @@ const Family = () => {
                 <h3 className='fs-1'>Family</h3>
 
                 <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item fs-3"><Link to="/admin" >Dashboard</Link></li>
-                        <li class="breadcrumb-item active fs-3  " aria-current="page" >Family</li>
+                    <ol className="breadcrumb">
+                        <li className="breadcrumb-item fs-3"><Link to="/admin" >Dashboard</Link></li>
+                        <li className="breadcrumb-item active fs-3  " aria-current="page" >Family</li>
                     </ol>
                 </nav>
 
@@ -38,11 +38,11 @@ const Family = () => {
                     <div className="row mb-2">
                         <div className='input-search col-md-3 offset-md-8'>
                             <h4 className='box-title'>Search</h4>
-                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+                            <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
                         </div>
                         <div className="text-center col-md-1">
-                            <button class="btn btn-refresh" type="submit">
-                                <i class="fa fa-refresh" aria-hidden="true"></i>
+                            <button className="btn btn-refresh" type="submit">
+                                <i className="fa fa-refresh" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
