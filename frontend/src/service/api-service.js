@@ -13,7 +13,7 @@ export const get = async (endpoint) => {
         headers: {}
     };
 
-    return axios.request(config);
+    return await axios.request(config);
 }
 
 /**
