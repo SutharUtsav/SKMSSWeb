@@ -207,7 +207,7 @@ export class UserService extends BaseService implements IUserService {
             if (users.length !== 0) {
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                apiResponse.data = { users: users }
+                apiResponse.data = users
             }
             else {
                 apiResponse = new ApiResponseDto();

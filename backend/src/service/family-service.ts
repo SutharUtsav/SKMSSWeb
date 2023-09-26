@@ -53,7 +53,7 @@ export class FamilyService extends BaseService implements IFamilyService {
             if (families.length !== 0) {
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                apiResponse.data = { families: families }
+                apiResponse.data = families
             }
             else {
                 apiResponse = new ApiResponseDto();

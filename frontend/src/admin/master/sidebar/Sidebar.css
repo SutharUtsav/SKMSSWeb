@@ -37,7 +37,7 @@
 }
 
 .sidebar .nav-pills .nav-link.active:hover{
-    background-color: #e3701c;
+    background-color: var(--secondary-color-hover);
 }
 
 .sidebar .nav-pills .nav-link.active{

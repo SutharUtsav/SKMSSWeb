@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import "./Role.css";
 import "../Common.css";
 import { useApiCall } from "../../../hooks/useApiCall";
 import { get } from "../../../service/api-service";
+import { BiEdit } from "react-icons/bi";
+import { MdDelete } from "react-icons/md";
+import { BsSearch } from "react-icons/bs";
+import { BiRefresh } from "react-icons/bi";
 
 export const Role = () => {
   const { data, error, loading } = useApiCall(() => get("/role"));
-
-//   useEffect(() => {
-//     if (!loading && error === null) {
-//       console.log(data);
-//     }
-//   }, [data, error]);
 
   return (
     <div className="roles content">
@@ -51,12 +49,12 @@ export const Role = () => {
             </div>
             <div className="text-center col-md-1">
               <button className="btn btn-refresh" type="submit">
-                <i className="fa fa-refresh" aria-hidden="true"></i>
+                <BiRefresh fill="#fff" size="2.5rem" />
               </button>
             </div>
           </div>
 
-          {data && data.status ===1 ? (
+          {data && data.status === 1 ? (
             <div className="table-reponsive mt-5">
               <table
                 role="table"
@@ -129,39 +127,71 @@ export const Role = () => {
                 </thead>
 
                 <tbody role="rowgroup">
-                  <tr role="row" aria-rowindex="1" className="">
-                    <td
-                      aria-colindex="1"
-                      data-label="ID"
-                      role="cell"
-                      className="text-center"
-                    >
-                      <div>1</div>
-                    </td>
+                  {data.data.map((role, index) => (
+                    <tr role="row" aria-rowindex="1" className="">
+                      <td
+                        aria-colindex="1"
+                        data-label="ID"
+                        role="cell"
+                        className="text-center"
+                      >
+                        {/* <div>{data.data[0].id}</div> */}
+                        <div>{index + 1}</div>
+                      </td>
 
-                    <td></td>
+                      <td
+                        aria-colindex="2"
+                        data-label="Name"
+                        role="cell"
+                        className="text-center"
+                      >
+                        <div>{role.name}</div>
+                      </td>
 
-                    <td></td>
+                      <td
+                        aria-colindex="3"
+                        data-label="Description"
+                        role="cell"
+                        className="text-center"
+                      >
+                        <div>{role.description}</div>
+                      </td>
 
-                    <td></td>
+                      <td
+                        aria-colindex="4"
+                        data-label="RoleType"
+                        role="cell"
+                        className="text-center"
+                      >
+                        <div>{role.roleType}</div>
+                      </td>
 
-                    <td aria-colindex="5" data-label="Actions" role="cell">
-                      <div className="action-btns">
-                        <button
-                          title="Edit"
-                          className="btn btn-sm btn-primary btn-edit"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          title="Delete"
-                          className="btn btn-sm btn-danger btn-delete"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                      <td aria-colindex="5" data-label="Actions" role="cell">
+                        <div className="action-btns">
+                          <button
+                            title="Edit"
+                            className="btn btn-sm btn-primary btn-edit"
+                          >
+                            <BiEdit
+                              fill="#fff"
+                              size={"2.5rem"}
+                              className="m-1"
+                            />
+                          </button>
+                          <button
+                            title="Delete"
+                            className="btn btn-sm btn-danger btn-delete"
+                          >
+                            <MdDelete
+                              fill="#fff"
+                              size={"2.5rem"}
+                              className="m-1"
+                            />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

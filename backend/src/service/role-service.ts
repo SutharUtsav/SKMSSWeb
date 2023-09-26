@@ -72,7 +72,7 @@ export class RoleService extends BaseService implements IRoleService {
             if (roles) {
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                apiResponse.data = { roles: roles }
+                apiResponse.data = roles
             }
             else {
                 apiResponse = new ApiResponseDto();

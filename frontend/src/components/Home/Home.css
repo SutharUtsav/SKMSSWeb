@@ -86,7 +86,7 @@
 }
 
 .activity-category .activity:hover {
-    background-color: #e3701c;
+    background-color: var(--secondary-color-hover);
 }
 
 .activity-category .activity .logo-container {
@@ -308,7 +308,7 @@
     }
     .activity-category .activity{
         padding: 10px;
-        border-top: 1px solid #e3701c;
+        border-top: 1px solid var(--secondary-color-hover);
     }
 
 

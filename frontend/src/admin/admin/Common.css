@@ -27,7 +27,7 @@
 }
 
 .admin-panel .content-main .content-title button:hover {
-    background-color: #e3701c;
+    background-color: var(--secondary-color-hover);
 }
 
 .admin-panel .content-main .content-body .box-title {
@@ -65,7 +65,7 @@
 
 .admin-panel .content-main .content-body table * {
     font-size: 1.875rem;
-    font-weight: 300;
+    font-weight: 350;
 }
 
 .admin-panel .content-main .content-body table th,

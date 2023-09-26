@@ -10,3 +10,12 @@
     color: var(--secondary-color);
     text-decoration: none;
 }
+
+.btn-edit{
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+.btn-edit:hover{
+    background-color: var(--secondary-color-hover);
+    border-color: var(--secondary-color-hover);
+}

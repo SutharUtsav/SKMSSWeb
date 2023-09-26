@@ -106,7 +106,7 @@
 }
 
 .header .login-btn:hover {
-    background-color: #e3701c;
+    background-color: var(--secondary-color-hover);
 }
 
 @media screen and (min-width:0px) and (max-width:425px) {
