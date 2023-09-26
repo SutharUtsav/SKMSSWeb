@@ -23,6 +23,7 @@
     color: #fff;
     font-size: 1.765rem;
     border-radius: 8px;
+    border: 1px solid var(--secondary-color);
     padding: 8px 20px;
 }
 
@@ -104,4 +105,26 @@
 .table.b-table.table-sm>thead>tr>[aria-sort]:not(.b-table-sort-icon-left) {
     background-position: right 0.15rem center;
     padding-right: calc(0.3rem + 0.65em);
+}
+
+
+
+.modal *{
+    font-size: 1.865rem;
+}
+
+.modal-content{
+    border-radius: 8px;
+    margin: 0;
+}
+
+.modal-header{
+    padding: 20px;
+}
+
+.modal-header h5{
+    font-size: 2.345rem;
+}
+.modal-body{
+    padding: 20px 10px;
 }

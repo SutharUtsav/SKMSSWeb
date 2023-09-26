@@ -19,3 +19,8 @@
     background-color: var(--secondary-color-hover);
     border-color: var(--secondary-color-hover);
 }
+
+
+#createRoleModal .modal-dialog{
+    max-width: 700px;
+}
