@@ -8,7 +8,7 @@ import { BiEdit } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
 import { BsSearch } from "react-icons/bs";
 import { BiRefresh } from "react-icons/bi";
-import CreateRoleModal from "./CreateRoleModal";
+import RoleModal from "./RoleModal";
 
 export const Role = () => {
     const { data, error, loading } = useApiCall(() => get("/role"));
@@ -197,11 +197,11 @@ export const Role = () => {
                                     </tbody>
                                 </table>
                             </div>
-                        ) : null}
+                        ) : <>loading</>}
                     </div>
                 </div>
             </div>
-            <CreateRoleModal />
+            <RoleModal />
         </>
     );
 };

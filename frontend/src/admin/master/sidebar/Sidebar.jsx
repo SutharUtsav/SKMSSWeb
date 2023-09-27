@@ -35,6 +35,12 @@ export const Sidebar = () => {
             Role
           </NavLink>
         </li>
+
+        <li>
+          <NavLink end to='/admin/permissions' className='nav-link link-dark'>
+            Permissions
+          </NavLink>
+        </li>
       </ul>
     </div>
   )

@@ -8,6 +8,7 @@ import User from "../../admin/user/User";
 import './Home.css'
 import {Role} from "../../admin/role/Role";
 import Family from "../../admin/family/Family";
+import Permission from "../../admin/permission/Permission";
 export const HomeAdmin = () => {
   return (
     <div className="admin-panel d-flex">
@@ -20,6 +21,7 @@ export const HomeAdmin = () => {
             <Route path="/" element={<Dashboard />}></Route>
             <Route path="/users" element={<User />}></Route>
             <Route path="/roles" element={<Role/>}></Route>
+            <Route path="/permissions" element={<Permission/>}></Route>
             <Route path="/families" element={<Family/>}></Route>
           </Routes>
         </div>

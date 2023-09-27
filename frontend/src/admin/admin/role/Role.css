@@ -33,8 +33,23 @@
 
 #createRoleModal .table{
     margin-top: 30px;
+    
 }
 
+#createRoleModal .table-responsive::-webkit-scrollbar {
+    width: 5px;
+    height: 10px;
+    background-color: #fff;
+  }
+  
+  #createRoleModal .table-responsive::-webkit-scrollbar-thumb{
+    background-color: var(--sub-text-color);
+    border-radius: 8px;
+  
+  }
 #createRoleModal .table th{
-    font-weight: 400
+    font-weight: 400;
+    background-color: #eee;
+    padding-left: 15px; 
+    vertical-align: middle;
 }

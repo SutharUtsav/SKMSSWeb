@@ -83,7 +83,16 @@
     border-radius: 0.4rem;
     padding: 3px 5px;
     line-height: 1.5;
+}
 
+.admin-panel .btn-save{
+    background-color: var(--secondary-color);
+    color: #fff;
+}
+
+
+.admin-panel .btn-save:hover{
+    background-color: var(--secondary-color-hover);
 }
 
 .pull-right {
@@ -127,4 +136,12 @@
 }
 .modal-body{
     padding: 20px 10px;
+}
+
+.modal-body form{
+    padding: 0 20px;
+}
+.modal-body form label{
+    text-transform: none;
+    font-weight: 400;
 }

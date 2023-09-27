@@ -1,12 +1,12 @@
 export const RolePermissionEntity = {
     DASHBOARD: {
-        name  : "DASHBOARD",
+        name  : "Dashboard",
         permissions: {
             MANAGEDASHBOARD :"Manage Dashboard"
         }
     },
     USER : {
-        name : "USER",
+        name : "User",
         permissions : {
             LISTACCESS : "User List", 
             UPDATEACCESS : "User Update", 
