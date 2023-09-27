@@ -210,27 +210,31 @@ export const validateRolePermission = (body: PermissionDto): PermissionDto | Err
         return undefined;
     }
     else {
-        //set permissionFor field
-        if (EnumPermissionFor[body.permissionFor as keyof typeof EnumPermissionFor] === undefined) {
-            let errorDto = new ErrorDto();
-            errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
-            errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
-            return errorDto;
-        }
-        else {
-            permissionDto.permissionFor = EnumPermissionForName[EnumPermissionFor[body.permissionFor as keyof typeof EnumPermissionFor]];
-        }
 
-        //set permissions field
-        if (EnumPermission[body.permissions as keyof typeof EnumPermission] === undefined) {
-            let errorDto = new ErrorDto();
-            errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
-            errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
-            return errorDto;
-        }
-        else {
-            permissionDto.permissions = EnumPermissionName[EnumPermission[body.permissions as keyof typeof EnumPermission]];
-        }
+        permissionDto.permissionFor = body.permissionFor;
+        permissionDto.permissions = body.permissions;
+        
+        //set permissionFor field
+        // if (EnumPermissionFor[body.permissionFor as keyof typeof EnumPermissionFor] === undefined) {
+        //     let errorDto = new ErrorDto();
+        //     errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+        //     errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        //     return errorDto;
+        // }
+        // else {
+        //     permissionDto.permissionFor = EnumPermissionForName[EnumPermissionFor[body.permissionFor as keyof typeof EnumPermissionFor]];
+        // }
+
+        // //set permissions field
+        // if (EnumPermission[body.permissions as keyof typeof EnumPermission] === undefined) {
+        //     let errorDto = new ErrorDto();
+        //     errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+        //     errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        //     return errorDto;
+        // }
+        // else {
+        //     permissionDto.permissions = EnumPermissionName[EnumPermission[body.permissions as keyof typeof EnumPermission]];
+        // }
     }
     return permissionDto;
 }

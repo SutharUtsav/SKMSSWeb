@@ -52,7 +52,7 @@ export class RolePermissionService extends BaseService implements IRolePermissio
             if (permissions.length !== 0) {
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                apiResponse.data = { permissions }
+                apiResponse.data = permissions 
             }
             else {
                 apiResponse = new ApiResponseDto();
