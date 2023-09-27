@@ -24,3 +24,17 @@
 #createRoleModal .modal-dialog{
     max-width: 700px;
 }
+
+
+
+#createRoleModal .table *{
+    font-weight: 300;
+}
+
+#createRoleModal .table{
+    margin-top: 30px;
+}
+
+#createRoleModal .table th{
+    font-weight: 400
+}

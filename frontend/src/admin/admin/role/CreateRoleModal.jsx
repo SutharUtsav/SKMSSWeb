@@ -1,5 +1,6 @@
 import React from 'react'
 import { RolePermissionEntity } from '../../../consts/RolePermissioEntity'
+import { RolePermissionType } from '../../../consts/RolePermissionType'
 
 const CreateRoleModal = () => {
     return (
@@ -31,10 +32,12 @@ const CreateRoleModal = () => {
                                                 <td>
                                                     <div className='row'>
                                                         <div className='col-6 col-md-4 mb-2'>
+                                                            {Object.keys(RolePermissionType).map((permission, ind)=>(
                                                             <div className='form-check form-switch'>
-                                                                <input type="checkbox" name="" id={`checkbox_${index}`} className='form-check-input' />
-                                                                <label htmlFor={`checkbox_${index}`} style={{marginLeft:"5px"}}>Manage Dashboard</label>
+                                                                <input type="checkbox" name="" id={`checkbox_${index}${ind}`} className='form-check-input' />
+                                                                <label htmlFor={`checkbox_${index}${ind}`} style={{marginLeft:"5px"}}>{permission}</label>
                                                             </div>
+                                                            ))}
                                                         </div>
                                                     </div>
                                                 </td>

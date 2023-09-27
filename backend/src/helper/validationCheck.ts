@@ -173,10 +173,10 @@ export const validateUser = (body: UserDto): UserDto | ErrorDto | undefined => {
 export const validateRole = (body: RoleDto): RoleDto | ErrorDto | undefined => {
     let roleDto: RoleDto = new RoleDto();
 
-    if (!areAllFieldsFilled(body)) {
-        return undefined;
-    }
-    else {
+    // if (!areAllFieldsFilled(body)) {
+    //     return undefined;
+    // }
+    // else {
 
         //set fields of RoleDto
         roleDto.name = body.name;
@@ -193,7 +193,7 @@ export const validateRole = (body: RoleDto): RoleDto | ErrorDto | undefined => {
         else {
             roleDto.roleType = EnumRoleTypeName[EnumRoleType[body.roleType as keyof typeof EnumRoleType]];
         }
-    }
+    // }
 
     return roleDto;
 }
