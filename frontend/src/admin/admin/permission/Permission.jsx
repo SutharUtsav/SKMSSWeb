@@ -1,11 +1,11 @@
 import React from "react";
 import { BiEdit, BiRefresh } from "react-icons/bi";
 import { Link } from "react-router-dom";
-import { useApiCall } from "../../../hooks/useApiCall";
 import { get } from "../../../service/api-service";
 import { MdDelete } from "react-icons/md";
 import { useEffect } from "react";
 import PermissionModal from "./PermissionModal";
+import useApiCall from "../../../hooks/useApiCall";
 
 const Permission = () => {
   const { data, error, loading } = useApiCall(() => get("/role-permission"));

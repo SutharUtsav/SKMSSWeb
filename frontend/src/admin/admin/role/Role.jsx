@@ -2,13 +2,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./Role.css";
 import "../Common.css";
-import { useApiCall } from "../../../hooks/useApiCall";
 import { get } from "../../../service/api-service";
 import { BiEdit } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
 import { BsSearch } from "react-icons/bs";
 import { BiRefresh } from "react-icons/bi";
 import RoleModal from "./RoleModal";
+import useApiCall from "../../../hooks/useApiCall";
 
 export const Role = () => {
     const { data, error, loading } = useApiCall(() => get("/role"));

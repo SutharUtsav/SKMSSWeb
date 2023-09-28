@@ -1,5 +1,5 @@
 import axios from "axios";
-
+const FormData = require('form-data');
 
 /**
  * Method to call GET request api
@@ -25,3 +25,29 @@ export const get = async (endpoint) => {
 //     return null
 // }
 
+
+
+export const add = async (endpoint, jsonData = null) => {
+
+    if(jsonData=== null){
+        return null;
+    }
+
+    let data = new FormData();
+    Object.keys(jsonData).forEach((data)=>{
+        data.append(data, jsonData[data]);
+    })
+
+    let config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: `localhost:3303/api/v1${endpoint}`,
+        headers: {
+            ...data.getHeaders()
+        },
+        data: data
+    };
+
+    return await axios.request(config);
+
+}

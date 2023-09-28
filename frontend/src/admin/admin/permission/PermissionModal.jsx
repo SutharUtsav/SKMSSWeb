@@ -1,5 +1,7 @@
 import React from "react";
 import { useState } from "react";
+import { add } from "../../../service/api-service";
+import useApiCall from "../../../hooks/useApiCall";
 
 const PermissionModal = () => {
 
@@ -22,8 +24,13 @@ const PermissionModal = () => {
 
   const handleSubmitForm = (e) => {
     e.preventDefault();
+    const {data,error,loading} = useApiCall(()=> add('/role-permission',permissionForm));
+    console.log(data)
+    console.log(error)
     console.log(permissionForm)
   }
+
+  const {data, error, loading} = useApiCall(()=>add('/role-permission'));
 
   return (
     <div

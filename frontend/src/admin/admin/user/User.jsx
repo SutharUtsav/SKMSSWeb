@@ -1,10 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useApiCall } from "../../../hooks/useApiCall";
 import { get } from "../../../service/api-service";
 import { BiRefresh } from "react-icons/bi";
 import { BiEdit } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
+import useApiCall from "../../../hooks/useApiCall";
 
 export const User = () => {
   const { data, error, loading } = useApiCall(() => get("/user"));
