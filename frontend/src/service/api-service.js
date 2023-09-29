@@ -27,7 +27,7 @@ export const get = async (endpoint) => {
 
 
 
-export const add = async (endpoint, jsonData = null) => {
+export const add = async (e, endpoint, jsonData = null) => {
 
     if(jsonData=== null){
         return null;
@@ -48,6 +48,7 @@ export const add = async (endpoint, jsonData = null) => {
         data: data
     };
 
-    return await axios.request(config);
+    console.log(config)
+    // return await axios.request(config);
 
 }

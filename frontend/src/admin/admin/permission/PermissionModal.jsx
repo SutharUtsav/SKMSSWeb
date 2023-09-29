@@ -22,13 +22,13 @@ const PermissionModal = () => {
     setpermissionForm(defaultPermissionForm);
   }
 
-  const handleSubmitForm = (e) => {
-    e.preventDefault();
-    const {data,error,loading} = useApiCall(()=> add('/role-permission',permissionForm));
-    console.log(data)
-    console.log(error)
-    console.log(permissionForm)
-  }
+  // const handleSubmitForm = (e) => {
+  //   e.preventDefault();
+  //   const {data,error,loading} = useApiCall(()=> add('/role-permission',permissionForm));
+  //   console.log(data)
+  //   console.log(error)
+  //   console.log(permissionForm)
+  // }
 
   const {data, error, loading} = useApiCall(()=>add('/role-permission'));
 
@@ -56,7 +56,12 @@ const PermissionModal = () => {
           </div>
 
           <div className="modal-body">
-            <form onSubmit={handleSubmitForm}>
+            <form onSubmit={(e)=>{
+              e.preventDefault();
+              add('/role-permission').then((response)=>{
+                console.log(response)
+              })
+            }}>
               <div className="mb-3">
                 <label htmlFor="permissionForInput" className="form-label">
                   Permission for Entity Name
