@@ -59,8 +59,6 @@ button {
   cursor: pointer;
 }
 
-
-
 @media screen and (max-width: 780px) {
   .hide-mobile{
     display: none;

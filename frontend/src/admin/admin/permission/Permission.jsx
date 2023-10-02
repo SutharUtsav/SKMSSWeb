@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BiEdit, BiRefresh } from "react-icons/bi";
 import { Link } from "react-router-dom";
 import { get } from "../../../service/api-service";
@@ -8,7 +8,30 @@ import PermissionModal from "./PermissionModal";
 import useApiCall from "../../../hooks/useApiCall";
 
 const Permission = () => {
-  const { data, error, loading } = useApiCall(() => get("/role-permission"));
+  let { data, error, loading } = useApiCall(() => get("/role-permission"));
+
+  const [isReloadData, setisReloadData] = useState(false)
+
+  //Reload Data on isReloadData is true
+  useEffect(() => {
+    if(isReloadData){
+      get("/role-permission")
+      .then((response)=>{
+        if(response.data.status){
+          data = response.data.data
+        }
+        else{ 
+          error = response.data.error
+        }
+      })
+      .catch((err)=>{
+        error = err
+      })
+    }
+  }, [isReloadData])
+  
+
+
 
   return (
     <>
@@ -191,7 +214,7 @@ const Permission = () => {
         </div>
       </div>
 
-      <PermissionModal />
+      <PermissionModal setisReloadData={setisReloadData}/>
     </>
   );
 };

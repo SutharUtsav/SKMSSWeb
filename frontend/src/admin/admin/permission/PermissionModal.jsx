@@ -1,36 +1,43 @@
 import React from "react";
 import { useState } from "react";
 import { add } from "../../../service/api-service";
-import useApiCall from "../../../hooks/useApiCall";
 
-const PermissionModal = () => {
+const PermissionModal = (props) => {
 
-  const defaultPermissionForm={
+  const defaultPermissionForm = {
     permissionFor: "",
-    permissions: "" 
+    permissions: ""
   };
 
   const [permissionForm, setpermissionForm] = useState(defaultPermissionForm)
+  const [LoadRequest, setLoadRequest] = useState(false);
 
   const handleChange = (e) => {
     setpermissionForm({
       ...permissionForm,
-      [e.target.name]:e.target.value})
+      [e.target.name]: e.target.value
+    })
   }
 
   const handleResetForm = () => {
     setpermissionForm(defaultPermissionForm);
   }
 
-  // const handleSubmitForm = (e) => {
-  //   e.preventDefault();
-  //   const {data,error,loading} = useApiCall(()=> add('/role-permission',permissionForm));
-  //   console.log(data)
-  //   console.log(error)
-  //   console.log(permissionForm)
-  // }
-
-  const {data, error, loading} = useApiCall(()=>add('/role-permission'));
+  const handleSubmitForm = (e) => {
+    e.preventDefault();
+    setLoadRequest(true)
+    add('/role-permission', permissionForm)
+    .then((response) => {
+      console.log(response);
+      props.setisReloadData(true)
+    })
+    .catch((error)=>{
+      console.error(error)
+    })
+    .finally(()=>{
+      setLoadRequest(false)
+    })
+  }
 
   return (
     <div
@@ -51,24 +58,19 @@ const PermissionModal = () => {
               className="btn-close"
               data-bs-dismiss="modal"
               aria-label="Close"
-              onClick={handleResetForm} 
+              onClick={handleResetForm}
             ></button>
           </div>
 
           <div className="modal-body">
-            <form onSubmit={(e)=>{
-              e.preventDefault();
-              add('/role-permission').then((response)=>{
-                console.log(response)
-              })
-            }}>
+            <form onSubmit={handleSubmitForm}>
               <div className="mb-3">
                 <label htmlFor="permissionForInput" className="form-label">
                   Permission for Entity Name
                 </label>
                 <input
                   type="text"
-                  className="form-control"
+                  className="form-control fw-light"
                   id="permissionForInput"
                   aria-describedby="permissionForInput"
                   name="permissionFor"
@@ -83,12 +85,12 @@ const PermissionModal = () => {
                 </label>
                 <input
                   type="text"
-                  className="form-control"
+                  className="form-control fw-light"
                   id="permissionInput"
                   aria-describedby="permissionInput"
                   name="permissions"
                   value={permissionForm.permissions}
-                  onChange={(e)=> {setpermissionForm({...permissionForm,permissions:e.target.value})}}
+                  onChange={(e) => { setpermissionForm({ ...permissionForm, permissions: e.target.value }) }}
                 />
               </div>
 

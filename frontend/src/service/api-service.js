@@ -1,5 +1,7 @@
 import axios from "axios";
+import { EnvConfig } from "../config/env-config";
 const FormData = require('form-data');
+
 
 /**
  * Method to call GET request api
@@ -9,7 +11,7 @@ export const get = async (endpoint) => {
     let config = {
         method: 'get',
         maxBodyLength: Infinity,
-        url: `http://localhost:3303/api/v1${endpoint}`,
+        url: `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}`,
         headers: {}
     };
 
@@ -27,28 +29,24 @@ export const get = async (endpoint) => {
 
 
 
-export const add = async (e, endpoint, jsonData = null) => {
+export const add = async (endpoint, jsonData = null) => {
 
     if(jsonData=== null){
         return null;
     }
 
-    let data = new FormData();
+    let formData = new FormData();
     Object.keys(jsonData).forEach((data)=>{
-        data.append(data, jsonData[data]);
+        formData.append(data.toString(), jsonData[data].toString());
     })
 
     let config = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: `localhost:3303/api/v1${endpoint}`,
-        headers: {
-            ...data.getHeaders()
-        },
-        data: data
+        url: `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}`,
+        headers: {},
+        data: formData
     };
 
-    console.log(config)
-    // return await axios.request(config);
-
+    return await axios.request(config);
 }
