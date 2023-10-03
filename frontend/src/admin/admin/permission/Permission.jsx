@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { BiEdit, BiRefresh } from "react-icons/bi";
 import { Link } from "react-router-dom";
-import { get } from "../../../service/api-service";
+import { del, get } from "../../../service/api-service";
 import { MdDelete } from "react-icons/md";
 import { useEffect } from "react";
 import PermissionModal from "./PermissionModal";
 import useApiCall from "../../../hooks/useApiCall";
 
 const Permission = () => {
-  let { data, error, loading } = useApiCall(() => get("/role-permission"));
+  let { data, setData, error, setError, loading, setLoading } = useApiCall(() => get("/role-permission"));
 
   const [isReloadData, setisReloadData] = useState(false)
 
@@ -17,20 +17,39 @@ const Permission = () => {
     if(isReloadData){
       get("/role-permission")
       .then((response)=>{
-        if(response.data.status){
-          data = response.data.data
+        console.log(response)
+        if(response.data.status === 1){
+          setData(response.data)
         }
         else{ 
-          error = response.data.error
+          setError(response.data.error)
         }
+        
       })
       .catch((err)=>{
         error = err
+      }).finally(()=>{
+        setisReloadData(false)
       })
     }
   }, [isReloadData])
   
 
+  const handleDelete = (id)=>{
+
+    console.log(id)
+    del("/role-permission",id)
+    .then((response)=>{
+      if(response.data.status===1){
+        setisReloadData(true)
+      }
+      console.log(response.data)
+      
+    })
+    .catch((error)=>{
+      console.log(error)
+    })
+  }
 
 
   return (
@@ -189,6 +208,7 @@ const Permission = () => {
                             <button
                               title="Delete"
                               className="btn btn-sm btn-danger btn-delete"
+                              onClick={()=>handleDelete(permission.id)}
                             >
                               <MdDelete
                                 fill="#fff"

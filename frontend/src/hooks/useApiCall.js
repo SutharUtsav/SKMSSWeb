@@ -31,7 +31,7 @@ const useApiCall = (api) => {
 
   }, [data, error, api]);
 
-  return { data, error, loading };
+  return { data, setData, error, setError, loading, setLoading };
 
 }
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { add } from "../../../service/api-service";
+import { useRef } from "react";
 
 const PermissionModal = (props) => {
 
@@ -9,8 +10,9 @@ const PermissionModal = (props) => {
     permissions: ""
   };
 
+  const closeModal = useRef();
+
   const [permissionForm, setpermissionForm] = useState(defaultPermissionForm)
-  const [LoadRequest, setLoadRequest] = useState(false);
 
   const handleChange = (e) => {
     setpermissionForm({
@@ -25,17 +27,22 @@ const PermissionModal = (props) => {
 
   const handleSubmitForm = (e) => {
     e.preventDefault();
-    setLoadRequest(true)
+    
+
     add('/role-permission', permissionForm)
     .then((response) => {
-      console.log(response);
-      props.setisReloadData(true)
+      if(response.data.status === 1){
+        props.setisReloadData(true);
+      }
+      else{
+        console.log(response.data)
+      }
     })
     .catch((error)=>{
       console.error(error)
     })
     .finally(()=>{
-      setLoadRequest(false)
+      closeModal.current.click()
     })
   }
 
@@ -59,6 +66,7 @@ const PermissionModal = (props) => {
               data-bs-dismiss="modal"
               aria-label="Close"
               onClick={handleResetForm}
+              ref={closeModal}
             ></button>
           </div>
 
