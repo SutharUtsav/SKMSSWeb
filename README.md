@@ -5,6 +5,11 @@ A web application for 'Suthar' community from where I belongs to.
 - We're weaving a user-friendly web experience, embracing both Suthar community members and those beyond, uniting them in a digital tapestry of connectivity.
 - Implementing login controls to keep your data safe and ensure only authorized access.
 
+# Tech Stack
+Backend: Node JS, Typescript
+Frontend: React JS, Redux
+Database: PostgresSQL
+
 Enjoy responsive UI for a User Panel (In progress):
 https://sutharutsav.github.io/SKMSSWebFrontend/
 
