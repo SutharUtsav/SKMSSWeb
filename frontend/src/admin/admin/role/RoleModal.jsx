@@ -1,11 +1,94 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { RolePermissionEntity } from "../../../consts/RolePermissioEntity";
+import { add, get } from "../../../service/api-service";
 
-const RoleModal = () => {
-  const [newRoleForm, setNewRoleForm] = useState({
-    name: null,
-    description: null,
-  });
+const RoleModal = (props) => {
+  const defaultRoleForm = {
+    name: "",
+    description: "",
+    rolePermissionIds : [],
+    roleType: "CustomRole"
+  };
+
+  const closeModal = useRef();
+  const [permissionList, setpermissionList] = useState(null);
+
+  const handleResetForm = () => {
+    props.setroleForm(defaultRoleForm);
+  };
+
+  const handleChange = (e) => {
+    props.setroleForm({
+      ...props.roleForm,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  useEffect(() => {
+      get("/role-permission")
+        .then((response) => {
+          if (response && response.data.status === 1) {
+            const groupedData = response.data.data.reduce((result, item) => {
+              const key = item.permissionFor;
+              // Create an array for each 'permissionFor' value if it doesn't exist
+              if (!result[key]) {
+                result[key] = [];
+              }
+              // Push the item into the corresponding array
+              result[key].push({title: item.permissions, id: item.id});
+              return result;
+            }, {});
+            setpermissionList(groupedData);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      handleResetForm();
+    }
+  }, [])
+  
+  //Method to handle changes of permissions
+  const handlePermissionSelection = (id) => {
+    //if Id already present then remove it
+    let temp_arr = props.roleForm.rolePermissionIds;
+    const index = temp_arr.indexOf(id)
+    if(index !== -1){
+      temp_arr.splice(index,1);
+    }
+    //else add it
+    else{
+      temp_arr.push(id);
+    }
+    props.setroleForm({
+      ...props.roleForm,
+      rolePermissionIds : temp_arr
+    })
+  }
+
+  //Method to handle form submission
+  const handleSubmitForm = (e) => {
+    e.preventDefault();
+    console.log(props.roleForm)
+
+    add("/role", props.roleForm)
+    .then((response)=>{
+      if(response && response.data.status===1){
+
+      }
+    })
+    .catch((err)=>{
+      console.log(err)
+    })
+    .finally(()=>{
+      closeModal.current.click();
+    })
+  }
+
 
   return (
     <div
@@ -26,10 +109,11 @@ const RoleModal = () => {
               className="btn-close"
               data-bs-dismiss="modal"
               aria-label="Close"
+              ref={closeModal}
             ></button>
           </div>
           <div className="modal-body">
-            <form>
+            <form onSubmit={handleSubmitForm}>
               <div className="mb-3">
                 <label htmlFor="roleNameInput" className="form-label">
                   Role Name
@@ -38,7 +122,10 @@ const RoleModal = () => {
                   type="text"
                   className="form-control"
                   id="roleNameInput"
+                  name="name"
                   aria-describedby="roleNameInput"
+                  value={props.roleForm.name}
+                  onChange={handleChange}
                 />
               </div>
 
@@ -50,52 +137,72 @@ const RoleModal = () => {
                   type="text"
                   className="form-control"
                   id="roleDescInput"
+                  name="description"
                   aria-describedby="roleDescInput"
+                  value={props.roleForm.description}
+                  onChange={handleChange}
                 />
               </div>
 
               <div className="table-responsive">
                 <table className="table table-lg table-bordered">
                   <tbody>
-                    {Object.keys(RolePermissionEntity).map((key, index) => (
-                      <tr key={index}>
-                        <th>{RolePermissionEntity[key]?.name}</th>
-                        <td>
-                          <div className="row">
-                            <div className=" mb-2">
-                              {Object.keys(
-                                RolePermissionEntity[key]?.permissions
-                              ).map((permission, ind) => (
-                                <div
-                                  className="form-check form-switch"
-                                  key={ind}
-                                >
-                                  <input
-                                    type="checkbox"
-                                    name=""
-                                    id={`checkbox_${index}${ind}`}
-                                    className="form-check-input"
-                                  />
-                                  <label
-                                    htmlFor={`checkbox_${index}${ind}`}
-                                    style={{ marginLeft: "5px" }}
-                                  >
-                                    {
-                                      RolePermissionEntity[key]?.permissions[
-                                        permission
-                                      ]
-                                    }
-                                  </label>
-                                </div>
-                              ))}
+                    {permissionList!== null &&
+                      Object.keys(permissionList).map((key, index) => (
+                        <tr key={index}>
+                          <th>{key}</th>
+                          <td>
+                            <div className="row">
+                              <div className=" mb-2">
+                                {permissionList[key].map(
+                                  (permission, ind) => (
+                                    <div
+                                      className="form-check form-switch"
+                                      key={ind}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        name=""
+                                        id={`checkbox_${index}${ind}`}
+                                        className="form-check-input"
+                                        checked={props.roleForm.rolePermissionIds.indexOf(permission.id)!==-1 ? true : false}
+                                        onChange={()=>{handlePermissionSelection(permission.id)}}
+                                      />
+                                      <label
+                                        htmlFor={`checkbox_${index}${ind}`}
+                                        style={{ marginLeft: "5px" }}
+                                      >
+                                        {permission.title}
+                                      </label>
+                                    </div>
+                                  )
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
+
+              <div className="float-end mt-4">
+                <button
+                  type="submit"
+                  className="btn btn-save m-2 px-4 py-2 fs-3 fw-normal rounded"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary m-2 px-4 py-2 fs-3 fw-normal rounded"
+                  data-bs-dismiss="modal"
+                  onClick={handleResetForm}
+                >
+                  Cancel
+                </button>
+              </div>
+
             </form>
           </div>
         </div>
