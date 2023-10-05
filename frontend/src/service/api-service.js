@@ -53,6 +53,28 @@ export const add = async (endpoint, jsonData = null) => {
   return await axios.request(config);
 };
 
+
+export const edit = async (endpoint, id, jsonData = null) => {
+  if(!jsonData || !id){
+    return null;
+  }
+
+  let formData = new FormData();
+  Object.keys(jsonData).forEach((data) => {
+    formData.append(data.toString(), jsonData[data].toString());
+  });
+
+  let config = {
+    method: 'put',
+    maxBodyLength: Infinity,
+    url: `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}?id=${id}`,
+    headers: { },
+    data : formData
+  };
+
+  return axios.request(config);
+}
+
 /**
  * Method to call DELETE request to delete record
  * @param {*} endpoint
@@ -60,10 +82,16 @@ export const add = async (endpoint, jsonData = null) => {
  * @returns
  */
 export const del = async (endpoint, id) => {
+
+  if(!id){
+    return null;
+  }
+  
+
   let config = {
     method: "delete",
     maxBodyLength: Infinity,
-    url: `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}`,
+    url: `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}?id=${id}`,
     headers: {},
   };
 

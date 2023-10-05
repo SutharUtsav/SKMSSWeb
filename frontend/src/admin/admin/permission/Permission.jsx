@@ -8,49 +8,54 @@ import PermissionModal from "./PermissionModal";
 import useApiCall from "../../../hooks/useApiCall";
 
 const Permission = () => {
-  let { data, setData, error, setError, loading, setLoading } = useApiCall(() => get("/role-permission"));
+  let { data, setData, error, setError, loading, setLoading } = useApiCall(() =>
+    get("/role-permission")
+  );
 
-  const [isReloadData, setisReloadData] = useState(false)
+  const defaultPermissionForm = {
+    permissionFor: "",
+    permissions: ""
+  };
+
+  const [isReloadData, setisReloadData] = useState(false);
+  const [permissionForm, setpermissionForm] = useState(defaultPermissionForm)
+  const [updateRecordId, setupdateRecordId] = useState(null)
 
   //Reload Data on isReloadData is true
   useEffect(() => {
-    if(isReloadData){
+    if (isReloadData) {
       get("/role-permission")
-      .then((response)=>{
-        console.log(response)
-        if(response.data.status === 1){
-          setData(response.data)
-        }
-        else{ 
-          setError(response.data.error)
-        }
-        
-      })
-      .catch((err)=>{
-        error = err
-      }).finally(()=>{
-        setisReloadData(false)
-      })
+        .then((response) => {
+          console.log(response);
+          if (response.data.status === 1) {
+            setData(response.data);
+          } else {
+            setError(response.data.error);
+          }
+        })
+        .catch((err) => {
+          error = err;
+        })
+        .finally(() => {
+          setisReloadData(false);
+        });
     }
-  }, [isReloadData])
-  
+  }, [isReloadData]);
 
-  const handleDelete = (id)=>{
-
-    console.log(id)
-    del("/role-permission",id)
-    .then((response)=>{
-      if(response.data.status===1){
-        setisReloadData(true)
-      }
-      console.log(response.data)
-      
-    })
-    .catch((error)=>{
-      console.log(error)
-    })
-  }
-
+  //Delete Api Call
+  const handleDelete = (id) => {
+    console.log(id);
+    del("/role-permission", id)
+      .then((response) => {
+        if (response && response.data.status === 1) {
+          setisReloadData(true);
+        }
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return (
     <>
@@ -198,6 +203,17 @@ const Permission = () => {
                             <button
                               title="Edit"
                               className="btn btn-sm btn-primary btn-edit"
+                              data-bs-toggle="modal"
+                              data-bs-target="#createPermissionModal"
+
+                              onClick={()=>{
+                                setupdateRecordId(permission.id);
+                                setpermissionForm({
+                                  permissionFor : permission.permissionFor,
+                                  permissions : permission.permissions 
+                                })
+
+                              }}
                             >
                               <BiEdit
                                 fill="#fff"
@@ -208,7 +224,7 @@ const Permission = () => {
                             <button
                               title="Delete"
                               className="btn btn-sm btn-danger btn-delete"
-                              onClick={()=>handleDelete(permission.id)}
+                              onClick={() => handleDelete(permission.id)}
                             >
                               <MdDelete
                                 fill="#fff"
@@ -234,7 +250,7 @@ const Permission = () => {
         </div>
       </div>
 
-      <PermissionModal setisReloadData={setisReloadData}/>
+      <PermissionModal setisReloadData={setisReloadData} permissionForm={permissionForm} setpermissionForm={setpermissionForm} updateRecordId={updateRecordId}/>
     </>
   );
 };

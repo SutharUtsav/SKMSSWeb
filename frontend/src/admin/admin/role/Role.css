@@ -1,55 +1,55 @@
-.content-header{
-    margin-top: 30px;
+.content-header {
+  margin-top: 30px;
 }
 
-.admin-panel .content{
-    padding: 20px;
+.admin-panel .content {
+  padding: 20px;
 }
 
-.breadcrumb a{
-    color: var(--secondary-color);
-    text-decoration: none;
+.breadcrumb a {
+  color: var(--secondary-color);
+  text-decoration: none;
 }
 
-.btn-edit{
-    background-color: var(--secondary-color);
-    border-color: var(--secondary-color);
+.btn-edit {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
 }
-.btn-edit:hover{
-    background-color: var(--secondary-color-hover);
-    border-color: var(--secondary-color-hover);
+.btn-edit:hover,
+.btn-edit:focus {
+  background-color: var(--secondary-color-hover);
+  border-color: var(--secondary-color-hover);
 }
+.btn-edit:focus{
+    box-shadow: 0 0 0 0.25rem var(--secondary-color-hover);
 
-
-#createRoleModal .modal-dialog{
-    max-width: 700px;
-}
-
-
-
-#createRoleModal .table *{
-    font-weight: 300;
 }
 
-#createRoleModal .table{
-    margin-top: 30px;
-    
+#createRoleModal .modal-dialog {
+  max-width: 700px;
+}
+
+#createRoleModal .table * {
+  font-weight: 300;
+}
+
+#createRoleModal .table {
+  margin-top: 30px;
 }
 
 #createRoleModal .table-responsive::-webkit-scrollbar {
-    width: 5px;
-    height: 10px;
-    background-color: #fff;
-  }
-  
-  #createRoleModal .table-responsive::-webkit-scrollbar-thumb{
-    background-color: var(--sub-text-color);
-    border-radius: 8px;
-  
-  }
-#createRoleModal .table th{
-    font-weight: 400;
-    background-color: #eee;
-    padding-left: 15px; 
-    vertical-align: middle;
+  width: 5px;
+  height: 10px;
+  background-color: #fff;
+}
+
+#createRoleModal .table-responsive::-webkit-scrollbar-thumb {
+  background-color: var(--sub-text-color);
+  border-radius: 8px;
+}
+#createRoleModal .table th {
+  font-weight: 400;
+  background-color: #eee;
+  padding-left: 15px;
+  vertical-align: middle;
 }

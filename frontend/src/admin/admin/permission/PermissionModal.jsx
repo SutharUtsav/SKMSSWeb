@@ -1,50 +1,68 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
-import { add } from "../../../service/api-service";
+import { add, edit } from "../../../service/api-service";
 import { useRef } from "react";
 
 const PermissionModal = (props) => {
-
   const defaultPermissionForm = {
     permissionFor: "",
-    permissions: ""
+    permissions: "",
   };
+
+  useEffect(() => {
+    return () => {
+      props.setpermissionForm(defaultPermissionForm);
+    };
+  }, []);
 
   const closeModal = useRef();
 
-  const [permissionForm, setpermissionForm] = useState(defaultPermissionForm)
-
   const handleChange = (e) => {
-    setpermissionForm({
-      ...permissionForm,
-      [e.target.name]: e.target.value
-    })
-  }
+    props.setpermissionForm({
+      ...props.permissionForm,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleResetForm = () => {
-    setpermissionForm(defaultPermissionForm);
-  }
+    props.setpermissionForm(defaultPermissionForm);
+  };
 
   const handleSubmitForm = (e) => {
     e.preventDefault();
-    
 
-    add('/role-permission', permissionForm)
-    .then((response) => {
-      if(response.data.status === 1){
-        props.setisReloadData(true);
-      }
-      else{
-        console.log(response.data)
-      }
-    })
-    .catch((error)=>{
-      console.error(error)
-    })
-    .finally(()=>{
-      closeModal.current.click()
-    })
-  }
+    if (props.updateRecordId === null) {
+      add("/role-permission", props.permissionForm)
+        .then((response) => {
+          if (response && response.data.status === 1) {
+            props.setisReloadData(true);
+          } else {
+            console.log(response);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+        .finally(() => {
+          closeModal.current.click();
+        });
+    } else {
+      edit("/role-permission", props.updateRecordId, props.permissionForm)
+        .then((response) => {
+          if (response && response.data.status === 1) {
+            props.setisReloadData(true);
+          } else {
+            console.log(response);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+        .finally(() => {
+          closeModal.current.click();
+        });
+    }
+  };
 
   return (
     <div
@@ -82,7 +100,7 @@ const PermissionModal = (props) => {
                   id="permissionForInput"
                   aria-describedby="permissionForInput"
                   name="permissionFor"
-                  value={permissionForm.permissionFor}
+                  value={props.permissionForm.permissionFor}
                   onChange={handleChange}
                 />
               </div>
@@ -97,14 +115,31 @@ const PermissionModal = (props) => {
                   id="permissionInput"
                   aria-describedby="permissionInput"
                   name="permissions"
-                  value={permissionForm.permissions}
-                  onChange={(e) => { setpermissionForm({ ...permissionForm, permissions: e.target.value }) }}
+                  value={props.permissionForm.permissions}
+                  onChange={(e) => {
+                    props.setpermissionForm({
+                      ...props.permissionForm,
+                      permissions: e.target.value,
+                    });
+                  }}
                 />
               </div>
 
               <div className="float-end mt-4">
-                <button type="submit" className="btn btn-save m-2 px-4 py-2 fs-3 fw-normal rounded">Save</button>
-                <button type="button" className="btn btn-secondary m-2 px-4 py-2 fs-3 fw-normal rounded" data-bs-dismiss="modal" onClick={handleResetForm}>Cancel</button>
+                <button
+                  type="submit"
+                  className="btn btn-save m-2 px-4 py-2 fs-3 fw-normal rounded"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary m-2 px-4 py-2 fs-3 fw-normal rounded"
+                  data-bs-dismiss="modal"
+                  onClick={handleResetForm}
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>
