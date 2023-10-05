@@ -162,7 +162,7 @@ export class RoleService extends BaseService implements IRoleService {
 
             apiResponse.status = 1;
             apiResponse.data = {
-                id : roleId.dataValues.id
+                id: roleId.dataValues.id
             }
 
             return apiResponse
@@ -301,7 +301,23 @@ export class RoleService extends BaseService implements IRoleService {
                     }
                 }
                 else {
-                    errorMessage = EnumApiResponseMsg[EnumApiResponse.DATA_ALREADY_EXIST];
+
+                    const roleRolePermission = await RoleRolePermission.destroy({
+                        where: {
+                            roleId: role.id,
+                            rolePermissionId: rolePermissionId,
+                        }
+                    })
+
+                    if (!roleRolePermission) {
+                        apiResponse = new ApiResponseDto();
+                        apiResponse.status = 0;
+                        let errorDto = new ErrorDto();
+                        errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG].toString();
+                        errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG];
+                        apiResponse.error = errorDto;
+                        return apiResponse;
+                    }
                 }
             }
             apiResponse = new ApiResponseDto();
