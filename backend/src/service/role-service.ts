@@ -244,7 +244,7 @@ export class RoleService extends BaseService implements IRoleService {
             //check if role with user-typed roleType is already present or not
             const foundRole = await Role.findAll({
                 where: {
-                    roleType: dtoRecord.roleType
+                    name: dtoRecord.name
                 }
             });
 
