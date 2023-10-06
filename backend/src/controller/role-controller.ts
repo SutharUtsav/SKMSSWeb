@@ -94,6 +94,7 @@ router.put('/', upload, async (req: any, res: any) => {
     }
     let roleDto: RoleDto | ErrorDto | undefined = validateRole(req.body);
 
+
     if (!roleDto || !id) {
         res.send(EnumErrorMsg.API_SOMETHING_WENT_WRONG);
     }
@@ -169,30 +170,34 @@ router.get('/role-permission-by-role', async (req: any, res: any) => {
     }
 })
 
+/**
+ * Update Role Permission by Role
+ */
+// router.put('/role-permission-by-role', upload, async (req: any, res: any) => {
+//     const id = req.query.id;
+//     const body = req.body.permissions;
+//     if(id===undefined || id===null){
+//         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+//             status: 0,
+//             message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+//         })
+//     }
 
-router.put('/role-permission-by-role', upload, async (req: any, res: any) => {
-    const id = req.query.id;
-    const body = req.body.permissions;
-    if(id===undefined || id===null){
-        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
-            status: 0,
-            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
-        })
-    }
+//     const roleService: IRoleService = new RoleService();
+//     const response = await roleService.UpdateRolePermission(body, id);
 
-    const roleService: IRoleService = new RoleService();
-    const response = await roleService.UpdateRolePermission(body, id);
+//     if (!response) {
+//         res.status(400).send({
+//             status: 0,
+//             message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+//         })
+//     }
+//     else {
+//         res.send(response)
+//     }
+// })
 
-    if (!response) {
-        res.status(400).send({
-            status: 0,
-            message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
-        })
-    }
-    else {
-        res.send(response)
-    }
-})
+
 //#endregion
 
 

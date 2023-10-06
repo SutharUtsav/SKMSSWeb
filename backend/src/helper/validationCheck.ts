@@ -182,7 +182,7 @@ export const validateRole = (body: RoleDto): RoleDto | ErrorDto | undefined => {
         roleDto.name = body.name;
         roleDto.description = body.description;
         if (body.rolePermissionIds)
-            roleDto.rolePermissionIds = body.rolePermissionIds;
+            roleDto.rolePermissionIds = String(body.rolePermissionIds).split(',').map(Number);
         //set roleType Field
         if (EnumRoleType[body.roleType as keyof typeof EnumRoleType] === undefined) {
             let errorDto = new ErrorDto();

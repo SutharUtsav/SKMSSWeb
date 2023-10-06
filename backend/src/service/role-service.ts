@@ -1,7 +1,7 @@
 import { EnumApiResponse, EnumApiResponseCode, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
-import { PermissionDto, PermissionListDto, RoleDto } from "../dtos/role-dto";
+import { PermissionDto, PermissionListDto, RoleDto, RoleRolePermissionLookupDto } from "../dtos/role-dto";
 import { Role, RolePermission, RoleRolePermission } from "../model/role";
 import { BaseService } from "./base-service";
 
@@ -65,11 +65,27 @@ export class RoleService extends BaseService implements IRoleService {
     public async GetRecords(): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
         try {
-            let roles: RoleDto[] | RoleDto = await Role.findAll({
+            let roles: RoleDto[] = await Role.findAll({
                 raw: true
             });
 
             if (roles) {
+                
+                for( const role of roles) {
+                    let permissions : RoleRolePermissionLookupDto[] = await RoleRolePermission.findAll({
+                        where: {
+                            roleId : role.id
+                        },
+                        raw: true,
+                        attributes :['roleId', 'rolePermissionId'] 
+                    });
+                    if(permissions){
+                        role.permissionIds = permissions;
+                    }else{
+                        role.permissionIds = [];
+                    }
+                };
+                
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
                 apiResponse.data = roles
@@ -358,6 +374,7 @@ export class RoleService extends BaseService implements IRoleService {
             const roleDto = new RoleDto();
             roleDto.name = dtoRecord.name;
             roleDto.description = dtoRecord.description;
+            roleDto.roleType = dtoRecord.roleType;
             roleDto.updatedAt = recordModifiedInfo.updatedAt;
             roleDto.updatedById = recordModifiedInfo.updatedById;
 
@@ -368,6 +385,13 @@ export class RoleService extends BaseService implements IRoleService {
             })
 
             if (updatedRecord !== undefined || updatedRecord !== null) {
+
+                const resp = await this.UpdateRolePermission(dtoRecord.rolePermissionIds, id);
+
+                if(!resp){
+                    return undefined;
+                }
+               
                 apiResponse = new ApiResponseDto()
                 apiResponse.status = 1;
                 apiResponse.data = { status: parseInt(updatedRecord[0]), message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
@@ -397,6 +421,7 @@ export class RoleService extends BaseService implements IRoleService {
     public async UpdateRolePermission(rolePermissions: number[], roleId: number): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
 
+        console.log(rolePermissions)
         try {
             let resp = await RoleRolePermission.destroy({
                 where: {
@@ -434,6 +459,7 @@ export class RoleService extends BaseService implements IRoleService {
                 //Bulk Create
                 resp = await RoleRolePermission.bulkCreate(list, { fields: ['roleId', 'rolePermissionId', 'createdAt', 'updatedAt', 'createdById', 'updatedById', 'disabled', 'enabledDisabledOn'] });
 
+                // console.log(resp)
                 if (resp === undefined || resp === null) {
                     return undefined
                 }
@@ -446,13 +472,7 @@ export class RoleService extends BaseService implements IRoleService {
             }
         }
         catch (error: any) {
-            apiResponse = new ApiResponseDto();
-            let errorDto = new ErrorDto();
-            errorDto.errorCode = '400';
-            errorDto.errorMsg = error.toString();
-            apiResponse.status = 0;
-            apiResponse.error = errorDto;
-            return apiResponse;
+            throw error;
         }
 
     }
@@ -466,38 +486,38 @@ export class RoleService extends BaseService implements IRoleService {
 
         try {
             //check whether roleRolePermission if found or not
-            const roleRolePermissions = await RoleRolePermission.findAll({
+            const roleRolePermissions = await RoleRolePermission.destroy({
                 where: {
                     roleId: id,
                 }
             });
 
-            //No entry in roleRolePermission is found, then continue; else remove all those entries
-            if (roleRolePermissions.length !== 0) {
+            // //No entry in roleRolePermission is found, then continue; else remove all those entries
+            // if (roleRolePermissions.length !== 0) {
 
-                for (const element of roleRolePermissions) {
-                    let rolePermission = element
+            //     for (const element of roleRolePermissions) {
+            //         let rolePermission = element
 
-                    const resp = await RoleRolePermission.destroy({
-                        where: {
-                            id: rolePermission.id,
-                        },
-                        cascade: true,
-                    })
+            //         const resp = await RoleRolePermission.destroy({
+            //             where: {
+            //                 id: rolePermission.id,
+            //             },
+            //             cascade: true,
+            //         })
 
-                    if (resp === undefined || resp === null) {
-                        apiResponse = new ApiResponseDto()
-                        apiResponse.status = 0;
-                        let errorDto = new ErrorDto();
-                        errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_RECORD_NOT_FOUND].toString();
-                        errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_RECORD_NOT_FOUND]
-                        apiResponse.error = errorDto;
-                        return apiResponse;
-                    }
+            //         if (resp === undefined || resp === null) {
+            //             apiResponse = new ApiResponseDto()
+            //             apiResponse.status = 0;
+            //             let errorDto = new ErrorDto();
+            //             errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_RECORD_NOT_FOUND].toString();
+            //             errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_RECORD_NOT_FOUND]
+            //             apiResponse.error = errorDto;
+            //             return apiResponse;
+            //         }
 
-                }
+            //     }
 
-            }
+            // }
 
             const response = await Role.destroy({
                 where: {

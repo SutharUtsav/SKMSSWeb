@@ -4,20 +4,19 @@ import { EnumRoleType } from "../consts/enumRoleType";
 import { BaseDto, BaseDtoWithCommonFields } from "./base-dto";
 
 //#region Role entity related dto
-export class RoleDto extends BaseDtoWithCommonFields{
-    name!:string;
-    description!:string;
+export class RoleDto extends BaseDtoWithCommonFields {
+    name!: string;
+    description!: string;
     roleType!: string;
-    permissions!: PermissionDto[];
-    rolePermissionIds !:number[];
+    permissionIds!: RoleRolePermissionLookupDto[];
+    rolePermissionIds !: number[];
 
-    todos = (e : RoleDto) =>{
+    todos = (e: RoleDto) => {
         this.id = e.id;
         this.name = e.name;
         this.description = e.description;
         this.roleType = e.roleType;
         this.rolePermissionIds = e.rolePermissionIds;
-        this.permissions = e.permissions;
         this.createdAt = e.createdAt;
         this.createdById = e.createdById;
         this.updatedAt = e.updatedAt;
@@ -28,10 +27,10 @@ export class RoleDto extends BaseDtoWithCommonFields{
 
 //#region Dto for any lookup of role
 export class RoleLookUpDto extends BaseDto {
-    name!:string;
-    roleType!:EnumRoleType; 
+    name!: string;
+    roleType!: EnumRoleType;
 
-    todos = (e : RoleLookUpDto) =>{
+    todos = (e: RoleLookUpDto) => {
         this.id = e.id;
         this.name = e.name;
         this.roleType = e.roleType;
@@ -45,7 +44,8 @@ export class RoleLookUpDto extends BaseDto {
  * Dto for Role permission.
  * Permission Information for each actual storage Entity or any virtual section or department.
  */
-export class PermissionDto extends BaseDtoWithCommonFields{
+
+export class PermissionDto extends BaseDtoWithCommonFields {
     /**
      * Indicate to what permission apply to. e.g. Specific storage entity or virtual department in application.
      */
@@ -58,7 +58,7 @@ export class PermissionDto extends BaseDtoWithCommonFields{
     /**
      * Select expression to be used to populate Dto directly from Database
      */
-    todos = (e : PermissionDto) => {
+    todos = (e: PermissionDto) => {
         this.id = e.id;
         this.permissionFor = e.permissionFor;
         this.permissions = e.permissions;
@@ -75,7 +75,7 @@ export class PermissionListDto extends BaseDtoWithCommonFields {
      */
     permissions!: string;
 
-    todos = (e : PermissionDto) => {
+    todos = (e: PermissionDto) => {
         this.id = e.id;
         this.permissionFor = e.permissionFor;
         this.permissions = e.permissions;
@@ -86,4 +86,12 @@ export class PermissionListDto extends BaseDtoWithCommonFields {
     }
 }
 
+
+/**
+ * Lookup Dto for Role permission.
+ */
+export class RoleRolePermissionLookupDto {
+    roleId!: number;
+    permissionId!: number
+}
 //#endregion
