@@ -253,6 +253,7 @@ const Permission = () => {
         permissionForm={permissionForm}
         setpermissionForm={setpermissionForm}
         updateRecordId={updateRecordId}
+        setupdateRecordId={setupdateRecordId}
       />
     </>
   );

@@ -25,6 +25,7 @@ const PermissionModal = (props) => {
   };
 
   const handleResetForm = () => {
+    props.setupdateRecordId(null);
     props.setpermissionForm(defaultPermissionForm);
   };
 
@@ -44,6 +45,8 @@ const PermissionModal = (props) => {
           console.error(error);
         })
         .finally(() => {
+          props.setupdateRecordId(null);
+          props.setpermissionForm(defaultPermissionForm);
           closeModal.current.click();
         });
     } else {
@@ -59,6 +62,8 @@ const PermissionModal = (props) => {
           console.error(error);
         })
         .finally(() => {
+          props.setupdateRecordId(null);
+          props.setpermissionForm(defaultPermissionForm);
           closeModal.current.click();
         });
     }

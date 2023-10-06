@@ -279,6 +279,7 @@ export const Role = () => {
         setroleForm={setroleForm}
         setisReloadData={setisReloadData}
         updateRecordId={updateRecordId}
+        setupdateRecordId={setupdateRecordId}
       />
     </>
   );

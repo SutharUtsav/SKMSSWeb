@@ -54,6 +54,9 @@ html::-webkit-scrollbar-thumb{
   border-radius: 8px;
 
 }
+input{
+  text-transform: none;
+}
 
 button {
   cursor: pointer;
