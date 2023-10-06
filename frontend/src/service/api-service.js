@@ -61,7 +61,12 @@ export const edit = async (endpoint, id, jsonData = null) => {
 
   let formData = new FormData();
   Object.keys(jsonData).forEach((data) => {
-    formData.append(data.toString(), jsonData[data].toString());
+    if(typeof(jsonData[data]) === Array){
+      formData.append(data.toString(), jsonData[data]);
+    }
+    else{
+      formData.append(data.toString(), jsonData[data].toString());
+    }
   });
 
   let config = {

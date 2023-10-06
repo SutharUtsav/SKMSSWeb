@@ -14,12 +14,12 @@ const Permission = () => {
 
   const defaultPermissionForm = {
     permissionFor: "",
-    permissions: ""
+    permissions: "",
   };
 
   const [isReloadData, setisReloadData] = useState(false);
-  const [permissionForm, setpermissionForm] = useState(defaultPermissionForm)
-  const [updateRecordId, setupdateRecordId] = useState(null)
+  const [permissionForm, setpermissionForm] = useState(defaultPermissionForm);
+  const [updateRecordId, setupdateRecordId] = useState(null);
 
   //Reload Data on isReloadData is true
   useEffect(() => {
@@ -205,14 +205,12 @@ const Permission = () => {
                               className="btn btn-sm btn-primary btn-edit"
                               data-bs-toggle="modal"
                               data-bs-target="#createPermissionModal"
-
-                              onClick={()=>{
+                              onClick={() => {
                                 setupdateRecordId(permission.id);
                                 setpermissionForm({
-                                  permissionFor : permission.permissionFor,
-                                  permissions : permission.permissions 
-                                })
-
+                                  permissionFor: permission.permissionFor,
+                                  permissions: permission.permissions,
+                                });
                               }}
                             >
                               <BiEdit
@@ -250,7 +248,12 @@ const Permission = () => {
         </div>
       </div>
 
-      <PermissionModal setisReloadData={setisReloadData} permissionForm={permissionForm} setpermissionForm={setpermissionForm} updateRecordId={updateRecordId}/>
+      <PermissionModal
+        setisReloadData={setisReloadData}
+        permissionForm={permissionForm}
+        setpermissionForm={setpermissionForm}
+        updateRecordId={updateRecordId}
+      />
     </>
   );
 };

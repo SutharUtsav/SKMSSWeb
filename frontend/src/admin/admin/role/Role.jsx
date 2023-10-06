@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Role.css";
 import "../Common.css";
-import { get } from "../../../service/api-service";
+import { del, get } from "../../../service/api-service";
 import { BiEdit } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
-import { BsSearch } from "react-icons/bs";
 import { BiRefresh } from "react-icons/bi";
 import RoleModal from "./RoleModal";
 import useApiCall from "../../../hooks/useApiCall";
@@ -14,7 +13,8 @@ export const Role = () => {
   const defaultRoleForm = {
     name: "",
     description: "",
-    rolePermissionIds: null,
+    rolePermissionIds: [],
+    roleType: "CustomRole",
   };
 
   let { data, setData, error, setError, loading, setLoading } = useApiCall(() =>
@@ -23,13 +23,14 @@ export const Role = () => {
 
   const [isReloadData, setisReloadData] = useState(false);
   const [roleForm, setroleForm] = useState(defaultRoleForm);
+  const [updateRecordId, setupdateRecordId] = useState(null);
 
   //Reload Data on isReloadData is true
   useEffect(() => {
     if (isReloadData) {
       get("/role")
         .then((response) => {
-          console.log(response);
+          // console.log(response);
           if (response.data.status === 1) {
             setData(response.data);
           } else {
@@ -44,6 +45,22 @@ export const Role = () => {
         });
     }
   }, [isReloadData]);
+
+
+  //Delete Api Call
+  const handleDelete = (id) => {
+    console.log(id);
+    del("/role", id)
+      .then((response) => {
+        if (response && response.data.status === 1) {
+          setisReloadData(true);
+        }
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return (
     <>
@@ -211,6 +228,21 @@ export const Role = () => {
                             <button
                               title="Edit"
                               className="btn btn-sm btn-primary btn-edit"
+                              data-bs-toggle="modal"
+                              data-bs-target="#createRoleModal"
+                              onClick={() => {
+                                setroleForm({
+                                  ...roleForm,
+                                  name: role.name,
+                                  description: role.description,
+                                  rolePermissionIds: role.permissionIds.map(
+                                    (permisssionId) => {
+                                      return permisssionId.rolePermissionId;
+                                    }
+                                  ),
+                                });
+                                setupdateRecordId(role.id);
+                              }}
                             >
                               <BiEdit
                                 fill="#fff"
@@ -221,6 +253,7 @@ export const Role = () => {
                             <button
                               title="Delete"
                               className="btn btn-sm btn-danger btn-delete"
+                              onClick={() => handleDelete(role.id)}
                             >
                               <MdDelete
                                 fill="#fff"
@@ -241,7 +274,12 @@ export const Role = () => {
           </div>
         </div>
       </div>
-      <RoleModal roleForm={roleForm} setroleForm={setroleForm} />
+      <RoleModal
+        roleForm={roleForm}
+        setroleForm={setroleForm}
+        setisReloadData={setisReloadData}
+        updateRecordId={updateRecordId}
+      />
     </>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RolePermissionEntity } from "../../../consts/RolePermissioEntity";
-import { add, get } from "../../../service/api-service";
+import { add, edit, get } from "../../../service/api-service";
 
 const RoleModal = (props) => {
   const defaultRoleForm = {
@@ -73,20 +73,37 @@ const RoleModal = (props) => {
   //Method to handle form submission
   const handleSubmitForm = (e) => {
     e.preventDefault();
-    console.log(props.roleForm)
-
-    add("/role", props.roleForm)
-    .then((response)=>{
-      if(response && response.data.status===1){
-
-      }
-    })
-    .catch((err)=>{
-      console.log(err)
-    })
-    .finally(()=>{
-      closeModal.current.click();
-    })
+    
+    if(props.updateRecordId === null){
+      add("/role", props.roleForm)
+      .then((response)=>{
+        if(response && response.data.status===1){
+          props.setisReloadData(true);
+        }
+        console.log(response)
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
+      .finally(()=>{
+        closeModal.current.click();
+      })
+    }
+    else{
+      edit("/role",props.updateRecordId,props.roleForm).then((response)=>{
+        if(response && response.data.status===1){
+          props.setisReloadData(true);
+        }
+        console.log(response)
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
+      .finally(()=>{
+        closeModal.current.click();
+      })
+    }
+    
   }
 
 
@@ -120,7 +137,7 @@ const RoleModal = (props) => {
                 </label>
                 <input
                   type="text"
-                  className="form-control"
+                  className="form-control fw-light"
                   id="roleNameInput"
                   name="name"
                   aria-describedby="roleNameInput"
@@ -135,7 +152,7 @@ const RoleModal = (props) => {
                 </label>
                 <input
                   type="text"
-                  className="form-control"
+                  className="form-control fw-light"
                   id="roleDescInput"
                   name="description"
                   aria-describedby="roleDescInput"
