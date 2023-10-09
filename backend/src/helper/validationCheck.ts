@@ -73,7 +73,7 @@ export const validateUserProfile = (body: UserProfileDto): UserProfileDto | Erro
 
     //check all required files
     if (!body.name || !body.wifeSurname || !body.marriedStatus || !body.birthDate || !body.weddingDate || !body.education || !body.occupation || !body.countryCode || !body.mobileNumber || !body.email || !body.gender
-        || !body.mainFamilyMemberRelation || !body.mainFamilyMemberName || !body.mainFamilyMemberSurname || !body.mainFamilyMemberVillage
+        || !body.mainFamilyMemberRelation || !body.mainFamilyMemberName || !body.mainFamilyMemberSurname || !body.mainFamilyMemberVillage || !body.surname || !body.village
         || !body.motherName || !body.motherSurname || !body.motherVillage || !body.fatherName || !body.fatherSurname || !body.fatherVillage) {
         let errorDto = new ErrorDto();
         errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
@@ -120,6 +120,9 @@ export const validateUserProfile = (body: UserProfileDto): UserProfileDto | Erro
     userDto.motherName = body.motherName;
     userDto.motherSurname = body.motherSurname;
     userDto.motherVillage = body.motherVillage;
+    //Later added fields after bulk Insert
+    userDto.surname = body.surname;
+    userDto.village = body.village; 
     return userDto;
 }
 
@@ -141,7 +144,7 @@ export const validateUser = (body: UserDto): UserDto | ErrorDto | undefined => {
     // }
 
     //check all required fields
-    if (!body.username || !body.roleId) {
+    if (!body.name || !body.roleId || !body.surname || !body.village) {
         let errorDto = new ErrorDto();
         errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
         errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
@@ -156,9 +159,12 @@ export const validateUser = (body: UserDto): UserDto | ErrorDto | undefined => {
 
 
     //set fields of UserDto
-    userDto.username = body.username;
+    userDto.name = body.name;
     userDto.userType = body.userType;
     userDto.roleId = body.roleId;
+    //Later Added Fields after bulk Insert
+    userDto.surname = body.surname;
+    userDto.village = body.village; 
 
 
     return userDto;
@@ -249,7 +255,7 @@ export const validateBulkEntries = (row: any):any=> {
     let familyDto : FamilyDto = new FamilyDto();
 
     userDto.userType = EnumUserStatusText[EnumUserStatus.ADMINCREATED];
-    userDto.username = String(row[1])?.trim();
+    userDto.name = String(row[1])?.trim();
     userDto.surname = String(row[2])?.trim();
     userDto.village = String(row[3])?.trim();
 

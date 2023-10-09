@@ -118,7 +118,7 @@ export class UserService extends BaseService implements IUserService {
             const familyArray = families.map((family: any) => family.dataValues)
 
 
-            const users = await User.bulkCreate(dtoUsersRecord, { fields: ['username', 'userType', 'isImageAvailable', 'roleId', 'surname', 'village'], transaction })
+            const users = await User.bulkCreate(dtoUsersRecord, { fields: ['name', 'userType', 'isImageAvailable', 'roleId', 'surname', 'village'], transaction })
             if (!users) {
                 throw new Error("Error Occurs while Inserting Into User Entity")
             }
@@ -137,26 +137,26 @@ export class UserService extends BaseService implements IUserService {
                 }
                 
 
-                const mainFamilyMemberUserId = userArray.find((user: UserDto) => user.username === profileRecord.mainFamilyMemberName && user.surname === profileRecord.mainFamilyMemberSurname && user.village === profileRecord.mainFamilyMemberVillage)?.id;
+                const mainFamilyMemberUserId = userArray.find((user: UserDto) => user.name === profileRecord.mainFamilyMemberName && user.surname === profileRecord.mainFamilyMemberSurname && user.village === profileRecord.mainFamilyMemberVillage)?.id;
 
                 profileRecord.mainFamilyMemberId = mainFamilyMemberUserId;
 
-                profileRecord.userId = userArray.find((user: UserDto) => user.username === profileRecord.name && user.surname === profileRecord.surname && user.village === profileRecord.village)?.id
+                profileRecord.userId = userArray.find((user: UserDto) => user.name === profileRecord.name && user.surname === profileRecord.surname && user.village === profileRecord.village)?.id
 
-                const father: UserDto = userArray.find((user: UserDto) => user.username === profileRecord.fatherName && user.surname === profileRecord.fatherSurname && user.village === profileRecord.fatherVillage);
+                const father: UserDto = userArray.find((user: UserDto) => user.name === profileRecord.fatherName && user.surname === profileRecord.fatherSurname && user.village === profileRecord.fatherVillage);
                 if (father) {
                     profileRecord.fatherId = father.id;
-                    profileRecord.fatherName = father.username;
+                    profileRecord.fatherName = father.name;
                 }
                 else {
                     profileRecord.fatherId = null;
                     profileRecord.fatherName = null;
                 }
 
-                const mother = userArray.find((user: UserDto) => user.username === profileRecord.motherName && user.surname === profileRecord.motherSurname && user.village === profileRecord.motherVillage);
+                const mother = userArray.find((user: UserDto) => user.name === profileRecord.motherName && user.surname === profileRecord.motherSurname && user.village === profileRecord.motherVillage);
                 if (mother) {
                     profileRecord.motherId = mother.id;
-                    profileRecord.motherName = mother.username;
+                    profileRecord.motherName = mother.name;
                 }
                 else {
                     profileRecord.motherId = null;
@@ -356,6 +356,8 @@ export class UserService extends BaseService implements IUserService {
      */
     public async Create(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto, dtoFamilyRecord: FamilyDto): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
+
+        const transaction = await sequelize.transaction();
         try {
             const recordCreatedInfo = this.SetRecordCreatedInfo(dtoRecord);
             const recordModifiedInfo = this.SetRecordModifiedInfo(dtoRecord);
@@ -416,7 +418,7 @@ export class UserService extends BaseService implements IUserService {
                     updatedById: recordModifiedInfo.updatedById,
                     disabled: false,
                     enabledDisabledOn: new Date(),
-                })
+                },{transaction})
 
                 dtoProfileRecord.familyId = family.id;
             }
@@ -433,7 +435,7 @@ export class UserService extends BaseService implements IUserService {
                 updatedById: recordModifiedInfo.updatedById,
                 disabled: false,
                 enabledDisabledOn: new Date(),
-            })
+            },{transaction})
 
 
             //if user is not created
@@ -501,7 +503,7 @@ export class UserService extends BaseService implements IUserService {
                 updatedById: recordModifiedInfo.updatedById,
                 disabled: false,
                 enabledDisabledOn: new Date(),
-            })
+            },{transaction})
 
 
             //if userProfile is not created
@@ -531,9 +533,14 @@ export class UserService extends BaseService implements IUserService {
                 user: user,
                 userDetail: userProfile
             }
+
+            await transaction.commit();
+
             return apiResponse;
         }
         catch (error: any) {
+
+            await transaction.rollback();
             apiResponse = new ApiResponseDto();
             let errorDto = new ErrorDto();
             errorDto.errorCode = '400';
@@ -979,7 +986,7 @@ export class UserService extends BaseService implements IUserService {
                     apiResponse.status = 1;
                     apiResponse.data = {
                         status: 0,
-                        message: EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND] + ' username: ' + name
+                        message: EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND] + ' name: ' + name
                     }
                     return apiResponse;
                 }
@@ -1002,7 +1009,7 @@ export class UserService extends BaseService implements IUserService {
             else {
                 apiResponse.data = {
                     status: 0,
-                    message: EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND] + 'for username: ' + name
+                    message: EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND] + 'for name: ' + name
                 }
             }
             return apiResponse;
