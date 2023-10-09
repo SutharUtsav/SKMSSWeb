@@ -65,7 +65,7 @@ export const edit = async (endpoint, id, jsonData = null) => {
       formData.append(data.toString(), jsonData[data]);
     }
     else{
-      formData.append(data.toString(), jsonData[data].toString());
+      formData.append(data.toString(), jsonData[data]?.toString());
     }
   });
 

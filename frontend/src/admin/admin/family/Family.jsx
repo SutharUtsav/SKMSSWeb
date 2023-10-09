@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { get } from "../../../service/api-service";
+import { del, get } from "../../../service/api-service";
 import { BiRefresh } from "react-icons/bi";
 import { BiEdit } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
@@ -14,6 +14,7 @@ const Family = () => {
 
   const navigate = useNavigate();
 
+  const [isReloadData, setisReloadData] = useState(false);
   const [isUpdateClicked, setisUpdateClicked] = useState(false)
   const [beforeUpdateData, setbeforeUpdateData] = useState(null)
 
@@ -23,6 +24,43 @@ const Family = () => {
       setisUpdateClicked(false)
     }
   }, [])
+
+  //Reload Data on isReloadData is true
+  useEffect(() => {
+    if (isReloadData) {
+      get("/family")
+        .then((response) => {
+          // console.log(response);
+          if (response.data.status === 1) {
+            setData(response.data);
+          } else {
+            setError(response.data.error);
+          }
+        })
+        .catch((err) => {
+          error = err;
+        })
+        .finally(() => {
+          setisReloadData(false);
+        });
+    }
+  }, [isReloadData]);
+
+ //Delete Api Call
+ const handleDelete = (id) => {
+  console.log(id);
+  del("/family", id)
+    .then((response) => {
+      if (response && response.data.status === 1) {
+        setisReloadData(true);
+      }
+      console.log(response);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
 
   return (
     <>
@@ -252,6 +290,7 @@ const Family = () => {
                             <button
                               title="Delete"
                               className="btn btn-sm btn-danger btn-delete"
+                              onClick={()=>handleDelete(family.id)}
                             >
                               <MdDelete fill="#fff" size={"2.5rem"} className="m-1" />
                             </button>
@@ -271,7 +310,7 @@ const Family = () => {
         </div>
       </div>
       {!isUpdateClicked ? null : (
-        <CreateFamily beforeUpdateData={beforeUpdateData} setbeforeUpdateData={setbeforeUpdateData} setisUpdateClicked={setisUpdateClicked}/>
+        <CreateFamily beforeUpdateData={beforeUpdateData} setbeforeUpdateData={setbeforeUpdateData} setisUpdateClicked={setisUpdateClicked} setisReloadData={setisReloadData}/>
       )}
     </>
   );
