@@ -4,7 +4,7 @@ import { PermissionDto, RoleDto, RoleLookUpDto } from "./role-dto";
 
 //#region User detail page Dto.
 export class UserDto extends BaseDtoWithCommonFields{
-    username!:string;
+    name!:string;
     surname!:string;
     village!:string;
     userType!:string;

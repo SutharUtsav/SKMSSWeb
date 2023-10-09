@@ -1,66 +1,69 @@
-.sidebar {
-    width: 280px;
-    height: 100vh;
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    overflow-y: auto;
-    scroll-behavior: smooth;
-
-}
-
-.sidebar::-webkit-scrollbar {
-    width: 10px;
-    background-color: #fff;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-    background-color: var(--sub-text-color);
-    border-radius: 8px;
-
-}
-
-.sidebar .logo {
-    display: flex;
-    align-items: center;
-}
-
-.sidebar .logo img {
-    width: 130px;
-    aspect-ratio: 4/3;
-    object-fit: contain;
-}
-
-.sidebar .logo span {
-    font-weight: bold;
-    font-size: 2.565rem;
-}
-
-.sidebar .nav-link {
-    font-size: 1.8rem;
-    margin: 2px 0;
-    padding: 10px;
-    border-radius: 5px;
-
-}
-
-.sidebar .nav-link:hover {
-    background-color: #ddd;
-}
-
-.sidebar .nav-pills .nav-link.active:hover {
-    background-color: var(--secondary-color-hover);
-}
-
-.sidebar .nav-pills .nav-link.active {
-    background-color: var(--secondary-color);
-    color: #fff;
-}
-
-@media screen and (max-width:769px) {
     .sidebar {
-        display: none;
+        width: 280px;
+        height: 100vh;
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        overflow-y: auto;
+        scroll-behavior: smooth;
+
     }
-}
+
+    .sidebar::-webkit-scrollbar {
+        width: 10px;
+        background-color: #fff;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+        background-color: var(--sub-text-color);
+        border-radius: 8px;
+
+    }
+
+    .sidebar .logo {
+        display: flex;
+        align-items: center;
+    }
+
+    .sidebar .logo img {
+        width: 130px;
+        aspect-ratio: 4/3;
+        object-fit: contain;
+    }
+
+    .sidebar .logo span {
+        font-weight: bold;
+        font-size: 2.565rem;
+    }
+
+    .sidebar .nav-link {
+        font-size: 1.8rem;
+        margin: 2px 0;
+        padding: 10px;
+        border-radius: 5px;
+
+    }
+
+    .sidebar .nav-link:hover {
+        background-color: #ddd;
+    }
+
+    .sidebar .nav-pills .nav-link.active:hover {
+        background-color: var(--secondary-color-hover);
+    }
+
+    .sidebar .nav-pills .nav-link.active {
+        background-color: var(--secondary-color);
+        color: #fff;
+    }
+
+    @media screen and (max-width:769px) {
+        .sidebar {
+            display: none;
+            width: 0;
+            height: 0;
+            position: relative;
+        }
+    }
