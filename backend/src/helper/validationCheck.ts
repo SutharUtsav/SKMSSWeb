@@ -34,7 +34,7 @@ export const validateFamily = (body: FamilyDto): FamilyDto | ErrorDto | undefine
     // }
 
     //check all required fields
-    if (!body.surname || !body.village || !body.currResidency || !body.adobeOfGod || !body.goddess || !body.residencyAddress || !body.villageGuj || !body.mainFamilyMemberName) {
+    if (!body.surname || !body.village || !body.villageGuj || !body.mainFamilyMemberName) {
         let errorDto = new ErrorDto();
         errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
         errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
@@ -46,7 +46,7 @@ export const validateFamily = (body: FamilyDto): FamilyDto | ErrorDto | undefine
     familyDto.village = body.village;
     familyDto.villageGuj = body.villageGuj;
     familyDto.currResidency = body.currResidency;
-    familyDto.adobeOfGod = body.adobeOfGod;
+    familyDto.adobeOfGod = body?.adobeOfGod;
     familyDto.goddess = body.goddess;
     familyDto.lineage = body.lineage;
     familyDto.residencyAddress = body.residencyAddress;

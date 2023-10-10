@@ -398,35 +398,28 @@ export class UserService extends BaseService implements IUserService {
                 return apiResponse;
             }
 
-            //Check if Family not exist then Create Entry for Family
+            //Check if Family not exist or not
             let family = await Family.findOne({
                 where: {
                     surname: dtoFamilyRecord.surname,
                     village: dtoFamilyRecord.village,
-                    currResidency: dtoFamilyRecord.currResidency,
-                    adobeOfGod: dtoFamilyRecord.adobeOfGod,
-                    goddess: dtoFamilyRecord.goddess
+                    villageGuj : dtoFamilyRecord.villageGuj,
+                    mainFamilyMemberName :  dtoFamilyRecord.mainFamilyMemberName
                 }
             })
 
             if (!family) {
-                family = await Family.create({
-                    ...dtoFamilyRecord,
-                    createdAt: recordCreatedInfo.createdAt,
-                    createdById: recordCreatedInfo.createdById,
-                    updatedAt: recordModifiedInfo.updatedAt,
-                    updatedById: recordModifiedInfo.updatedById,
-                    disabled: false,
-                    enabledDisabledOn: new Date(),
-                },{transaction})
-
-                dtoProfileRecord.familyId = family.id;
+                apiResponse = new ApiResponseDto();
+                apiResponse.status = 0;
+                let errorDto = new ErrorDto();
+                errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_RECORD_NOT_FOUND].toString();
+                errorDto.errorMsg = "Family " + EnumErrorMsgText[EnumErrorMsg.API_RECORD_NOT_FOUND];
+                apiResponse.error = errorDto;
+                return apiResponse;
             }
-            else {
-                dtoProfileRecord.familyId = family.id;
-            }
+            
 
-
+            dtoProfileRecord.familyId = family.id;
             const user = await User.create({
                 ...dtoRecord,
                 createdAt: recordCreatedInfo.createdAt,

@@ -4,7 +4,7 @@ import { ModelBaseWithCommonFields } from "./modelBase"
 const sequelize = require('../config/db')
 
 export const User = sequelize.define('User',{
-    username : {
+    name : {
         type : DataTypes.STRING
     },
     userType : {

@@ -15,13 +15,14 @@ export class FamilyDto extends BaseDtoWithCommonFields{
 }
 
 
-export class FamilyLookupDto extends BaseDto{
+export class FamilyLookupDto{
     surname!:string | null;
     village!:string | null;
+    villageGuj!:string | null;
     mainFamilyMemberName!:string | null;
 
     todos = (e : FamilyLookupDto) =>{
-        e.id = this.id;
+        
         e.surname = this.surname;
         e.village = this.village;
         e.mainFamilyMemberName = this.mainFamilyMemberName;

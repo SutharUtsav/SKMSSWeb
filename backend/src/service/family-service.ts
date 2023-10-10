@@ -50,7 +50,7 @@ export class FamilyService extends BaseService implements IFamilyService {
         try {
 
             if (lookup) {
-                let families: FamilyLookupDto[] = await Family.findAll({attributes :['id', 'surname', 'village', 'mainFamilyMemberName']});
+                let families: FamilyLookupDto[] = await Family.findAll({attributes :[ 'surname', 'village', 'villageGuj', 'mainFamilyMemberName']});
 
                 if (families.length !== 0) {
                     apiResponse = new ApiResponseDto();
