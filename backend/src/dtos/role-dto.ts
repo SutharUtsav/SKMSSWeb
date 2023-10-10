@@ -29,11 +29,13 @@ export class RoleDto extends BaseDtoWithCommonFields {
 export class RoleLookUpDto extends BaseDto {
     name!: string;
     roleType!: EnumRoleType;
+    description!: string;
 
     todos = (e: RoleLookUpDto) => {
         this.id = e.id;
         this.name = e.name;
         this.roleType = e.roleType;
+        this.description = e.description;
     }
 }
 //#endregion

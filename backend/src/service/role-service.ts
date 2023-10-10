@@ -1,7 +1,7 @@
 import { EnumApiResponse, EnumApiResponseCode, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
-import { PermissionDto, PermissionListDto, RoleDto, RoleRolePermissionLookupDto } from "../dtos/role-dto";
+import { PermissionDto, PermissionListDto, RoleDto, RoleLookUpDto, RoleRolePermissionLookupDto } from "../dtos/role-dto";
 import { Role, RolePermission, RoleRolePermission } from "../model/role";
 import { BaseService } from "./base-service";
 
@@ -10,7 +10,7 @@ export interface IRoleService {
     /**
      * Get All Records of Role Entity 
      */
-    GetRecords(): Promise<ApiResponseDto | undefined>;
+    GetRecords(lookup ?: boolean): Promise<ApiResponseDto | undefined>;
 
     /**
      * Get Record of Role by Id
@@ -62,43 +62,68 @@ export class RoleService extends BaseService implements IRoleService {
     /**
      * Get All Records of Role Entity 
      */
-    public async GetRecords(): Promise<ApiResponseDto | undefined> {
+    public async GetRecords(lookup: boolean = false): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
+        
         try {
-            let roles: RoleDto[] = await Role.findAll({
-                raw: true
-            });
+            if(lookup){
+                let roles: RoleLookUpDto[] = await Role.findAll({
+                    raw: true,
+                    attributes : ['name', 'description', 'roleType']
+                });
 
-            if (roles) {
-                
-                for( const role of roles) {
-                    let permissions : RoleRolePermissionLookupDto[] = await RoleRolePermission.findAll({
-                        where: {
-                            roleId : role.id
-                        },
-                        raw: true,
-                        attributes :['roleId', 'rolePermissionId'] 
-                    });
-                    if(permissions){
-                        role.permissionIds = permissions;
-                    }else{
-                        role.permissionIds = [];
-                    }
-                };
-                
-                apiResponse = new ApiResponseDto();
-                apiResponse.status = 1;
-                apiResponse.data = roles
+                if (roles) {
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 1;
+                    apiResponse.data = roles
+                }
+                else {
+                    apiResponse = new ApiResponseDto();
+                    let errorDto = new ErrorDto();
+                    apiResponse.status = 0;
+                    errorDto.errorCode = '200';
+                    errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                    apiResponse.error = errorDto;
+                }
+                return apiResponse;
             }
-            else {
-                apiResponse = new ApiResponseDto();
-                let errorDto = new ErrorDto();
-                apiResponse.status = 0;
-                errorDto.errorCode = '200';
-                errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
-                apiResponse.error = errorDto;
+            else{
+                let roles: RoleDto[] = await Role.findAll({
+                    raw: true
+                });
+                if (roles) {
+                
+                    for( const role of roles) {
+                        let permissions : RoleRolePermissionLookupDto[] = await RoleRolePermission.findAll({
+                            where: {
+                                roleId : role.id
+                            },
+                            raw: true,
+                            attributes :['roleId', 'rolePermissionId'] 
+                        });
+                        if(permissions){
+                            role.permissionIds = permissions;
+                        }else{
+                            role.permissionIds = [];
+                        }
+                    };
+                    
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 1;
+                    apiResponse.data = roles
+                }
+                else {
+                    apiResponse = new ApiResponseDto();
+                    let errorDto = new ErrorDto();
+                    apiResponse.status = 0;
+                    errorDto.errorCode = '200';
+                    errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                    apiResponse.error = errorDto;
+                }
+                return apiResponse;
             }
-            return apiResponse;
+
+            
         }
         catch (error: any) {
             apiResponse = new ApiResponseDto();
