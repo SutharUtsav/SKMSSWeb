@@ -156,7 +156,7 @@ export const User = () => {
                         <div>{index + 1}</div>
                       </td>
 
-                      <td className="text-center">{user.username}</td>
+                      <td className="text-center">{user.name}</td>
 
                       <td className="text-center">{user.surname}</td>
 
