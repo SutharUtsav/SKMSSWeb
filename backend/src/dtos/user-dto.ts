@@ -59,6 +59,15 @@ export class UserProfileDto extends BaseDtoWithCommonFields{
 }
 
 /**
+ * Dto for UserProfile LookUp Dto
+ */
+export class UserProfileLookUpDto {
+    name!: string;
+    surname!:string;
+    village!:string;
+}
+
+/**
  * Dto for User profile Image
  */
 export class UserProfileImageDto extends BaseDtoWithCommonFields{

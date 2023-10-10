@@ -3,7 +3,7 @@ import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enum
 import { EnumFamilyMemberRelation, EnumFamilyMemberRelationName } from "../consts/enumFamilyMemberRelation";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { FamilyDto } from "../dtos/family-dto";
-import { UserDto, UserProfileDto, UserProfileImageDto } from "../dtos/user-dto";
+import { UserDto, UserProfileDto, UserProfileImageDto, UserProfileLookUpDto } from "../dtos/user-dto";
 import { RemoveFile } from "../helper/file-handling";
 import { Family } from "../model/family";
 import { Role } from "../model/role";
@@ -60,6 +60,11 @@ export interface IUserService {
      */
     UpdateUserProfile(dtoRecord: UserProfileDto, id: number): Promise<UserProfileDto | ApiResponseDto | undefined>;
 
+    /**
+     * Get All User Profiles detail
+     * @param lookup 
+     */
+    GetUserProfiles(lookup ?: boolean) : Promise<ApiResponseDto | undefined>;
     /**
      * Get User Details based on userId
      * @param id UserId
@@ -298,6 +303,68 @@ export class UserService extends BaseService implements IUserService {
 
             }
             return apiResponse;
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
+
+    /**
+     * Get All User Profiles detail
+     * @param lookup 
+     */
+    public async GetUserProfiles(lookup : boolean = false) : Promise<ApiResponseDto | undefined>{
+        let apiResponse!: ApiResponseDto;
+        try {
+            if(lookup){
+                let userProfile: UserProfileLookUpDto[] = await UserProfile.findAll({
+                    raw: true,
+                    attributes : ['name', 'surname', 'village']
+                });
+    
+                if (userProfile) {
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 1;
+                    apiResponse.data = userProfile
+                }
+                else {
+                    apiResponse = new ApiResponseDto();
+                    let errorDto = new ErrorDto();
+                    apiResponse.status = 0;
+                    errorDto.errorCode = '200';
+                    errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                    apiResponse.error = errorDto;
+    
+                }
+                return apiResponse;
+            }
+            else{
+                let userProfile: UserProfileDto[] = await UserProfile.findAll({
+                    raw: true,
+                });
+    
+                if (userProfile) {
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 1;
+                    apiResponse.data = userProfile
+                }
+                else {
+                    apiResponse = new ApiResponseDto();
+                    let errorDto = new ErrorDto();
+                    apiResponse.status = 0;
+                    errorDto.errorCode = '200';
+                    errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                    apiResponse.error = errorDto;
+    
+                }
+                return apiResponse;
+            }
         }
         catch (error: any) {
             apiResponse = new ApiResponseDto();

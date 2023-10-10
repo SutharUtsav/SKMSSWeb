@@ -70,6 +70,25 @@ router.get('/', async (req: any, res: any) => {
     }
 
 })
+
+/**
+ * Get UserProfile Details based on userId
+ */
+router.get('/look-up', async (req: any, res: any) => {
+        const userService: IUserService = new UserService();
+        const response = await userService.GetUserProfiles(true);
+
+        if (!response) {
+            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                status: 0,
+                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+            })
+        }
+        else {
+            res.send(response)
+        }
+})
+
 //#endregion
 
 
