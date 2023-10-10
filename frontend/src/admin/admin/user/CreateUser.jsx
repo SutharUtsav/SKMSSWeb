@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./User.css";
-import useApiCall from "../../../hooks/useApiCall";
 import { get } from "../../../service/api-service";
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
 
 const CreateUser = () => {
   const defaultUserForm = {
@@ -10,8 +11,8 @@ const CreateUser = () => {
     userType: "ADMINCREATED",
     wifeSurname: "",
     marriedStatus: "",
-    birthDate: null,
-    weddingDate: null,
+    birthDate: "",
+    weddingDate: "",
     education: "",
     occupation: "",
     mobileNumber: "",
@@ -38,13 +39,67 @@ const CreateUser = () => {
     residencyAddress: "",
   };
 
-  let { data, setData, error, setError, loading, setLoading } = useApiCall(() =>
-    get("/family/look-up")
-  );
 
   const [userForm, setuserForm] = useState(defaultUserForm);
+  const [familyLookUp, setFamilyLookUp] = useState([]);
+  const [roleLookUp, setRoleLookUp] = useState([]);
+  const [userLookUp, setUserLookUp] = useState([]);
+  const [userFrom, setUserForm] = useState(defaultUserForm);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    get("/family/look-up")
+      .then((response) => {
+        if (response.data.status === 1) {
+          setFamilyLookUp(response.data.data)
+        }
+        else {
+          console.log(response)
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+
+    get("/role/look-up")
+      .then((response) => {
+        if (response.data.status === 1) {
+          setRoleLookUp(response.data.data)
+        }
+        else {
+          console.log(response)
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+
+    get("/user-profile/look-up")
+      .then((response) => {
+        if (response.data.status === 1) {
+          setUserLookUp(response.data.data)
+        }
+        else {
+          console.log(response)
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+      })
+
+  }, [])
+
+  const handleResetForm = () => {
+    setUserForm(defaultUserForm);
+  };
+
+  const handleChange = (e) => {
+    setUserForm({
+      ...userForm,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   return (
     <div className="users content">
@@ -88,7 +143,6 @@ const CreateUser = () => {
 
           <form className="row mt-5 gx-5 gy-5">
             <h3 className="text-uppercase my-1 mx-0 text-center">
-              {" "}
               User Details
             </h3>
 
@@ -100,6 +154,9 @@ const CreateUser = () => {
                 type="text"
                 placeholder="Enter User Fullname"
                 className="form-control"
+                name="name"
+                value={userFrom.name}
+                onChange={handleChange}
               />
             </div>
 
@@ -111,6 +168,7 @@ const CreateUser = () => {
                 type="text"
                 placeholder="Enter User Type"
                 className="form-control"
+                name="userType"
                 value={userForm.userType}
                 disabled={true}
               />
@@ -120,12 +178,14 @@ const CreateUser = () => {
               <label htmlFor="userInputMarriedStatus">
                 User Married Status
               </label>
-              <i className="text-danger">*</i>
               <input
                 id="userInputMarriedStatus"
                 type="text"
                 placeholder="Enter User Married Status"
                 className="form-control"
+                name="marriedStatus"
+                value={userForm.marriedStatus}
+                onChange={handleChange}
               />
             </div>
 
@@ -136,6 +196,9 @@ const CreateUser = () => {
                 type="text"
                 placeholder="Enter User Wife Surname"
                 className="form-control"
+                name="wifeSurname"
+                value={userForm.wifeSurname}
+                onChange={handleChange}
               />
             </div>
 
@@ -146,6 +209,9 @@ const CreateUser = () => {
                 type="date"
                 placeholder="Enter User Birthdate"
                 className="form-control"
+                name="birthDate"
+                value={userForm.birthDate}
+                onChange={handleChange}
               />
             </div>
 
@@ -156,6 +222,9 @@ const CreateUser = () => {
                 type="date"
                 placeholder="Enter User Wedding Date"
                 className="form-control"
+                name="weddingDate"
+                value={userForm.weddingDate}
+                onChange={handleChange}
               />
             </div>
 
@@ -166,6 +235,9 @@ const CreateUser = () => {
                 type="text"
                 placeholder="Enter User Education"
                 className="form-control"
+                name="education"
+                value={userForm.education}
+                onChange={handleChange}
               />
             </div>
 
@@ -176,6 +248,9 @@ const CreateUser = () => {
                 type="text"
                 placeholder="Enter User Occupation"
                 className="form-control"
+                name="occupation"
+                value={userForm.occupation}
+                onChange={handleChange}
               />
             </div>
 
@@ -183,18 +258,11 @@ const CreateUser = () => {
               <label htmlFor="userInputCountryCode">Mobile Number</label>
               <i className="text-danger">*</i>
               <div className="d-flex gap-3">
-                <input
-                  id="userInputCountryCode"
-                  type="text"
-                  placeholder="Enter Country Code"
-                  className="form-control"
-                />
-                <input
-                  id="userInputMobileNumber"
-                  type="text"
-                  placeholder="Enter Mobile Number"
-                  className="form-control"
-                />
+                <PhoneInput country={'in'}
+                  value={defaultUserForm.mobileNumber}
+                  onChange={(phone) => {
+                    console.log(phone)
+                  }} />
               </div>
             </div>
 
@@ -205,8 +273,21 @@ const CreateUser = () => {
                 type="text"
                 placeholder="Enter User Email"
                 className="form-control"
+                name="email"
+                value={userForm.email}
+                onChange={handleChange}
               />
             </div>
+
+            <div className="col-md-6">
+              <select className="form-select" id="userInputFamily" aria-label="Example select with button addon">
+                <option selected defaultValue={''}>Select Family...</option>
+                {familyLookUp.map((family, index) => (
+                  <option key={index} defaultValue={index}>{family.name}</option>
+                ))}
+              </select>
+            </div>
+
           </form>
         </div>
       </div>
