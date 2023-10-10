@@ -1,4 +1,4 @@
-import { BaseDtoWithCommonFields } from "./base-dto";
+import { BaseDto, BaseDtoWithCommonFields } from "./base-dto";
 
 //#region Family Detail Dto
 
@@ -14,4 +14,17 @@ export class FamilyDto extends BaseDtoWithCommonFields{
     mainFamilyMemberName!:string | null;
 }
 
+
+export class FamilyLookupDto extends BaseDto{
+    surname!:string | null;
+    village!:string | null;
+    mainFamilyMemberName!:string | null;
+
+    todos = (e : FamilyLookupDto) =>{
+        e.id = this.id;
+        e.surname = this.surname;
+        e.village = this.village;
+        e.mainFamilyMemberName = this.mainFamilyMemberName;
+    }
+}
 //#endregion

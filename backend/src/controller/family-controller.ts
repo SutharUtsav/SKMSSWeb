@@ -28,6 +28,25 @@ router.get('/', async (req: any, res: any) => {
         res.send(response)
     }
 })
+
+
+/**
+ * Get All Lookup Records of Family
+ */
+router.get('/look-up', async (req: any, res: any) => {
+    const familyService: IFamilyService = new FamilyService();
+    const response = await familyService.GetRecords(true);
+
+    if (!response) {
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+        })
+    }
+    else {
+        res.send(response)
+    }
+})
 /**
 * Get Record of Family Entity by Id
 */

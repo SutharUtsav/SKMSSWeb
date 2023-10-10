@@ -1,7 +1,7 @@
 import { EnumApiResponse, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
-import { FamilyDto } from "../dtos/family-dto";
+import { FamilyDto, FamilyLookupDto } from "../dtos/family-dto";
 import { Family } from "../model/family";
 import { UserProfile } from "../model/userProfile";
 import { BaseService } from "./base-service";
@@ -11,7 +11,7 @@ export interface IFamilyService {
     /**
      * Get All Records of Family Entity 
      */
-    GetRecords(): Promise<ApiResponseDto | undefined>;
+    GetRecords(lookup?: boolean): Promise<ApiResponseDto | undefined>;
 
     /**
      * Get Record of Family by Id
@@ -45,25 +45,47 @@ export class FamilyService extends BaseService implements IFamilyService {
     /**
      * Get All Records of Family Entity 
      */
-    public async GetRecords(): Promise<ApiResponseDto | undefined> {
+    public async GetRecords(lookup = false): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
         try {
-            let families: FamilyDto[] = await Family.findAll({});
 
-            if (families.length !== 0) {
-                apiResponse = new ApiResponseDto();
-                apiResponse.status = 1;
-                apiResponse.data = families
+            if (lookup) {
+                let families: FamilyLookupDto[] = await Family.findAll({attributes :['id', 'surname', 'village', 'mainFamilyMemberName']});
+
+                if (families.length !== 0) {
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 1;
+                    apiResponse.data = families
+                }
+                else {
+                    apiResponse = new ApiResponseDto();
+                    let errorDto = new ErrorDto();
+                    apiResponse.status = 0;
+                    errorDto.errorCode = '200';
+                    errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                    apiResponse.error = errorDto;
+                }
+                return apiResponse;
             }
             else {
-                apiResponse = new ApiResponseDto();
-                let errorDto = new ErrorDto();
-                apiResponse.status = 0;
-                errorDto.errorCode = '200';
-                errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
-                apiResponse.error = errorDto;
+
+                let families: FamilyDto[] = await Family.findAll({});
+
+                if (families.length !== 0) {
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 1;
+                    apiResponse.data = families
+                }
+                else {
+                    apiResponse = new ApiResponseDto();
+                    let errorDto = new ErrorDto();
+                    apiResponse.status = 0;
+                    errorDto.errorCode = '200';
+                    errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                    apiResponse.error = errorDto;
+                }
+                return apiResponse;
             }
-            return apiResponse;
         }
         catch (error: any) {
             apiResponse = new ApiResponseDto();
@@ -137,7 +159,7 @@ export class FamilyService extends BaseService implements IFamilyService {
                     currResidency: dtoRecord.currResidency,
                     adobeOfGod: dtoRecord.adobeOfGod,
                     goddess: dtoRecord.goddess,
-                    mainFamilyMemberName : dtoRecord.mainFamilyMemberName
+                    mainFamilyMemberName: dtoRecord.mainFamilyMemberName
                 }
             });
 
