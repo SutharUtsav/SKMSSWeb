@@ -280,10 +280,66 @@ const CreateUser = () => {
             </div>
 
             <div className="col-md-6">
-              <select className="form-select" id="userInputFamily" aria-label="Example select with button addon">
-                <option selected defaultValue={''}>Select Family...</option>
-                {familyLookUp.map((family, index) => (
-                  <option key={index} defaultValue={index}>{family.name}</option>
+              <label htmlFor="userInputFamily">User's Family</label>
+              <i className="text-danger">*</i>
+              <select className="form-select fs-2 fw-light" id="userInputFamily" >
+                <option defaultChecked={true} value={0} className="fs-2 fw-light">Select Family...</option>
+                {familyLookUp && familyLookUp.map((family, index) => (
+                  <option key={index} value={family} className="fs-2 fw-light">
+                    Surname: {family.surname}  Village: {family.village} Main Family Member Name: {family.mainFamilyMemberName}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="col-md-6">
+              <label htmlFor="userInputFamily">Family's Main Family Member Name</label>
+              <i className="text-danger">*</i>
+              <select className="form-select fs-2 fw-light" id="userInputFamily" >
+                <option defaultChecked={true} value={0} className="fs-2 fw-light">Select Main Family Member Name...</option>
+                {userLookUp && userLookUp.map((user, index) => (
+                  <option key={index} value={user} className="fs-2 fw-light">
+                    Name: {user.name} Surname : {user.surname} Village : {user.village}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="col-md-6">
+              <label htmlFor="userInputFamily">User's Role</label>
+              <i className="text-danger">*</i>
+              <select className="form-select fs-2 fw-light" id="userInputFamily" >
+                <option defaultChecked={true} value={0} className="fs-2 fw-light">Select Role...</option>
+                {roleLookUp && roleLookUp.map((role, index) => (
+                  <option key={index} value={role} data-subtext={role.roleType} className="fs-2 fw-light">
+                    Name: {role.name} RoleType : {role.roleType}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="col-md-6">
+              <label htmlFor="userInputFamily">User's Mother</label>
+              <i className="text-danger">*</i>
+              <select className="form-select fs-2 fw-light" id="userInputFamily" >
+                <option defaultChecked={true} value={0} className="fs-2 fw-light">Select User...</option>
+                {userLookUp && userLookUp.map((user, index) => (
+                  <option key={index} value={user} className="fs-2 fw-light">
+                    Name: {user.name} Surname : {user.surname} Village : {user.village}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="col-md-6">
+              <label htmlFor="userInputFamily">User's Father</label>
+              <i className="text-danger">*</i>
+              <select className="form-select fs-2 fw-light" id="userInputFamily" >
+                <option defaultChecked={true} value={0} className="fs-2 fw-light">Select User...</option>
+                {userLookUp && userLookUp.map((user, index) => (
+                  <option key={index} value={user} className="fs-2 fw-light">
+                    Name: {user.name} Surname : {user.surname} Village : {user.village}
+                  </option>
                 ))}
               </select>
             </div>

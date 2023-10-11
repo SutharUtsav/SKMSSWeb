@@ -146,7 +146,7 @@ export const User = () => {
 
                 <tbody role="rowgroup">
                   {data.data.map((user, index) => (
-                    <tr role="row" aria-rowindex="1" className="">
+                    <tr role="row" aria-rowindex="1" className="" key={index}>
                       <td
                         aria-colindex="1"
                         data-label="ID"
