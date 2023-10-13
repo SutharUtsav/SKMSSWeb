@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./User.css";
-import { get } from "../../../service/api-service";
+import { add, get } from "../../../service/api-service";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
@@ -109,11 +109,32 @@ const CreateUser = () => {
   const handleSubmitForm = (e) => {
     e.preventDefault();
 
+    if(mainFamilyMemberRef.current.value === "Main Family Member" || userForm.mainFamilyMemberRelation === "SELF"){
+      setUserForm({
+        ...userForm,
+        mainFamilyMemberRelation : "SELF",
+        mainFamilyMemberName : userForm.name
+      })
+    }
+
     if(userForm.mobileNumber === "" || userForm.countryCode === ""){
       console.log("Mobile number is required")
     }
+    else if(roleRef.current.value === "No Role Selected"){
+      console.log("No Role Selected")
+    }
+    else if(familyRef.current.value === "Family is not Selected"){
+      console.log("Family is not Selected")
+    }
     else{
       console.log(userForm);
+      add('/user',userForm)
+      .then((response)=>{
+        console.log(response);
+      })
+      .catch((error)=>{ 
+        console.log(error)
+      })
     }
   };
 
