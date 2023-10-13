@@ -5,7 +5,8 @@ const sequelize = require('../config/db')
 
 export const User = sequelize.define('User',{
     name : {
-        type : DataTypes.STRING
+        type : DataTypes.STRING,
+        allowNull : false
     },
     userType : {
         type : DataTypes.STRING
@@ -14,10 +15,12 @@ export const User = sequelize.define('User',{
         type : DataTypes.BOOLEAN
     },
     surname : {
-        type : DataTypes.STRING
+        type : DataTypes.STRING,
+        allowNull : false
     },
     village: {
-        type : DataTypes.STRING
+        type : DataTypes.STRING,
+        allowNull : false
     },
     ...ModelBaseWithCommonFields
 },{tableName : 'User'})

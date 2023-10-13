@@ -3,6 +3,7 @@ import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enum
 import { EnumFamilyMemberRelation, EnumFamilyMemberRelationName } from "../consts/enumFamilyMemberRelation";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { FamilyDto } from "../dtos/family-dto";
+import { RoleDto, RoleLookUpDto } from "../dtos/role-dto";
 import { UserDto, UserProfileDto, UserProfileImageDto, UserProfileLookUpDto } from "../dtos/user-dto";
 import { RemoveFile } from "../helper/file-handling";
 import { Family } from "../model/family";
@@ -30,7 +31,7 @@ export interface IUserService {
      * Create Record for Entity User
      * @param dtoRecord 
      */
-    Create(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto, dtoFamilyRecord: FamilyDto): Promise<ApiResponseDto | undefined>;
+    Create(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto, dtoFamilyRecord: FamilyDto, dtoRoleRecord : RoleLookUpDto): Promise<ApiResponseDto | undefined>;
 
     /**
      * Create Bulk Record for entity Family, User, UserProfile 
@@ -421,18 +422,21 @@ export class UserService extends BaseService implements IUserService {
      * Create Record for Entity User
      * @param dtoRecord 
      */
-    public async Create(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto, dtoFamilyRecord: FamilyDto): Promise<ApiResponseDto | undefined> {
+    public async Create(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto, dtoFamilyRecord: FamilyDto, dtoRoleRecord:RoleLookUpDto): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
 
         const transaction = await sequelize.transaction();
         try {
+            console.log("in service")
             const recordCreatedInfo = this.SetRecordCreatedInfo(dtoRecord);
             const recordModifiedInfo = this.SetRecordModifiedInfo(dtoRecord);
 
             //check if role exist or not
             const role = await Role.findOne({
                 where: {
-                    id: dtoRecord.roleId
+                    name : dtoRoleRecord.name,
+                    description : dtoRoleRecord.description,
+                    roleType : dtoRoleRecord.roleType
                 }
             })
 
@@ -445,6 +449,7 @@ export class UserService extends BaseService implements IUserService {
                 apiResponse.error = errorDto;
                 return apiResponse;
             }
+            dtoRecord.roleId = role.id;
 
             //check if user already exist with that same phone number
             const userWithSameDetails = await UserProfile.findOne({
@@ -486,6 +491,7 @@ export class UserService extends BaseService implements IUserService {
             }
             
 
+            console.log("familyService: ",family.id)
             dtoProfileRecord.familyId = family.id;
             const user = await User.create({
                 ...dtoRecord,
@@ -1033,15 +1039,18 @@ export class UserService extends BaseService implements IUserService {
             //find family Id if not exist
             if (familyId == null) {
 
-                familyId = await Family.findOne({
+                let tmpfamily = await Family.findOne({
                     where: {
                         surname: surname,
                         village: village
-                    }
+                    },
+                    attribute :['id']
                 })
 
+                familyId = tmpfamily.id
 
-                if (!familyId) {
+
+                if (!tmpfamily) {
                     apiResponse = new ApiResponseDto();
                     apiResponse.status = 1;
                     apiResponse.data = {

@@ -42,41 +42,37 @@ export const UserProfile = sequelize.define('UserProfile', {
      */
     marriedStatus: {
         type: DataTypes.STRING,
-        allowNull: false
     },
     /**
      * Person's BirthDate
      */
     birthDate: {
-        type: DataTypes.DATE,
-        allowNull: false
+        type: DataTypes.STRING,
     },
     /**
      * Person's Wedding Date
      */
-    weddingDate: DataTypes.DATE,
+    weddingDate: DataTypes.STRING,
     /**
      * Person's Highest Education 
      */
     education: {
         type: DataTypes.STRING,
-        allowNull: false
     },
     /**
      * Person's Occupation
      */
     occupation: {
         type: DataTypes.STRING,
-        allowNull: false
     },
     /**
      * Person's Mobile Number
      */
     mobileNumber: {
         type: DataTypes.STRING,
-        validate: {
-            is: /^[0-9]{10}$/i,
-        },
+        // validate: {
+        //     is: /^[0-9]{10}$/i,
+        // },
         allowNull: false
 
     },

@@ -1,22 +1,19 @@
 //this file includes all functions that checks validation for incoming req in api
 
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
-import { EnumFamilyMemberRelation, EnumFamilyMemberRelationName } from "../consts/enumFamilyMemberRelation";
-import { EnumPermission, EnumPermissionName } from "../consts/enumPermission";
-import { EnumPermissionFor, EnumPermissionForName } from "../consts/enumPermissionFor";
-import { EnumRoleType, EnumRoleTypeName } from "../consts/enumRoleType";
 import { EnumUserStatus, EnumUserStatusText } from "../consts/enumUserStatus";
 import { ErrorDto } from "../dtos/api-response-dto";
 import { FamilyDto } from "../dtos/family-dto";
 import { PermissionDto, RoleDto } from "../dtos/role-dto";
-import { UserDto, UserProfileDto, UserProfileImageDto } from "../dtos/user-dto";
+import { UserDto, UserProfileDto } from "../dtos/user-dto";
 import { areAllFieldsFilled } from "./heper";
 
 
 //#region Regex validations
 
-export const regexMobile = /^[7-9]\d{9}$/;
+export const regexMobile = /^\+[1-9]\d{1,14}$/; ///^[7-9]\d{9}$/
 export const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+export const regexDate = /^\d{4}-\d{2}-\d{2}$/;
 
 //#endregion
 
@@ -70,31 +67,50 @@ export const validateUserProfile = (body: UserProfileDto): UserProfileDto | Erro
     // else {
     // }
 
-
+    console.log(body)
     //check all required files
-    if (!body.name || !body.wifeSurname || !body.marriedStatus || !body.birthDate || !body.weddingDate || !body.education || !body.occupation || !body.countryCode || !body.mobileNumber || !body.email || !body.gender
-        || !body.mainFamilyMemberRelation || !body.mainFamilyMemberName || !body.mainFamilyMemberSurname || !body.mainFamilyMemberVillage || !body.surname || !body.village
-        || !body.motherName || !body.motherSurname || !body.motherVillage || !body.fatherName || !body.fatherSurname || !body.fatherVillage) {
+    //removed || !body.wifeSurname || !body.marriedStatus || !body.birthDate || !body.weddingDate || !body.education || !body.occupation || !body.gender
+    //        || !body.mainFamilyMemberSurname || !body.mainFamilyMemberVillage || !body.motherName || !body.motherSurname || !body.motherVillage || !body.fatherName || !body.fatherSurname || !body.fatherVillage
+    if (!body.name || !body.countryCode || !body.mobileNumber || !body.email || !body.surname || !body.village || !body.villageGuj
+        || !body.mainFamilyMemberRelation || !body.mainFamilyMemberName) {
+            console.log("error1")
         let errorDto = new ErrorDto();
         errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
         errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
         return errorDto;
     }
 
-    if (!regexMobile.test(body.mobileNumber) || !regexEmail.test(body.email)) {
+    //!regexMobile.test(body.mobileNumber) removed
+    if ( !regexEmail.test(body.email)) {
+        console.log("error2")
         let errorDto = new ErrorDto();
         errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
         errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
         return errorDto;
     }
 
-    if (new Date(body.birthDate).toString() === "Invalid Date" || new Date(body.weddingDate).toString() === "Invalid Date") {
-        let errorDto = new ErrorDto();
-        errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
-        errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
-        return errorDto;
+    if (body.birthDate) {
+        console.log("error3")
+
+        if (!regexDate.test(String(body.birthDate))) {
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+            errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+            return errorDto;
+        }
+    }
+    if(body.weddingDate){
+        console.log("error4")
+
+        if (!regexDate.test(String(body.weddingDate))) {
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+            errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+            return errorDto;
+        }
     }
 
+    
     //set fields of UserDto
     userDto.name = body.name;
     // userDto.surname = body.surname;
@@ -102,8 +118,8 @@ export const validateUserProfile = (body: UserProfileDto): UserProfileDto | Erro
     // userDto.city = body.city;
     // userDto.currResidency = body.currResidency;
     userDto.marriedStatus = body.marriedStatus;
-    userDto.birthDate = new Date(body.birthDate);
-    userDto.weddingDate = new Date(body.weddingDate);
+    userDto.birthDate = !isNaN(Date.parse(String(body.birthDate))) ? new Date(body.birthDate).toISOString() : "";
+    userDto.weddingDate = !isNaN(Date.parse(String(body.weddingDate))) ? new Date(body.weddingDate).toISOString() : "";
     userDto.education = body.education;
     userDto.occupation = body.occupation;
     userDto.mobileNumber = body.mobileNumber;
@@ -122,7 +138,8 @@ export const validateUserProfile = (body: UserProfileDto): UserProfileDto | Erro
     userDto.motherVillage = body.motherVillage;
     //Later added fields after bulk Insert
     userDto.surname = body.surname;
-    userDto.village = body.village; 
+    userDto.village = body.village;
+    userDto.villageGuj = body.villageGuj;
     return userDto;
 }
 
@@ -144,7 +161,8 @@ export const validateUser = (body: UserDto): UserDto | ErrorDto | undefined => {
     // }
 
     //check all required fields
-    if (!body.name || !body.roleId || !body.surname || !body.village) {
+    // removed || !body.roleId 
+    if (!body.name || !body.surname || !body.village || !body.villageGuj) {
         let errorDto = new ErrorDto();
         errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
         errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
@@ -161,7 +179,8 @@ export const validateUser = (body: UserDto): UserDto | ErrorDto | undefined => {
     //set fields of UserDto
     userDto.name = body.name;
     userDto.userType = body.userType;
-    userDto.roleId = body.roleId;
+    userDto.villageGuj = body.villageGuj;
+    // userDto.roleId = body.roleId;
     //Later Added Fields after bulk Insert
     userDto.surname = body.surname;
     userDto.village = body.village; 
@@ -184,21 +203,30 @@ export const validateRole = (body: RoleDto): RoleDto | ErrorDto | undefined => {
     // }
     // else {
 
-        //set fields of RoleDto
-        roleDto.name = body.name;
-        roleDto.description = body.description;
-        if (body.rolePermissionIds)
-            roleDto.rolePermissionIds = String(body.rolePermissionIds).split(',').map(Number);
-        //set roleType Field
-        if (EnumRoleType[body.roleType as keyof typeof EnumRoleType] === undefined) {
-            let errorDto = new ErrorDto();
-            errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
-            errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
-            return errorDto;
-        }
-        else {
-            roleDto.roleType = EnumRoleTypeName[EnumRoleType[body.roleType as keyof typeof EnumRoleType]];
-        }
+    //set fields of RoleDto
+
+    if (!body.name || !body.roleType || !body.description) {
+        let errorDto = new ErrorDto();
+        errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+        errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        return errorDto;
+    }
+
+    roleDto.name = body.name;
+    roleDto.description = body.description;
+    roleDto.roleType = body.roleType;
+    if (body.rolePermissionIds)
+        roleDto.rolePermissionIds = String(body.rolePermissionIds).split(',').map(Number);
+    //set roleType Field
+    // if (EnumRoleType[body.roleType as keyof typeof EnumRoleType] === undefined) {
+    //     let errorDto = new ErrorDto();
+    //     errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+    //     errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+    //     return errorDto;
+    // }
+    // else {
+    //     roleDto.roleType = EnumRoleTypeName[EnumRoleType[body.roleType as keyof typeof EnumRoleType]];
+    // }
     // }
 
     return roleDto;
@@ -219,7 +247,7 @@ export const validateRolePermission = (body: PermissionDto): PermissionDto | Err
 
         permissionDto.permissionFor = body.permissionFor;
         permissionDto.permissions = body.permissions;
-        
+
         //set permissionFor field
         // if (EnumPermissionFor[body.permissionFor as keyof typeof EnumPermissionFor] === undefined) {
         //     let errorDto = new ErrorDto();
@@ -249,10 +277,10 @@ export const validateRolePermission = (body: PermissionDto): PermissionDto | Err
 //#region Validation Function for Bulk User Insert
 
 
-export const validateBulkEntries = (row: any):any=> {
+export const validateBulkEntries = (row: any): any => {
     let userProfileDto: UserProfileDto = new UserProfileDto();
-    let userDto : UserDto = new UserDto();
-    let familyDto : FamilyDto = new FamilyDto();
+    let userDto: UserDto = new UserDto();
+    let familyDto: FamilyDto = new FamilyDto();
 
     userDto.userType = EnumUserStatusText[EnumUserStatus.ADMINCREATED];
     userDto.name = String(row[1])?.trim();
@@ -262,8 +290,8 @@ export const validateBulkEntries = (row: any):any=> {
     userProfileDto.name = String(row[1])?.trim();
     userProfileDto.wifeSurname = String(row[10])?.trim();
     userProfileDto.marriedStatus = String(row[11])?.trim();
-    userProfileDto.birthDate = new Date(row[12]);
-    userProfileDto.weddingDate = new Date(row[13]);
+    userProfileDto.birthDate = !isNaN(Date.parse(row[12])) ? new Date(row[12]).toISOString() : '';
+    userProfileDto.weddingDate = !isNaN(Date.parse(row[13])) ? new Date(row[13]).toISOString() : '';;
     userProfileDto.education = String(row[14])?.trim();
     userProfileDto.occupation = String(row[15])?.trim();
     userProfileDto.countryCode = String(row[16])?.trim();
@@ -282,23 +310,23 @@ export const validateBulkEntries = (row: any):any=> {
     userProfileDto.motherVillage = String(row[26])?.trim();
     userProfileDto.fatherName = String(row[27])?.trim();
     userProfileDto.fatherSurname = String(row[28])?.trim();
-    userProfileDto.fatherVillage = String(row[29])?.trim();    
+    userProfileDto.fatherVillage = String(row[29])?.trim();
 
-    familyDto.surname = String(row[2])?.trim()=== "undefined" ? null : String(row[2])?.trim();
-    familyDto.village = String(row[3])?.trim()=== "undefined" ? null : String(row[3])?.trim();
-    familyDto.villageGuj = String(row[4])?.trim()=== "undefined" ? null : String(row[4])?.trim();
-    familyDto.currResidency = String(row[5])?.trim()=== "undefined" ? null : String(row[5])?.trim();;
+    familyDto.surname = String(row[2])?.trim() === "undefined" ? null : String(row[2])?.trim();
+    familyDto.village = String(row[3])?.trim() === "undefined" ? null : String(row[3])?.trim();
+    familyDto.villageGuj = String(row[4])?.trim() === "undefined" ? null : String(row[4])?.trim();
+    familyDto.currResidency = String(row[5])?.trim() === "undefined" ? null : String(row[5])?.trim();;
     familyDto.adobeOfGod = String(row[6])?.trim() === "undefined" ? null : String(row[6])?.trim();;
-    familyDto.goddess = String(row[7])?.trim()=== "undefined" ? null : String(row[7])?.trim();;
+    familyDto.goddess = String(row[7])?.trim() === "undefined" ? null : String(row[7])?.trim();;
     familyDto.lineage = String(row[8])?.trim() === "undefined" ? null : String(row[8])?.trim();
-    familyDto.residencyAddress = String(row[9])?.trim()=== "undefined" ? null : String(row[9])?.trim();
-    familyDto.mainFamilyMemberName = String(row[21])?.trim()=== "undefined" ? null : String(row[21])?.trim();
+    familyDto.residencyAddress = String(row[9])?.trim() === "undefined" ? null : String(row[9])?.trim();
+    familyDto.mainFamilyMemberName = String(row[21])?.trim() === "undefined" ? null : String(row[21])?.trim();
 
-    
+
     return {
-        userDto : userDto, 
-        userProfileDto: userProfileDto, 
-        familyDto :familyDto
+        userDto: userDto,
+        userProfileDto: userProfileDto,
+        familyDto: familyDto
     };
 }
 

@@ -3,10 +3,11 @@ import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enum
 import { EnumRoleType, EnumRoleTypeName } from "../consts/enumRoleType";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { FamilyDto } from "../dtos/family-dto";
+import { RoleDto, RoleLookUpDto } from "../dtos/role-dto";
 import { UserDto, UserProfileDto } from "../dtos/user-dto";
 import { RemoveFile } from "../helper/file-handling";
 import { createTable } from "../helper/stagingTable";
-import { validateBulkEntries, validateFamily, validateUser, validateUserProfile } from "../helper/validationCheck";
+import { validateBulkEntries, validateFamily, validateRole, validateUser, validateUserProfile } from "../helper/validationCheck";
 import { authMiddleware } from "../middleware/auth-middleware";
 import { BaseService } from "../service/base-service";
 import { IRoleService, RoleService } from "../service/role-service";
@@ -232,9 +233,23 @@ router.post('/', upload, async (req: any, res: any) => {
     let userDto: UserDto | ErrorDto | undefined = validateUser(req.body);
     let userProfileDto: UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
     let familyDto: FamilyDto | ErrorDto | undefined = validateFamily(req.body);
+    let roleDto : RoleLookUpDto | ErrorDto | undefined;
 
+    if(!req.body.roleName || !req.body.roleDescription || !req.body.roleType){
+        roleDto = undefined;
+    }
+    else{
+        roleDto = new RoleLookUpDto();
+        roleDto.name = req.body.roleName;
+        roleDto.description = req.body.roleDescription;
+        roleDto.roleType = req.body.roleType;
+    }
 
-    if (!userDto || !userProfileDto || !familyDto) {
+    console.log("userDto ",userDto)
+    console.log("userProfileDto ",userProfileDto)
+    console.log("familyDto ",familyDto)
+    console.log("roleDto ",roleDto)
+    if (!userDto || !userProfileDto || !familyDto || !roleDto) {
         res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
     }
     else if (userDto instanceof ErrorDto) {
@@ -248,7 +263,7 @@ router.post('/', upload, async (req: any, res: any) => {
     }
     else {
         const userService: IUserService = new UserService();
-        const response = await userService.Create(userDto, userProfileDto, familyDto);
+        const response = await userService.Create(userDto, userProfileDto, familyDto, roleDto);
 
         if (!response) {
             res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
