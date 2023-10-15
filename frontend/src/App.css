@@ -1,10 +1,10 @@
 :root {
 
   --body-background: #f7f7f7;
-  --secondary-background:#034359;
+  --secondary-background: #034359;
   --primary-color: #000000;
   --secondary-color: #f58634;
-  --secondary-color-hover:#e3701c;
+  --secondary-color-hover: #e3701c;
   --sub-text-color: #8b8b8b;
   --second-cards-color: #ffffff;
   --text-field-color: #fff;
@@ -49,12 +49,13 @@ html::-webkit-scrollbar {
   background-color: #fff;
 }
 
-html::-webkit-scrollbar-thumb{
+html::-webkit-scrollbar-thumb {
   background-color: var(--sub-text-color);
   border-radius: 8px;
 
 }
-input{
+
+input {
   text-transform: none;
 }
 
@@ -62,14 +63,18 @@ button {
   cursor: pointer;
 }
 
+button.active {
+  transform: scale(0.5);
+}
+
 @media screen and (max-width: 780px) {
-  .hide-mobile{
+  .hide-mobile {
     display: none;
   }
 }
 
 @media screen and (min-width: 780px) {
-  .hide-desktop{
+  .hide-desktop {
     display: none;
   }
 }

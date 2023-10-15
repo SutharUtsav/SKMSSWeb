@@ -187,3 +187,22 @@
     font-size: 2.565rem;
 }
 
+
+
+.lookup-modal {
+    cursor: pointer;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.lookup-modal:hover {
+    background-color: var(--secondary-color);
+}
+
+.lookup-modal.active {
+    transform: scale(0.5);
+}
+
+.lookup-modal *{
+    text-transform: none;
+}

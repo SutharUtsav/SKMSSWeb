@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { get } from "../../../service/api-service";
-import { BiRefresh } from "react-icons/bi";
+import { del, get } from "../../../service/api-service";
+import { BiRefresh, BiSolidUserDetail } from "react-icons/bi";
 import { BiEdit } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
 import useApiCall from "../../../hooks/useApiCall";
@@ -13,6 +13,45 @@ export const User = () => {
   let { data, setData, error, setError, loading, setLoading } = useApiCall(() =>
     get("/user")
   );
+
+
+  const [isReloadData, setisReloadData] = useState(false);
+
+  //Reload Data on isReloadData is true
+  useEffect(() => {
+    if (isReloadData) {
+      get("/user")
+        .then((response) => {
+          // console.log(response);
+          if (response.data.status === 1) {
+            setData(response.data);
+          } else {
+            setError(response.data.error);
+          }
+        })
+        .catch((err) => {
+          error = err;
+        })
+        .finally(() => {
+          setisReloadData(false);
+        });
+    }
+  }, [isReloadData]);
+
+  //Delete Api Call
+  const handleDelete = (id) => {
+    console.log(id);
+    del("/user", id)
+      .then((response) => {
+        if (response && response.data.status === 1) {
+          setisReloadData(true);
+        }
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return (
     <div className="users content">
@@ -35,7 +74,7 @@ export const User = () => {
         <div className="card-header content-title">
           <h4>User</h4>
           <span className="pull-right">
-            <button onClick={()=>{
+            <button onClick={() => {
               navigate('create')
             }}>Add New</button>
           </span>
@@ -162,9 +201,13 @@ export const User = () => {
 
                       <td className="text-center">{user.village}</td>
 
-                      <td className="text-center">{user.userType }</td>
+                      <td className="text-center">{user.userType}</td>
                       <td aria-colindex="5" data-label="Actions" role="cell">
                         <div className="action-btns">
+                          <button title="User Details"
+                            className="btn btn-sm btn-success">
+                            <BiSolidUserDetail fill="#fff" size={"2.5rem"} className="m-1" />
+                          </button>
                           <button
                             title="Edit"
                             className="btn btn-sm btn-primary btn-edit"
@@ -174,6 +217,7 @@ export const User = () => {
                           <button
                             title="Delete"
                             className="btn btn-sm btn-danger btn-delete"
+                            onClick={() => handleDelete(user.id)}
                           >
                             <MdDelete fill="#fff" size={"2.5rem"} className="m-1" />
                           </button>

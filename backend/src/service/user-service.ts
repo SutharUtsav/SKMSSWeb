@@ -326,7 +326,7 @@ export class UserService extends BaseService implements IUserService {
             if(lookup){
                 let userProfile: UserProfileLookUpDto[] = await UserProfile.findAll({
                     raw: true,
-                    attributes : ['name', 'surname', 'village']
+                    attributes : ['name', 'surname', 'village', 'gender']
                 });
     
                 if (userProfile) {

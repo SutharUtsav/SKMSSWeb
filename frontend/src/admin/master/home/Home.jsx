@@ -22,6 +22,7 @@ export const HomeAdmin = () => {
           <Routes>
             <Route path="/" element={<Dashboard />}></Route>
             <Route path="/users" element={<User />}></Route>
+            
             <Route path="/users/create" element={<CreateUser />}></Route>
             <Route path="/roles" element={<Role/>}></Route>
             <Route path="/permissions" element={<Permission/>}></Route>
