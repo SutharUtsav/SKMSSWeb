@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./User.css";
-import { add, get } from "../../../service/api-service";
+import { add, get, getByQueryParams } from "../../../service/api-service";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import FamilyLookUpModal from "../family/FamilyLookUpModal";
 import UserLookUpModal from "./UserLookUpModal";
+import { useDispatch, useSelector } from "react-redux";
+import { ActionTypes } from "../../../redux/action-type";
 
-const CreateUser = () => {
+const CreateUser = (props) => {
   const defaultUserForm = {
     name: "",
     userType: "ADMINCREATED",
@@ -54,7 +56,18 @@ const CreateUser = () => {
   const roleRef = useRef(null);
 
   const navigate = useNavigate();
+  const selectedUser = useSelector((state)=>state.user.user);
+  const dispatch = useDispatch();
 
+  useEffect(() => {
+    
+  
+    return () => {
+      dispatch({type: ActionTypes.SET_USER, payload : null})
+    }
+  }, [])
+  
+  
   //Api call on page load
   useEffect(() => {
     get("/family/look-up")
@@ -93,6 +106,24 @@ const CreateUser = () => {
         console.log(error);
       });
   }, []);
+
+  //get Users profile details if user is updating
+  useEffect(()=> {
+    console.log(selectedUser)
+    if(props.isUpdateUser && selectedUser){
+      console.log(selectedUser.id)
+      const queryParams = {
+        userId : selectedUser.id
+      }
+      getByQueryParams('/user-profile', queryParams)
+      .then((response)=> {
+        console.log(response)
+      })
+      .catch((error)=> {
+        console.log(error)
+      })
+    }
+  },[selectedUser])
 
   // selected family  
   useEffect(() => {

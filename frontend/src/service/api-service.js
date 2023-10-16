@@ -17,14 +17,29 @@ export const get = async (endpoint) => {
   return await axios.request(config);
 };
 
+
 /**
  * Method to call GET request api with id
  * @param endpoint
  * @param id
  */
-// async getById(endpoint, id) {
-//     return null
-// }
+export const getByQueryParams = async (endpoint, params) => {
+  if(Object.keys(params).length === 0 ){
+    return null;
+  }
+
+  const url = `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}?${Object.keys(params).map((key)=> encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&')}`;
+  console.log(url)
+  let config = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}?${Object.keys(params).map((key)=> encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&')}`,
+    headers: { }
+  };
+  
+
+  return await axios.request(config);
+}
 
 /**
  * Method to call POST request to insert record
@@ -53,7 +68,13 @@ export const add = async (endpoint, jsonData = null) => {
   return await axios.request(config);
 };
 
-
+/**
+ * Method to call PUT request to update record
+ * @param {*} endpoint 
+ * @param {*} id 
+ * @param {*} jsonData 
+ * @returns 
+ */
 export const edit = async (endpoint, id, jsonData = null) => {
   if(!jsonData || !id){
     return null;

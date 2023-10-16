@@ -44,10 +44,10 @@ const UserLookUpModal = (props) => {
                                     }
                                 </div>
                                 {props.userLookUp.map((user, index) => (
-                                    <>
+                                    <div key={index}>
                                         {(props.modalForFather && user.gender === "MALE") || (props.modalForMother && user.gender === "FEMALE") ? (
 
-                                            <div className='border-bottom px-5 py-4 lookup-modal' data-bs-dismiss="modal" key={index} onClick={() => {
+                                            <div className='border-bottom px-5 py-4 lookup-modal' data-bs-dismiss="modal"  onClick={() => {
 
                                                 if (props.modalForFather) {
                                                     props.setselectedFather(user)
@@ -67,7 +67,7 @@ const UserLookUpModal = (props) => {
 
                                             </div>
                                         ) : null}
-                                    </>
+                                    </div>
                                 ))}
                             </>
                         ) : (

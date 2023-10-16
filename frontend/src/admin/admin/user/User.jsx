@@ -5,15 +5,15 @@ import { BiRefresh, BiSolidUserDetail } from "react-icons/bi";
 import { BiEdit } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
 import useApiCall from "../../../hooks/useApiCall";
-
+import { useDispatch } from "react-redux";
+import { ActionTypes } from "../../../redux/action-type";
 export const User = () => {
-
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   let { data, setData, error, setError, loading, setLoading } = useApiCall(() =>
     get("/user")
   );
-
 
   const [isReloadData, setisReloadData] = useState(false);
 
@@ -74,9 +74,13 @@ export const User = () => {
         <div className="card-header content-title">
           <h4>User</h4>
           <span className="pull-right">
-            <button onClick={() => {
-              navigate('create')
-            }}>Add New</button>
+            <button
+              onClick={() => {
+                navigate("create");
+              }}
+            >
+              Add New
+            </button>
           </span>
         </div>
 
@@ -182,7 +186,6 @@ export const User = () => {
                   </tr>
                 </thead>
 
-
                 <tbody role="rowgroup">
                   {data.data.map((user, index) => (
                     <tr role="row" aria-rowindex="1" className="" key={index}>
@@ -204,22 +207,44 @@ export const User = () => {
                       <td className="text-center">{user.userType}</td>
                       <td aria-colindex="5" data-label="Actions" role="cell">
                         <div className="action-btns">
-                          <button title="User Details"
-                            className="btn btn-sm btn-success">
-                            <BiSolidUserDetail fill="#fff" size={"2.5rem"} className="m-1" />
+                          <button
+                            title="User Details"
+                            className="btn btn-sm btn-success"
+                            onClick={()=>{
+                              console.log("first")
+                              dispatch({type : ActionTypes.SET_USER, payload : user})
+                            }}
+                          >
+                            <BiSolidUserDetail
+                              fill="#fff"
+                              size={"2.5rem"}
+                              className="m-1"
+                            />
                           </button>
                           <button
                             title="Edit"
                             className="btn btn-sm btn-primary btn-edit"
+                            onClick={()=> {
+                              dispatch({type : ActionTypes.SET_USER, payload : user})
+                              navigate("edit")
+                            }}
                           >
-                            <BiEdit fill="#fff" size={"2.5rem"} className="m-1" />
+                            <BiEdit
+                              fill="#fff"
+                              size={"2.5rem"}
+                              className="m-1"
+                            />
                           </button>
                           <button
                             title="Delete"
                             className="btn btn-sm btn-danger btn-delete"
                             onClick={() => handleDelete(user.id)}
                           >
-                            <MdDelete fill="#fff" size={"2.5rem"} className="m-1" />
+                            <MdDelete
+                              fill="#fff"
+                              size={"2.5rem"}
+                              className="m-1"
+                            />
                           </button>
                         </div>
                       </td>
@@ -231,7 +256,6 @@ export const User = () => {
           ) : (
             <>loading</>
           )}
-
         </div>
       </div>
     </div>

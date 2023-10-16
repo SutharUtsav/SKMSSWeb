@@ -292,7 +292,7 @@ export class UserService extends BaseService implements IUserService {
             if (userProfile) {
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                apiResponse.data = { userProfile: userProfile }
+                apiResponse.data = userProfile 
             }
             else {
                 apiResponse = new ApiResponseDto();
