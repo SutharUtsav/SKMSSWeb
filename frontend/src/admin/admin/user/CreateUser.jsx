@@ -45,29 +45,27 @@ const CreateUser = (props) => {
   const [familyLookUp, setFamilyLookUp] = useState([]);
   const [roleLookUp, setRoleLookUp] = useState([]);
   const [userLookUp, setUserLookUp] = useState([]);
-  const [inputMainFamilyMemberRelation, setinputMainFamilyMemberRelation] = useState(false);
+  const [inputMainFamilyMemberRelation, setinputMainFamilyMemberRelation] =
+    useState(false);
   const [selectedFamily, setselectedFamily] = useState(null);
   const [selectedFather, setselectedFather] = useState(null);
   const [selectedMother, setselectedMother] = useState(null);
 
-  const [modalForFather, setmodalForFather] = useState(false)
-  const [modalForMother, setmodalForMother] = useState(false)
+  const [modalForFather, setmodalForFather] = useState(false);
+  const [modalForMother, setmodalForMother] = useState(false);
 
   const roleRef = useRef(null);
 
   const navigate = useNavigate();
-  const selectedUser = useSelector((state)=>state.user.user);
+  const selectedUser = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    
-  
     return () => {
-      dispatch({type: ActionTypes.SET_USER, payload : null})
-    }
-  }, [])
-  
-  
+      dispatch({ type: ActionTypes.SET_USER, payload: null });
+    };
+  }, []);
+
   //Api call on page load
   useEffect(() => {
     get("/family/look-up")
@@ -108,36 +106,75 @@ const CreateUser = (props) => {
   }, []);
 
   //get Users profile details if user is updating
-  useEffect(()=> {
-    console.log(selectedUser)
-    if(props.isUpdateUser && selectedUser){
-      console.log(selectedUser.id)
+  useEffect(() => {
+    console.log(selectedUser);
+    if (props.isUpdateUser && selectedUser) {
+      console.log(selectedUser.id);
       const queryParams = {
-        userId : selectedUser.id
-      }
-      getByQueryParams('/user-profile', queryParams)
-      .then((response)=> {
-        console.log(response)
-      })
-      .catch((error)=> {
-        console.log(error)
-      })
-    }
-  },[selectedUser])
+        userId: selectedUser.id,
+      };
+      getByQueryParams("/user-profile", queryParams)
+        .then((response) => {
+          console.log(response);
+          if (response.data.status) {
+            let user = response.data.data;
 
-  // selected family  
+            console.log(user);
+
+            let birthDate = new Date(user.birthDate);
+            let weddingDate = new Date(user.weddingDate);
+            console.log(birthDate.toISOString())
+            console.log(weddingDate)
+            setUserForm({
+              name: user.name,
+              userType: "ADMINCREATED",
+              wifeSurname: user.wifeSurname,
+              marriedStatus: user.marriedStatus,
+              birthDate: birthDate.valueOf() ? birthDate.toISOString().split('T')[0] : "",
+              weddingDate:  weddingDate.valueOf() ? weddingDate.toISOString().split('T')[0] : "",
+              education: user.education,
+              occupation: user.occupation,
+              mobileNumber: user.mobileNumber,
+              countryCode: user.countryCode,
+              email: user.email,
+              gender: user.gender,
+              mainFamilyMemberName: "",
+              mainFamilyMemberRelation: "",
+              mainFamilyMemberSurname: "",
+              mainFamilyMemberVillage: "",
+              fatherName: "",
+              fatherSurname: "",
+              fatherVillage: "",
+              motherName: "",
+              motherSurname: "",
+              motherVillage: "",
+              surname: "",
+              village: "",
+              villageGuj: "",
+              roleName: "",
+              roleDescription: "",
+              roleType: "",
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [selectedUser]);
+
+  // selected family
   useEffect(() => {
     //user's family selected
     if (selectedFamily === null) {
       setUserForm({
         ...userForm,
-        mainFamilyMemberRelation: "SELF"
-      })
-    }
-    else {
+        mainFamilyMemberRelation: "SELF",
+      });
+    } else {
       const mainFamilyMember = userLookUp.find((user) => {
-        return user.name === selectedFamily.mainFamilyMemberName
-      })
+        return user.name === selectedFamily.mainFamilyMemberName;
+      });
 
       if (mainFamilyMember) {
         setinputMainFamilyMemberRelation(true);
@@ -149,10 +186,9 @@ const CreateUser = (props) => {
           mainFamilyMemberName: mainFamilyMember.name,
           mainFamilyMemberSurname: mainFamilyMember.surname,
           mainFamilyMemberVillage: mainFamilyMember.village,
-          mainFamilyMemberRelation: ""
-        })
-      }
-      else {
+          mainFamilyMemberRelation: "",
+        });
+      } else {
         setUserForm({
           ...userForm,
           surname: selectedFamily.surname,
@@ -161,14 +197,13 @@ const CreateUser = (props) => {
           mainFamilyMemberRelation: "SELF",
           mainFamilyMemberVillage: selectedFamily.village,
           mainFamilyMemberSurname: selectedFamily.surname,
-          mainFamilyMemberName: userForm.name
-        })
+          mainFamilyMemberName: userForm.name,
+        });
       }
-
     }
-  }, [selectedFamily])
+  }, [selectedFamily]);
 
-  //selected Father details 
+  //selected Father details
   useEffect(() => {
     if (selectedFather !== null) {
       setUserForm({
@@ -176,21 +211,19 @@ const CreateUser = (props) => {
         fatherName: selectedFather.name,
         fatherSurname: selectedFather.surname,
         fatherVillage: selectedFather.village,
-      })
-    }
-    else {
+      });
+    } else {
       setUserForm({
         ...userForm,
         fatherName: "",
         fatherSurname: "",
         fatherVillage: "",
-      })
+      });
     }
-    setmodalForFather(false)
-  }, [selectedFather])
+    setmodalForFather(false);
+  }, [selectedFather]);
 
-
-  //selected Mother details 
+  //selected Mother details
   useEffect(() => {
     if (selectedMother !== null) {
       setUserForm({
@@ -198,38 +231,38 @@ const CreateUser = (props) => {
         motherName: selectedMother.name,
         motherSurname: selectedMother.surname,
         motherVillage: selectedMother.village,
-      })
-    }
-    else {
+      });
+    } else {
       setUserForm({
         ...userForm,
         motherName: "",
         motherSurname: "",
         motherVillage: "",
-      })
+      });
     }
-    setmodalForMother(false)
-  }, [selectedMother])
-
+    setmodalForMother(false);
+  }, [selectedMother]);
 
   const handleResetForm = () => {
     setUserForm(defaultUserForm);
     setselectedFather(null);
     setselectedFamily(null);
     setselectedMother(null);
-    setinputMainFamilyMemberRelation(false)
+    setinputMainFamilyMemberRelation(false);
     roleRef.current.value = null;
   };
 
   const handleChange = (e) => {
-    if (e.target.name === "name" && userForm.mainFamilyMemberRelation === "SELF") {
+    if (
+      e.target.name === "name" &&
+      userForm.mainFamilyMemberRelation === "SELF"
+    ) {
       setUserForm({
         ...userForm,
         [e.target.name]: e.target.value,
-        mainFamilyMemberName: e.target.value
+        mainFamilyMemberName: e.target.value,
       });
-    }
-    else {
+    } else {
       setUserForm({
         ...userForm,
         [e.target.name]: e.target.value,
@@ -241,35 +274,35 @@ const CreateUser = (props) => {
   const handleSubmitForm = (e) => {
     e.preventDefault();
 
-    if (!selectedFamily || (userForm.mainFamilyMemberRelation === "SELF" && selectedFamily.mainFamilyMemberName !== userForm.name)) {
-      console.log("Please Select Family or Create Main Family Member's Entry First...")
-    }
-    else if (userForm.name === "") {
-      console.log("Name is required")
-    }
-    else if (userForm.mobileNumber === "" || userForm.countryCode === "") {
-      console.log("Mobile number is required")
-    }
-    else if (roleRef.current.value === "No Role Selected") {
-      console.log("No Role Selected")
-    }
-    else if (selectedFamily === null) {
-      console.log("Family is not Selected")
-    }
-    else {
-
+    if (
+      !selectedFamily ||
+      (userForm.mainFamilyMemberRelation === "SELF" &&
+        selectedFamily.mainFamilyMemberName !== userForm.name)
+    ) {
+      console.log(
+        "Please Select Family or Create Main Family Member's Entry First..."
+      );
+    } else if (userForm.name === "") {
+      console.log("Name is required");
+    } else if (userForm.mobileNumber === "" || userForm.countryCode === "") {
+      console.log("Mobile number is required");
+    } else if (roleRef.current.value === "No Role Selected") {
+      console.log("No Role Selected");
+    } else if (selectedFamily === null) {
+      console.log("Family is not Selected");
+    } else {
       console.log(userForm);
-      add('/user', userForm)
+      add("/user", userForm)
         .then((response) => {
           console.log(response);
-          navigate("/admin/users")
+          navigate("/admin/users");
         })
         .catch((error) => {
-          console.log(error)
+          console.log(error);
         })
-        .finally(()=>{
-          handleResetForm()
-        })
+        .finally(() => {
+          handleResetForm();
+        });
     }
   };
 
@@ -319,7 +352,6 @@ const CreateUser = (props) => {
                 User Details
               </h3>
 
-
               <div className="col-md-6">
                 <label htmlFor="userInputName">User Name</label>
                 <i className="text-danger">*</i>
@@ -335,19 +367,23 @@ const CreateUser = (props) => {
                 />
               </div>
 
-
               <div className="col-md-6">
                 <label htmlFor="userInputFamily">User's Family</label>
                 <i className="text-danger">*</i>
-                <input type="text"
+                <input
+                  type="text"
                   data-bs-toggle="modal"
                   className="form-control"
                   data-bs-target="#familyLookUpModal"
                   placeholder="Select Family..."
                   readOnly={true}
-                  value={selectedFamily === null ? "Select Family..." : `Surname : ${selectedFamily.surname}, Village :${selectedFamily.village}, MainFamilyMemberName: ${selectedFamily.mainFamilyMemberName}`}
+                  value={
+                    selectedFamily === null
+                      ? "Select Family..."
+                      : `Surname : ${selectedFamily.surname}, Village :${selectedFamily.village}, MainFamilyMemberName: ${selectedFamily.mainFamilyMemberName}`
+                  }
                   onClick={() => {
-                    setinputMainFamilyMemberRelation(false)
+                    setinputMainFamilyMemberRelation(false);
                   }}
                 />
               </div>
@@ -478,14 +514,13 @@ const CreateUser = (props) => {
                     if (e.target.value === "Gender is not Selected") {
                       setUserForm({
                         ...userForm,
-                        gender: ""
-                      })
-                    }
-                    else {
+                        gender: "",
+                      });
+                    } else {
                       setUserForm({
                         ...userForm,
-                        gender: e.target.value
-                      })
+                        gender: e.target.value,
+                      });
                     }
                   }}
                 >
@@ -545,7 +580,6 @@ const CreateUser = (props) => {
                 />
               </div>
 
-
               <div className="col-md-6">
                 <label htmlFor="userInputRole">User's Role</label>
                 <i className="text-danger">*</i>
@@ -594,36 +628,45 @@ const CreateUser = (props) => {
 
               <div className="col-md-6">
                 <label htmlFor="userInputMother">User's Mother</label>
-                <input type="text"
+                <input
+                  type="text"
                   id="userInputMother"
                   data-bs-toggle="modal"
                   className="form-control"
                   data-bs-target="#userLookUpModal"
                   placeholder="Select Mother..."
                   readOnly={true}
-                  value={selectedMother === null ? "Select Mother..." : `Name : ${selectedMother.name}, Surname : ${selectedMother.surname}, Village :${selectedMother.village}`}
+                  value={
+                    selectedMother === null
+                      ? "Select Mother..."
+                      : `Name : ${selectedMother.name}, Surname : ${selectedMother.surname}, Village :${selectedMother.village}`
+                  }
                   onClick={() => {
-                    setmodalForMother(true)
+                    setmodalForMother(true);
                   }}
                 />
               </div>
 
               <div className="col-md-6">
                 <label htmlFor="userInputFather">User's Father</label>
-                <input type="text"
+                <input
+                  type="text"
                   id="userInputFather"
                   data-bs-toggle="modal"
                   className="form-control"
                   data-bs-target="#userLookUpModal"
                   placeholder="Select Father..."
                   readOnly={true}
-                  value={selectedFather === null ? "Select Father..." : `Name : ${selectedFather.name}, Surname : ${selectedFather.surname}, Village :${selectedFather.village}`}
+                  value={
+                    selectedFather === null
+                      ? "Select Father..."
+                      : `Name : ${selectedFather.name}, Surname : ${selectedFather.surname}, Village :${selectedFather.village}`
+                  }
                   onClick={() => {
-                    setmodalForFather(true)
+                    setmodalForFather(true);
                   }}
                 />
               </div>
-
 
               <div className="float-end mt-4">
                 <button
@@ -645,8 +688,12 @@ const CreateUser = (props) => {
           </div>
         </div>
       </div>
-      <FamilyLookUpModal familyLookUp={familyLookUp} setselectedFamily={setselectedFamily} />
-      <UserLookUpModal userLookUp={userLookUp}
+      <FamilyLookUpModal
+        familyLookUp={familyLookUp}
+        setselectedFamily={setselectedFamily}
+      />
+      <UserLookUpModal
+        userLookUp={userLookUp}
         modalForFather={modalForFather}
         setmodalForFather={setmodalForFather}
         setselectedFather={setselectedFather}
