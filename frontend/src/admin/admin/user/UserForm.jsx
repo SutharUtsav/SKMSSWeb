@@ -95,6 +95,8 @@ const UserForm = (props) => {
       .catch((error) => {
         console.log(error);
       });
+
+
   }, []);
 
   //get Users profile details if user is updating
@@ -124,7 +126,6 @@ const UserForm = (props) => {
                         get(`/family/look-up/${user.familyId}`)
                           .then((response) => {
                             if (response.data.status === 1) {
-                              console.log(response.data.data);
                               const family = response.data.data;
 
                               setselectedFamily(family);
@@ -137,6 +138,7 @@ const UserForm = (props) => {
                                     if (response.data.status === 1) {
                                       setselectedFather(response.data.data);
                                       fatherDetails = response.data.data;
+                                      console.log(fatherDetails)
                                     } else {
                                       console.log(response.data);
                                     }
@@ -152,6 +154,7 @@ const UserForm = (props) => {
                                     if (response.data.status === 1) {
                                       setselectedMother(response.data.data);
                                       motherDetails = response.data.data;
+                                      console.log(motherDetails)
                                     } else {
                                       console.log(response.data);
                                     }
@@ -161,11 +164,40 @@ const UserForm = (props) => {
                                   });
                               }
 
-                              if(user.mainFamilyMemberRelation !== "SELF" && user.mainFamilyMemberId){
+                              if (user.mainFamilyMemberId) {
                                 get(`/user-profile/look-up/${user.mainFamilyMemberId}`)
                                   .then((response) => {
                                     if (response.data.status === 1) {
                                       mainFamilyMemberDetails = response.data.data;
+
+                                      setUserForm({
+                                        ...userForm,
+                                        name: user.name,
+                                        userType: "ADMINCREATED",
+                                        wifeSurname: user.wifeSurname,
+                                        marriedStatus: user.marriedStatus,
+                                        birthDate: user.birthDate.split("T")[0],
+                                        weddingDate: user.weddingDate.split("T")[0],
+                                        education: user.education,
+                                        occupation: user.occupation,
+                                        mobileNumber: user.mobileNumber,
+                                        countryCode: user.countryCode,
+                                        email: user.email,
+                                        gender: user.gender,
+                                        mainFamilyMemberRelation: user.mainFamilyMemberRelation,
+                                        surname: family.surname,
+                                        village: family.village,
+                                        villageGuj: family.villageGuj,
+                                        mainFamilyMemberName: user.mainFamilyMemberRelation === "SELF" ? user.name : mainFamilyMemberDetails.name,
+                                        mainFamilyMemberSurname: user.mainFamilyMemberRelation === "SELF" ? user.surname : mainFamilyMemberDetails.surname,
+                                        mainFamilyMemberVillage: user.mainFamilyMemberRelation === "SELF" ? user.value : mainFamilyMemberDetails.village,
+                                        fatherName: fatherDetails ? fatherDetails.name : "",
+                                        fatherSurname: fatherDetails ? fatherDetails.surname : "",
+                                        fatherVillage: fatherDetails ? fatherDetails.village : "",
+                                        motherName: motherDetails ? motherDetails.name : "",
+                                        motherSurname: motherDetails ? motherDetails.surname : "",
+                                        motherVillage: motherDetails ? motherDetails.village : "",
+                                      });
                                     } else {
                                       console.log(response.data);
                                     }
@@ -175,34 +207,6 @@ const UserForm = (props) => {
                                   });
                               }
 
-                              setUserForm({
-                                ...userForm,
-                                name: user.name,
-                                userType: "ADMINCREATED",
-                                wifeSurname: user.wifeSurname,
-                                marriedStatus: user.marriedStatus,
-                                birthDate: user.birthDate.split("T")[0],
-                                weddingDate: user.weddingDate.split("T")[0],
-                                education: user.education,
-                                occupation: user.occupation,
-                                mobileNumber: user.mobileNumber,
-                                countryCode: user.countryCode,
-                                email: user.email,
-                                gender: user.gender,
-                                mainFamilyMemberRelation: user.mainFamilyMemberRelation,
-                                surname: family.surname,
-                                village: family.village,
-                                villageGuj: family.villageGuj,
-                                mainFamilyMemberName: user.mainFamilyMemberRelation === "SELF" ? user.name : mainFamilyMemberDetails.name,
-                                mainFamilyMemberSurname: user.mainFamilyMemberRelation === "SELF" ? user.surname : mainFamilyMemberDetails.surname,
-                                mainFamilyMemberVillage: user.mainFamilyMemberRelation === "SELF" ? user.value : mainFamilyMemberDetails.village,
-                                fatherName: fatherDetails ? fatherDetails.name : "",
-                                fatherSurname: fatherDetails ? fatherDetails.surname : "",
-                                fatherVillage: fatherDetails ? fatherDetails.village : "",
-                                motherName: motherDetails ? motherDetails.name : "",
-                                motherSurname: motherDetails ? motherDetails.surname : "",
-                                motherVillage: motherDetails ? motherDetails.village : "",
-                              });
 
 
                             } else {
@@ -241,41 +245,47 @@ const UserForm = (props) => {
   // selected family
   useEffect(() => {
     //user's family selected
-    if (selectedFamily === null) {
-      setUserForm({
-        ...userForm,
-        mainFamilyMemberRelation: "SELF",
-      });
-      setinputMainFamilyMemberRelation(false)
-    } else {
-      const mainFamilyMember = userLookUp.find((user) => {
-        return user.name === selectedFamily.mainFamilyMemberName;
-      });
-
-      if (mainFamilyMember && !params.id) {
-      
-        setinputMainFamilyMemberRelation(true);
+    if (userId) {
+      setinputMainFamilyMemberRelation(true);
+    }
+    else {
+      if (selectedFamily === null) {
         setUserForm({
           ...userForm,
-          surname: selectedFamily.surname,
-          village: selectedFamily.village,
-          villageGuj: selectedFamily.villageGuj,
-          mainFamilyMemberName: mainFamilyMember.name,
-          mainFamilyMemberSurname: mainFamilyMember.surname,
-          mainFamilyMemberVillage: mainFamilyMember.village,
-          mainFamilyMemberRelation: "",
-        });
-      } else {
-        setUserForm({
-          ...userForm,
-          surname: selectedFamily.surname,
-          village: selectedFamily.village,
-          villageGuj: selectedFamily.villageGuj,
           mainFamilyMemberRelation: "SELF",
-          mainFamilyMemberVillage: selectedFamily.village,
-          mainFamilyMemberSurname: selectedFamily.surname,
-          mainFamilyMemberName: userForm.name,
         });
+        setinputMainFamilyMemberRelation(false)
+      } else {
+        const mainFamilyMember = userLookUp.find((user) => {
+          return user.name === selectedFamily.mainFamilyMemberName;
+        });
+
+        if (mainFamilyMember) {
+          setinputMainFamilyMemberRelation(true);
+
+          setUserForm({
+            ...userForm,
+            surname: selectedFamily.surname,
+            village: selectedFamily.village,
+            villageGuj: selectedFamily.villageGuj,
+            mainFamilyMemberName: mainFamilyMember.name,
+            mainFamilyMemberSurname: mainFamilyMember.surname,
+            mainFamilyMemberVillage: mainFamilyMember.village,
+          });
+
+        } else {
+
+          setUserForm({
+            ...userForm,
+            surname: selectedFamily.surname,
+            village: selectedFamily.village,
+            villageGuj: selectedFamily.villageGuj,
+            mainFamilyMemberVillage: selectedFamily.village,
+            mainFamilyMemberSurname: selectedFamily.surname,
+            mainFamilyMemberName: userForm.name,
+          });
+
+        }
       }
     }
   }, [selectedFamily]);
@@ -369,17 +379,19 @@ const UserForm = (props) => {
       console.log("Family is not Selected");
     } else {
       console.log(userForm);
-      add("/user", userForm)
-        .then((response) => {
-          console.log(response);
-          navigate("/admin/users");
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-        .finally(() => {
-          handleResetForm();
-        });
+      if (!userId) {
+        add("/user", userForm)
+          .then((response) => {
+            console.log(response);
+            navigate("/admin/users");
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+          .finally(() => {
+            handleResetForm();
+          });
+      }
     }
   };
 
@@ -459,7 +471,7 @@ const UserForm = (props) => {
                       ? "Select Family..."
                       : `Surname : ${selectedFamily.surname}, Village :${selectedFamily.village}, MainFamilyMemberName: ${selectedFamily.mainFamilyMemberName}`
                   }
-                  
+
                 />
               </div>
 
@@ -694,7 +706,7 @@ const UserForm = (props) => {
                       key={index}
                       value={JSON.stringify(role)}
                       className="fs-2 fw-light"
-                      // defaultChecked = {userForm.roleName === role.name}
+                    // defaultChecked = {userForm.roleName === role.name}
                     >
                       Name: {role.name} RoleType : {role.roleType}
                     </option>
@@ -774,9 +786,11 @@ const UserForm = (props) => {
         modalForFather={modalForFather}
         setmodalForFather={setmodalForFather}
         setselectedFather={setselectedFather}
+        selectedFather={selectedFather}
         modalForMother={modalForMother}
         setmodalForMother={setmodalForMother}
         setselectedMother={setselectedMother}
+        selectedMother={selectedMother}
       />
     </>
   );

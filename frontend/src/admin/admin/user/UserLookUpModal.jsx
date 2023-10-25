@@ -47,7 +47,7 @@ const UserLookUpModal = (props) => {
                                     <div key={index}>
                                         {(props.modalForFather && user.gender === "MALE") || (props.modalForMother && user.gender === "FEMALE") ? (
 
-                                            <div className='border-bottom px-5 py-4 lookup-modal' data-bs-dismiss="modal"  onClick={() => {
+                                            <div className={`border-bottom px-5 py-4 lookup-modal ${props.selectedFather.name === user.name || props.selectedMother.name === user.name ? 'active' : ''}`} data-bs-dismiss="modal"  onClick={() => {
 
                                                 if (props.modalForFather) {
                                                     props.setselectedFather(user)
