@@ -10,7 +10,7 @@ export interface IRoleService {
     /**
      * Get All Records of Role Entity 
      */
-    GetRecords(lookup ?: boolean): Promise<ApiResponseDto | undefined>;
+    GetRecords(lookup ?: boolean, id?: number | undefined): Promise<ApiResponseDto | undefined>;
 
     /**
      * Get Record of Role by Id
@@ -62,29 +62,56 @@ export class RoleService extends BaseService implements IRoleService {
     /**
      * Get All Records of Role Entity 
      */
-    public async GetRecords(lookup: boolean = false): Promise<ApiResponseDto | undefined> {
+    public async GetRecords(lookup: boolean = false, id: number | undefined = undefined): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
         
         try {
             if(lookup){
-                let roles: RoleLookUpDto[] = await Role.findAll({
-                    raw: true,
-                    attributes : ['name', 'description', 'roleType']
-                });
 
-                if (roles) {
-                    apiResponse = new ApiResponseDto();
-                    apiResponse.status = 1;
-                    apiResponse.data = roles
+                if(id){
+                    let role: RoleLookUpDto = await Role.findOne({
+                        raw: true,
+                        attributes : ['name', 'description', 'roleType'],
+                        where : {
+                            id : id
+                        }
+                    });
+    
+                    if (role) {
+                        apiResponse = new ApiResponseDto();
+                        apiResponse.status = 1;
+                        apiResponse.data = role
+                    }
+                    else {
+                        apiResponse = new ApiResponseDto();
+                        let errorDto = new ErrorDto();
+                        apiResponse.status = 0;
+                        errorDto.errorCode = '200';
+                        errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                        apiResponse.error = errorDto;
+                    }
                 }
-                else {
-                    apiResponse = new ApiResponseDto();
-                    let errorDto = new ErrorDto();
-                    apiResponse.status = 0;
-                    errorDto.errorCode = '200';
-                    errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
-                    apiResponse.error = errorDto;
+                else{
+                    let roles: RoleLookUpDto[] = await Role.findAll({
+                        raw: true,
+                        attributes : ['name', 'description', 'roleType']
+                    });
+    
+                    if (roles) {
+                        apiResponse = new ApiResponseDto();
+                        apiResponse.status = 1;
+                        apiResponse.data = roles
+                    }
+                    else {
+                        apiResponse = new ApiResponseDto();
+                        let errorDto = new ErrorDto();
+                        apiResponse.status = 0;
+                        errorDto.errorCode = '200';
+                        errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                        apiResponse.error = errorDto;
+                    }
                 }
+                
                 return apiResponse;
             }
             else{

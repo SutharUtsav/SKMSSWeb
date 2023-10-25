@@ -45,6 +45,22 @@ router.get('/look-up', async (req: any, res: any) => {
         res.send(response)
     }
 })
+
+router.get('/look-up/:id', async (req: any, res: any) => {
+    const roleService: IRoleService = new RoleService();
+    const id = req.params.id;
+    const response = await roleService.GetRecords(true, id);
+
+    if (!response) {
+        res.status(400).send({
+            status: 0,
+            message: EnumErrorMsg.API_SOMETHING_WENT_WRONG
+        })
+    }
+    else {
+        res.send(response)
+    }
+})
 /**
 * Get Record of Role Entity by Id
 */

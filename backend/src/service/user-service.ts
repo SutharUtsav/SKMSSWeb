@@ -31,7 +31,7 @@ export interface IUserService {
      * Create Record for Entity User
      * @param dtoRecord 
      */
-    Create(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto, dtoFamilyRecord: FamilyDto, dtoRoleRecord : RoleLookUpDto): Promise<ApiResponseDto | undefined>;
+    Create(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto, dtoFamilyRecord: FamilyDto, dtoRoleRecord: RoleLookUpDto): Promise<ApiResponseDto | undefined>;
 
     /**
      * Create Bulk Record for entity Family, User, UserProfile 
@@ -65,7 +65,7 @@ export interface IUserService {
      * Get All User Profiles detail
      * @param lookup 
      */
-    GetUserProfiles(lookup ?: boolean) : Promise<ApiResponseDto | undefined>;
+    GetUserProfiles(lookup?: boolean, id?: number): Promise<ApiResponseDto | undefined>;
     /**
      * Get User Details based on userId
      * @param id UserId
@@ -141,7 +141,7 @@ export class UserService extends BaseService implements IUserService {
                 else {
                     profileRecord.isMainFamilyMember = true;
                 }
-                
+
 
                 const mainFamilyMemberUserId = userArray.find((user: UserDto) => user.name === profileRecord.mainFamilyMemberName && user.surname === profileRecord.mainFamilyMemberSurname && user.village === profileRecord.mainFamilyMemberVillage)?.id;
 
@@ -181,13 +181,13 @@ export class UserService extends BaseService implements IUserService {
             apiResponse = new ApiResponseDto()
             apiResponse.status = 1;
             apiResponse.data = {
-                status : EnumApiResponseCode[EnumApiResponse.DATA_UPLOAD_SUCCESS],
-                message : EnumApiResponseMsg[EnumApiResponse.DATA_UPLOAD_SUCCESS]
+                status: EnumApiResponseCode[EnumApiResponse.DATA_UPLOAD_SUCCESS],
+                message: EnumApiResponseMsg[EnumApiResponse.DATA_UPLOAD_SUCCESS]
             }
             return apiResponse;
         }
         catch (error: any) {
-            
+
             await transaction.rollback();
             apiResponse = new ApiResponseDto();
             let errorDto = new ErrorDto();
@@ -252,7 +252,7 @@ export class UserService extends BaseService implements IUserService {
             if (user) {
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                apiResponse.data = { user: user }
+                apiResponse.data = user;
             }
             else {
                 apiResponse = new ApiResponseDto();
@@ -292,7 +292,7 @@ export class UserService extends BaseService implements IUserService {
             if (userProfile) {
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                apiResponse.data = userProfile 
+                apiResponse.data = userProfile
             }
             else {
                 apiResponse = new ApiResponseDto();
@@ -320,36 +320,63 @@ export class UserService extends BaseService implements IUserService {
      * Get All User Profiles detail
      * @param lookup 
      */
-    public async GetUserProfiles(lookup : boolean = false) : Promise<ApiResponseDto | undefined>{
+    public async GetUserProfiles(lookup: boolean = false, id: number): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
         try {
-            if(lookup){
-                let userProfile: UserProfileLookUpDto[] = await UserProfile.findAll({
-                    raw: true,
-                    attributes : ['name', 'surname', 'village', 'gender']
-                });
-    
-                if (userProfile) {
-                    apiResponse = new ApiResponseDto();
-                    apiResponse.status = 1;
-                    apiResponse.data = userProfile
+            if (lookup) {
+                if (id) {
+                    let userProfile: UserProfileLookUpDto = await UserProfile.findOne({
+                        raw: true,
+                        attributes: ['name', 'surname', 'village', 'gender'],
+                        where : {
+                            userId : id
+                        }
+                    });
+
+                    if (userProfile) {
+                        apiResponse = new ApiResponseDto();
+                        apiResponse.status = 1;
+                        apiResponse.data = userProfile
+                    }
+                    else {
+                        apiResponse = new ApiResponseDto();
+                        let errorDto = new ErrorDto();
+                        apiResponse.status = 0;
+                        errorDto.errorCode = '200';
+                        errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                        apiResponse.error = errorDto;
+
+                    }
                 }
                 else {
-                    apiResponse = new ApiResponseDto();
-                    let errorDto = new ErrorDto();
-                    apiResponse.status = 0;
-                    errorDto.errorCode = '200';
-                    errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
-                    apiResponse.error = errorDto;
-    
+
+                    let userProfile: UserProfileLookUpDto[] = await UserProfile.findAll({
+                        raw: true,
+                        attributes: ['name', 'surname', 'village', 'gender']
+                    });
+
+                    if (userProfile) {
+                        apiResponse = new ApiResponseDto();
+                        apiResponse.status = 1;
+                        apiResponse.data = userProfile
+                    }
+                    else {
+                        apiResponse = new ApiResponseDto();
+                        let errorDto = new ErrorDto();
+                        apiResponse.status = 0;
+                        errorDto.errorCode = '200';
+                        errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                        apiResponse.error = errorDto;
+
+                    }
                 }
                 return apiResponse;
             }
-            else{
+            else {
                 let userProfile: UserProfileDto[] = await UserProfile.findAll({
                     raw: true,
                 });
-    
+
                 if (userProfile) {
                     apiResponse = new ApiResponseDto();
                     apiResponse.status = 1;
@@ -362,7 +389,7 @@ export class UserService extends BaseService implements IUserService {
                     errorDto.errorCode = '200';
                     errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
                     apiResponse.error = errorDto;
-    
+
                 }
                 return apiResponse;
             }
@@ -422,7 +449,7 @@ export class UserService extends BaseService implements IUserService {
      * Create Record for Entity User
      * @param dtoRecord 
      */
-    public async Create(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto, dtoFamilyRecord: FamilyDto, dtoRoleRecord:RoleLookUpDto): Promise<ApiResponseDto | undefined> {
+    public async Create(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto, dtoFamilyRecord: FamilyDto, dtoRoleRecord: RoleLookUpDto): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
 
         const transaction = await sequelize.transaction();
@@ -434,9 +461,9 @@ export class UserService extends BaseService implements IUserService {
             //check if role exist or not
             const role = await Role.findOne({
                 where: {
-                    name : dtoRoleRecord.name,
-                    description : dtoRoleRecord.description,
-                    roleType : dtoRoleRecord.roleType
+                    name: dtoRoleRecord.name,
+                    description: dtoRoleRecord.description,
+                    roleType: dtoRoleRecord.roleType
                 }
             })
 
@@ -475,8 +502,8 @@ export class UserService extends BaseService implements IUserService {
                 where: {
                     surname: dtoFamilyRecord.surname,
                     village: dtoFamilyRecord.village,
-                    villageGuj : dtoFamilyRecord.villageGuj,
-                    mainFamilyMemberName :  dtoFamilyRecord.mainFamilyMemberName
+                    villageGuj: dtoFamilyRecord.villageGuj,
+                    mainFamilyMemberName: dtoFamilyRecord.mainFamilyMemberName
                 }
             })
 
@@ -489,9 +516,9 @@ export class UserService extends BaseService implements IUserService {
                 apiResponse.error = errorDto;
                 return apiResponse;
             }
-            
 
-            console.log("familyService: ",family.id)
+
+            console.log("familyService: ", family.id)
             dtoProfileRecord.familyId = family.id;
             const user = await User.create({
                 ...dtoRecord,
@@ -501,7 +528,7 @@ export class UserService extends BaseService implements IUserService {
                 updatedById: recordModifiedInfo.updatedById,
                 disabled: false,
                 enabledDisabledOn: new Date(),
-            },{transaction})
+            }, { transaction })
 
 
             //if user is not created
@@ -569,7 +596,7 @@ export class UserService extends BaseService implements IUserService {
                 updatedById: recordModifiedInfo.updatedById,
                 disabled: false,
                 enabledDisabledOn: new Date(),
-            },{transaction})
+            }, { transaction })
 
 
             //if userProfile is not created
@@ -1044,7 +1071,7 @@ export class UserService extends BaseService implements IUserService {
                         surname: surname,
                         village: village
                     },
-                    attribute :['id']
+                    attribute: ['id']
                 })
 
                 familyId = tmpfamily.id

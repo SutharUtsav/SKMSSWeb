@@ -11,7 +11,7 @@ export interface IFamilyService {
     /**
      * Get All Records of Family Entity 
      */
-    GetRecords(lookup?: boolean): Promise<ApiResponseDto | undefined>;
+    GetRecords(lookup?: boolean, id?: number): Promise<ApiResponseDto | undefined>;
 
     /**
      * Get Record of Family by Id
@@ -45,25 +45,51 @@ export class FamilyService extends BaseService implements IFamilyService {
     /**
      * Get All Records of Family Entity 
      */
-    public async GetRecords(lookup = false): Promise<ApiResponseDto | undefined> {
+    public async GetRecords(lookup = false, id = undefined): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
         try {
 
             if (lookup) {
-                let families: FamilyLookupDto[] = await Family.findAll({attributes :[ 'surname', 'village', 'villageGuj', 'mainFamilyMemberName']});
 
-                if (families.length !== 0) {
-                    apiResponse = new ApiResponseDto();
-                    apiResponse.status = 1;
-                    apiResponse.data = families
+                if (id) {
+                    let family: FamilyLookupDto = await Family.findOne({ 
+                        attributes: ['surname', 'village', 'villageGuj', 'mainFamilyMemberName'],
+                        where: {
+                            id : id
+                        }
+                    });
+
+                    if (family) {
+                        apiResponse = new ApiResponseDto();
+                        apiResponse.status = 1;
+                        apiResponse.data = family
+                    }
+                    else {
+                        apiResponse = new ApiResponseDto();
+                        let errorDto = new ErrorDto();
+                        apiResponse.status = 0;
+                        errorDto.errorCode = '200';
+                        errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                        apiResponse.error = errorDto;
+                    }
                 }
                 else {
-                    apiResponse = new ApiResponseDto();
-                    let errorDto = new ErrorDto();
-                    apiResponse.status = 0;
-                    errorDto.errorCode = '200';
-                    errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
-                    apiResponse.error = errorDto;
+
+                    let families: FamilyLookupDto[] = await Family.findAll({ attributes: ['surname', 'village', 'villageGuj', 'mainFamilyMemberName'] });
+
+                    if (families.length !== 0) {
+                        apiResponse = new ApiResponseDto();
+                        apiResponse.status = 1;
+                        apiResponse.data = families
+                    }
+                    else {
+                        apiResponse = new ApiResponseDto();
+                        let errorDto = new ErrorDto();
+                        apiResponse.status = 0;
+                        errorDto.errorCode = '200';
+                        errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                        apiResponse.error = errorDto;
+                    }
                 }
                 return apiResponse;
             }

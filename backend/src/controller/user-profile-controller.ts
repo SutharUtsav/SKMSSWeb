@@ -89,6 +89,22 @@ router.get('/look-up', async (req: any, res: any) => {
         }
 })
 
+router.get('/look-up/:id', async (req: any, res: any) => {
+    const id = req.params.id;
+    const userService: IUserService = new UserService();
+    const response = await userService.GetUserProfiles(true,id);
+
+    if (!response) {
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+        })
+    }
+    else {
+        res.send(response)
+    }
+})
+
 //#endregion
 
 
