@@ -23,7 +23,7 @@ const FamilyLookUpModal = (props) => {
                                         No Family Selected
                                     </div>
                                 {props.familyLookUp.map((family,index) => (
-                                    <div className='border-bottom px-5 py-4 lookup-modal' data-bs-dismiss="modal" key={index}  onClick={()=>{
+                                    <div className={props.selectedFamily && family.surname === props.selectedFamily.surname && family.village === props.selectedFamily.village && family.villageGuj === props.selectedFamily.villageGuj && family.mainFamilyMemberName === props.selectedFamily.mainFamilyMemberName ? 'border-bottom px-5 py-4 lookup-modal active' : 'border-bottom px-5 py-4 lookup-modal'} data-bs-dismiss="modal" key={index}  onClick={()=>{
                                         props.setselectedFamily(family)
                                     }}>
                                         <div className='d-flex align-items-center justify-content-between'>

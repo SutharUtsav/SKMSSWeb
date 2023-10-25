@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import "./User.css";
 import { add, get, getByQueryParams } from "../../../service/api-service";
 import PhoneInput from "react-phone-input-2";
@@ -9,7 +9,7 @@ import UserLookUpModal from "./UserLookUpModal";
 import { useDispatch, useSelector } from "react-redux";
 import { ActionTypes } from "../../../redux/action-type";
 
-const CreateUser = (props) => {
+const UserForm = (props) => {
   const defaultUserForm = {
     name: "",
     userType: "ADMINCREATED",
@@ -45,8 +45,7 @@ const CreateUser = (props) => {
   const [familyLookUp, setFamilyLookUp] = useState([]);
   const [roleLookUp, setRoleLookUp] = useState([]);
   const [userLookUp, setUserLookUp] = useState([]);
-  const [inputMainFamilyMemberRelation, setinputMainFamilyMemberRelation] =
-    useState(false);
+  const [inputMainFamilyMemberRelation, setinputMainFamilyMemberRelation] = useState(false);
   const [selectedFamily, setselectedFamily] = useState(null);
   const [selectedFather, setselectedFather] = useState(null);
   const [selectedMother, setselectedMother] = useState(null);
@@ -55,18 +54,11 @@ const CreateUser = (props) => {
   const [modalForMother, setmodalForMother] = useState(false);
 
   const roleRef = useRef(null);
-
+  const params = useParams();
+  const userId = params.id;
   const navigate = useNavigate();
-  const selectedUser = useSelector((state) => state.user.user);
-  const dispatch = useDispatch();
 
-  useEffect(() => {
-    return () => {
-      dispatch({ type: ActionTypes.SET_USER, payload: null });
-    };
-  }, []);
-
-  //Api call on page load
+  //Api call on page load to get all entities look up list
   useEffect(() => {
     get("/family/look-up")
       .then((response) => {
@@ -107,61 +99,144 @@ const CreateUser = (props) => {
 
   //get Users profile details if user is updating
   useEffect(() => {
-    console.log(selectedUser);
-    if (props.isUpdateUser && selectedUser) {
-      console.log(selectedUser.id);
-      const queryParams = {
-        userId: selectedUser.id,
-      };
-      getByQueryParams("/user-profile", queryParams)
+    if (userId) {
+      get(`/user/${userId}`)
         .then((response) => {
-          console.log(response);
-          if (response.data.status) {
-            let user = response.data.data;
+          if (response.data.status === 1) {
+            //get role detail
+            const roleId = response.data.data.roleId;
+            get(`/role/look-up/${roleId}`)
+              .then((response) => {
+                if (response.data.status === 1) {
+                  setUserForm({
+                    ...userForm,
+                    roleName: response.data.data.name,
+                    roleDescription: response.data.data.description,
+                    roleType: response.data.data.roleType,
+                  });
+                  roleRef.current.value = JSON.stringify(response.data.data);
 
-            console.log(user);
+                  getByQueryParams("/user-profile", queryParams)
+                    .then((response) => {
+                      if (response.data.status === 1) {
+                        let user = response.data.data;
 
-            let birthDate = new Date(user.birthDate);
-            let weddingDate = new Date(user.weddingDate);
-            console.log(birthDate.toISOString())
-            console.log(weddingDate)
-            setUserForm({
-              name: user.name,
-              userType: "ADMINCREATED",
-              wifeSurname: user.wifeSurname,
-              marriedStatus: user.marriedStatus,
-              birthDate: birthDate.valueOf() ? birthDate.toISOString().split('T')[0] : "",
-              weddingDate:  weddingDate.valueOf() ? weddingDate.toISOString().split('T')[0] : "",
-              education: user.education,
-              occupation: user.occupation,
-              mobileNumber: user.mobileNumber,
-              countryCode: user.countryCode,
-              email: user.email,
-              gender: user.gender,
-              mainFamilyMemberName: "",
-              mainFamilyMemberRelation: "",
-              mainFamilyMemberSurname: "",
-              mainFamilyMemberVillage: "",
-              fatherName: "",
-              fatherSurname: "",
-              fatherVillage: "",
-              motherName: "",
-              motherSurname: "",
-              motherVillage: "",
-              surname: "",
-              village: "",
-              villageGuj: "",
-              roleName: "",
-              roleDescription: "",
-              roleType: "",
-            });
+                        get(`/family/look-up/${user.familyId}`)
+                          .then((response) => {
+                            if (response.data.status === 1) {
+                              console.log(response.data.data);
+                              const family = response.data.data;
+
+                              setselectedFamily(family);
+                              let fatherDetails = null;
+                              let motherDetails = null;
+                              let mainFamilyMemberDetails = null;
+                              if (user.fatherId) {
+                                get(`/user-profile/look-up/${user.fatherId}`)
+                                  .then((response) => {
+                                    if (response.data.status === 1) {
+                                      setselectedFather(response.data.data);
+                                      fatherDetails = response.data.data;
+                                    } else {
+                                      console.log(response.data);
+                                    }
+                                  })
+                                  .catch((error) => {
+                                    console.log(error);
+                                  });
+                              }
+
+                              if (user.motherId) {
+                                get(`/user-profile/look-up/${user.motherId}`)
+                                  .then((response) => {
+                                    if (response.data.status === 1) {
+                                      setselectedMother(response.data.data);
+                                      motherDetails = response.data.data;
+                                    } else {
+                                      console.log(response.data);
+                                    }
+                                  })
+                                  .catch((error) => {
+                                    console.log(error);
+                                  });
+                              }
+
+                              if(user.mainFamilyMemberRelation !== "SELF" && user.mainFamilyMemberId){
+                                get(`/user-profile/look-up/${user.mainFamilyMemberId}`)
+                                  .then((response) => {
+                                    if (response.data.status === 1) {
+                                      mainFamilyMemberDetails = response.data.data;
+                                    } else {
+                                      console.log(response.data);
+                                    }
+                                  })
+                                  .catch((error) => {
+                                    console.log(error);
+                                  });
+                              }
+
+                              setUserForm({
+                                ...userForm,
+                                name: user.name,
+                                userType: "ADMINCREATED",
+                                wifeSurname: user.wifeSurname,
+                                marriedStatus: user.marriedStatus,
+                                birthDate: user.birthDate.split("T")[0],
+                                weddingDate: user.weddingDate.split("T")[0],
+                                education: user.education,
+                                occupation: user.occupation,
+                                mobileNumber: user.mobileNumber,
+                                countryCode: user.countryCode,
+                                email: user.email,
+                                gender: user.gender,
+                                mainFamilyMemberRelation: user.mainFamilyMemberRelation,
+                                surname: family.surname,
+                                village: family.village,
+                                villageGuj: family.villageGuj,
+                                mainFamilyMemberName: user.mainFamilyMemberRelation === "SELF" ? user.name : mainFamilyMemberDetails.name,
+                                mainFamilyMemberSurname: user.mainFamilyMemberRelation === "SELF" ? user.surname : mainFamilyMemberDetails.surname,
+                                mainFamilyMemberVillage: user.mainFamilyMemberRelation === "SELF" ? user.value : mainFamilyMemberDetails.village,
+                                fatherName: fatherDetails ? fatherDetails.name : "",
+                                fatherSurname: fatherDetails ? fatherDetails.surname : "",
+                                fatherVillage: fatherDetails ? fatherDetails.village : "",
+                                motherName: motherDetails ? motherDetails.name : "",
+                                motherSurname: motherDetails ? motherDetails.surname : "",
+                                motherVillage: motherDetails ? motherDetails.village : "",
+                              });
+
+
+                            } else {
+                              console.log(response);
+                            }
+                          })
+                          .catch((error) => {
+                            console.log(error);
+                          });
+                      } else {
+                        console.log(response);
+                      }
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                    });
+                } else {
+                  console.log(response);
+                }
+              })
+              .catch((error) => {
+                console.log(error);
+              });
           }
         })
         .catch((error) => {
           console.log(error);
         });
+
+      const queryParams = {
+        userId: userId,
+      };
     }
-  }, [selectedUser]);
+  }, [userId]);
 
   // selected family
   useEffect(() => {
@@ -171,12 +246,14 @@ const CreateUser = (props) => {
         ...userForm,
         mainFamilyMemberRelation: "SELF",
       });
+      setinputMainFamilyMemberRelation(false)
     } else {
       const mainFamilyMember = userLookUp.find((user) => {
         return user.name === selectedFamily.mainFamilyMemberName;
       });
 
-      if (mainFamilyMember) {
+      if (mainFamilyMember && !params.id) {
+      
         setinputMainFamilyMemberRelation(true);
         setUserForm({
           ...userForm,
@@ -249,7 +326,7 @@ const CreateUser = (props) => {
     setselectedFamily(null);
     setselectedMother(null);
     setinputMainFamilyMemberRelation(false);
-    roleRef.current.value = null;
+    roleRef.current.value = "No Role Selected";
   };
 
   const handleChange = (e) => {
@@ -382,9 +459,7 @@ const CreateUser = (props) => {
                       ? "Select Family..."
                       : `Surname : ${selectedFamily.surname}, Village :${selectedFamily.village}, MainFamilyMemberName: ${selectedFamily.mainFamilyMemberName}`
                   }
-                  onClick={() => {
-                    setinputMainFamilyMemberRelation(false);
-                  }}
+                  
                 />
               </div>
 
@@ -619,6 +694,7 @@ const CreateUser = (props) => {
                       key={index}
                       value={JSON.stringify(role)}
                       className="fs-2 fw-light"
+                      // defaultChecked = {userForm.roleName === role.name}
                     >
                       Name: {role.name} RoleType : {role.roleType}
                     </option>
@@ -678,7 +754,7 @@ const CreateUser = (props) => {
                 <button
                   type="button"
                   className="btn btn-secondary m-2 px-4 py-2 fs-3 fw-normal rounded"
-                  data-bs-dismiss="modal"
+                  // data-bs-dismiss="modal"
                   onClick={handleResetForm}
                 >
                   Cancel
@@ -691,6 +767,7 @@ const CreateUser = (props) => {
       <FamilyLookUpModal
         familyLookUp={familyLookUp}
         setselectedFamily={setselectedFamily}
+        selectedFamily={selectedFamily}
       />
       <UserLookUpModal
         userLookUp={userLookUp}
@@ -705,4 +782,4 @@ const CreateUser = (props) => {
   );
 };
 
-export default CreateUser;
+export default UserForm;

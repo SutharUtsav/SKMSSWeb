@@ -225,8 +225,9 @@ export const User = () => {
                             title="Edit"
                             className="btn btn-sm btn-primary btn-edit"
                             onClick={()=> {
-                              dispatch({type : ActionTypes.SET_USER, payload : user})
-                              navigate("edit")
+                              // dispatch({type : ActionTypes.SET_USER, payload : user})
+                              navigate(`/admin/users/edit/${user.id}`)
+                              // navigate("edit")
                             }}
                           >
                             <BiEdit

@@ -9,7 +9,7 @@ import './Home.css'
 import {Role} from "../../admin/role/Role";
 import Family from "../../admin/family/Family";
 import Permission from "../../admin/permission/Permission";
-import CreateUser from "../../admin/user/CreateUser";
+import UserForm from "../../admin/user/UserForm";
 import CreateFamily from "../../admin/family/CreateFamily";
 export const HomeAdmin = () => {
   return (
@@ -22,8 +22,8 @@ export const HomeAdmin = () => {
           <Routes>
             <Route path="/" element={<Dashboard />}></Route>
             <Route path="/users" element={<User />}></Route>
-            <Route path="/users/create" element={<CreateUser />}></Route>
-            <Route path="/users/edit" element={<CreateUser isUpdateUser={true}/>}></Route>
+            <Route path="/users/create" element={<UserForm />}></Route>
+            <Route path="/users/edit/:id" element={<UserForm/>}></Route>
             <Route path="/roles" element={<Role/>}></Route>
             <Route path="/permissions" element={<Permission/>}></Route>
             <Route path="/families" element={<Family/>}></Route>

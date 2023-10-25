@@ -195,12 +195,8 @@
     overflow-y: auto;
 }
 
-.lookup-modal:hover {
+.lookup-modal:hover, .lookup-modal.active {
     background-color: var(--secondary-color);
-}
-
-.lookup-modal.active {
-    transform: scale(0.5);
 }
 
 .lookup-modal *{

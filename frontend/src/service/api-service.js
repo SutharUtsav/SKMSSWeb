@@ -29,7 +29,6 @@ export const getByQueryParams = async (endpoint, params) => {
   }
 
   const url = `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}?${Object.keys(params).map((key)=> encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&')}`;
-  console.log(url)
   let config = {
     method: 'get',
     maxBodyLength: Infinity,
