@@ -562,7 +562,7 @@ export class UserService extends BaseService implements IUserService {
 
             //set mother Id
             const motherId = await this.findUserIdByDetails(dtoProfileRecord.motherName, dtoProfileRecord.motherVillage, dtoProfileRecord.motherSurname);
-
+            console.log("motherId",motherId)
             if (motherId?.status === 0) {
                 return motherId
             }
@@ -583,8 +583,11 @@ export class UserService extends BaseService implements IUserService {
                 dtoProfileRecord.fatherId = Number(null);
             }
             else {
-                dtoProfileRecord.fatherId = motherId?.data.userId;
+                dtoProfileRecord.fatherId = fatherId?.data.userId;
             }
+
+
+            console.log("dtoProfileRecord",dtoProfileRecord)
 
 
             const userProfile = await UserProfile.create({

@@ -71,7 +71,7 @@ export const validateUserProfile = (body: UserProfileDto): UserProfileDto | Erro
     //check all required files
     //removed || !body.wifeSurname || !body.marriedStatus || !body.birthDate || !body.weddingDate || !body.education || !body.occupation || !body.gender
     //        || !body.mainFamilyMemberSurname || !body.mainFamilyMemberVillage || !body.motherName || !body.motherSurname || !body.motherVillage || !body.fatherName || !body.fatherSurname || !body.fatherVillage
-    if (!body.name || !body.countryCode || !body.mobileNumber || !body.email || !body.surname || !body.village || !body.villageGuj
+    if (!body.name || !body.countryCode || !body.mobileNumber || !body.surname || !body.village || !body.villageGuj
         || !body.mainFamilyMemberRelation || !body.mainFamilyMemberName) {
             console.log("error1")
         let errorDto = new ErrorDto();
@@ -81,7 +81,7 @@ export const validateUserProfile = (body: UserProfileDto): UserProfileDto | Erro
     }
 
     //!regexMobile.test(body.mobileNumber) removed
-    if ( !regexEmail.test(body.email)) {
+    if ( body.email && !regexEmail.test(body.email)) {
         console.log("error2")
         let errorDto = new ErrorDto();
         errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
