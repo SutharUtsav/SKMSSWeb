@@ -288,15 +288,41 @@ router.put('/', upload, async (req: any, res: any) => {
     }
 
     let userDto: UserDto | ErrorDto | undefined = validateUser(req.body);
-    if (!userDto || !id) {
+    let userProfileDto: UserProfileDto | ErrorDto | undefined = validateUserProfile(req.body);
+    let familyDto: FamilyDto | ErrorDto | undefined = validateFamily(req.body);
+    let roleDto : RoleLookUpDto | ErrorDto | undefined;
+
+    if(!req.body.roleName || !req.body.roleDescription || !req.body.roleType){
+        roleDto = undefined;
+    }
+    else{
+        roleDto = new RoleLookUpDto();
+        roleDto.name = req.body.roleName;
+        roleDto.description = req.body.roleDescription;
+        roleDto.roleType = req.body.roleType;
+    }
+    
+
+    console.log("userDto",userDto);
+    console.log("userProfileDto",userProfileDto);
+    console.log("familyDto",familyDto);
+    console.log("roleDto",roleDto);
+
+    if (!userDto || !userProfileDto || !familyDto || !roleDto || !id) {
         res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
     }
     else if (userDto instanceof ErrorDto) {
         res.status(parseInt(userDto.errorCode)).send(userDto);
     }
+    else if (userProfileDto instanceof ErrorDto) {
+        res.status(parseInt(userProfileDto.errorCode)).send(userProfileDto);
+    }
+    else if (familyDto instanceof ErrorDto) {
+        res.status(parseInt(familyDto.errorCode)).send(familyDto);
+    }
     else {
         const userService: IUserService = new UserService();
-        const response = await userService.Update(userDto, id);
+        const response = await userService.Update(userDto, userProfileDto, familyDto, roleDto, id);
 
         if (!response) {
             res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
@@ -304,7 +330,7 @@ router.put('/', upload, async (req: any, res: any) => {
                 message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
             })
         }
-        else {
+        else {   
             res.send(response)
         }
     }

@@ -46,7 +46,7 @@ export interface IUserService {
      * @param dtoRecord 
      * @param id 
      */
-    Update(dtoRecord: UserDto, id: number): Promise<UserDto | ApiResponseDto | undefined>;
+    Update(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto, dtoFamilyRecord: FamilyDto, dtoRoleRecord: RoleLookUpDto, id: number): Promise<UserDto | ApiResponseDto | undefined>;
 
     /**
      * Remove Record by given parameter id
@@ -328,8 +328,8 @@ export class UserService extends BaseService implements IUserService {
                     let userProfile: UserProfileLookUpDto = await UserProfile.findOne({
                         raw: true,
                         attributes: ['name', 'surname', 'village', 'gender'],
-                        where : {
-                            userId : id
+                        where: {
+                            userId: id
                         }
                     });
 
@@ -454,7 +454,6 @@ export class UserService extends BaseService implements IUserService {
 
         const transaction = await sequelize.transaction();
         try {
-            console.log("in service")
             const recordCreatedInfo = this.SetRecordCreatedInfo(dtoRecord);
             const recordModifiedInfo = this.SetRecordModifiedInfo(dtoRecord);
 
@@ -518,7 +517,6 @@ export class UserService extends BaseService implements IUserService {
             }
 
 
-            console.log("familyService: ", family.id)
             dtoProfileRecord.familyId = family.id;
             const user = await User.create({
                 ...dtoRecord,
@@ -562,7 +560,6 @@ export class UserService extends BaseService implements IUserService {
 
             //set mother Id
             const motherId = await this.findUserIdByDetails(dtoProfileRecord.motherName, dtoProfileRecord.motherVillage, dtoProfileRecord.motherSurname);
-            console.log("motherId",motherId)
             if (motherId?.status === 0) {
                 return motherId
             }
@@ -586,8 +583,6 @@ export class UserService extends BaseService implements IUserService {
                 dtoProfileRecord.fatherId = fatherId?.data.userId;
             }
 
-
-            console.log("dtoProfileRecord",dtoProfileRecord)
 
 
             const userProfile = await UserProfile.create({
@@ -652,10 +647,11 @@ export class UserService extends BaseService implements IUserService {
     * @param dtoRecord 
     * @param id 
     */
-    public async Update(dtoRecord: UserDto, id: number): Promise<UserDto | ApiResponseDto | undefined> {
+    public async Update(dtoRecord: UserDto, dtoProfileRecord: UserProfileDto, dtoFamilyRecord: FamilyDto, dtoRoleRecord: RoleLookUpDto, id: number): Promise<UserDto | ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
         const recordModifiedInfo = this.SetRecordModifiedInfo(dtoRecord);
 
+        const transaction = await sequelize.transaction();
         try {
             //check whether user exist or not
             let isUser = await User.findOne({
@@ -664,7 +660,54 @@ export class UserService extends BaseService implements IUserService {
                 }
             })
 
-            if (isUser) {
+            let isUserProfile = await UserProfile.findOne({
+                where: {
+                    userId: id
+                }
+            })
+
+            if (isUser && isUserProfile) {
+
+                //check if role exist or not
+                const role = await Role.findOne({
+                    where: {
+                        name: dtoRoleRecord.name,
+                        description: dtoRoleRecord.description,
+                        roleType: dtoRoleRecord.roleType
+                    }
+                })
+
+                if (!role) {
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 0;
+                    let errorDto = new ErrorDto();
+                    errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+                    errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST];
+                    apiResponse.error = errorDto;
+                    return apiResponse;
+                }
+                dtoRecord.roleId = role.id;
+
+                //Check if Family not exist or not
+                let family = await Family.findOne({
+                    where: {
+                        surname: dtoFamilyRecord.surname,
+                        village: dtoFamilyRecord.village,
+                        villageGuj: dtoFamilyRecord.villageGuj,
+                        mainFamilyMemberName: dtoFamilyRecord.mainFamilyMemberName
+                    }
+                })
+
+                if (!family) {
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 0;
+                    let errorDto = new ErrorDto();
+                    errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_RECORD_NOT_FOUND].toString();
+                    errorDto.errorMsg = "Family " + EnumErrorMsgText[EnumErrorMsg.API_RECORD_NOT_FOUND];
+                    apiResponse.error = errorDto;
+                    return apiResponse;
+                }
+                dtoProfileRecord.familyId = family.id;
 
                 let updatedRecord = await User.update({
                     ...dtoRecord,
@@ -673,15 +716,71 @@ export class UserService extends BaseService implements IUserService {
                 }, {
                     where: {
                         id: id
-                    }
+                    },
+                    transaction
                 })
 
 
-                if (updatedRecord !== undefined || updatedRecord !== null) {
+                //set mainFamilyMemberId
+                if (dtoProfileRecord.mainFamilyMemberRelation === EnumFamilyMemberRelationName[EnumFamilyMemberRelation.SELF]) {
+                    dtoProfileRecord.mainFamilyMemberId = id;
+                }
+                else {
+                    const maniFamilyMember = await this.findUserIdByDetails(dtoProfileRecord.mainFamilyMemberName, dtoProfileRecord.mainFamilyMemberVillage, dtoProfileRecord.mainFamilyMemberSurname);
+
+                    if (maniFamilyMember?.status === 0) {
+                        return maniFamilyMember
+                    }
+                    else if (maniFamilyMember?.data?.status === 0) {
+                        dtoProfileRecord.mainFamilyMemberId = Number(null);
+                    }
+                    else {
+                        dtoProfileRecord.mainFamilyMemberId = maniFamilyMember?.data.userId;
+                    }
+                }
+
+                //set mother Id
+                const motherId = await this.findUserIdByDetails(dtoProfileRecord.motherName, dtoProfileRecord.motherVillage, dtoProfileRecord.motherSurname);
+                if (motherId?.status === 0) {
+                    return motherId
+                }
+                else if (motherId?.data?.status === 0) {
+                    dtoProfileRecord.motherId = Number(null);
+                }
+                else {
+                    dtoProfileRecord.motherId = motherId?.data.userId;
+                }
+
+                //set father Id
+                const fatherId = await this.findUserIdByDetails(dtoProfileRecord.fatherName, dtoProfileRecord.fatherVillage, dtoProfileRecord.fatherSurname);
+
+                if (fatherId?.status === 0) {
+                    return fatherId
+                }
+                else if (fatherId?.data?.status === 0) {
+                    dtoProfileRecord.fatherId = Number(null);
+                }
+                else {
+                    dtoProfileRecord.fatherId = fatherId?.data.userId;
+                }
+
+
+                let updatedProfileRecord = await UserProfile.update({
+                    ...dtoProfileRecord,
+                    updatedAt: recordModifiedInfo.updatedAt,
+                    updatedById: recordModifiedInfo.updatedById
+                }, {
+                    where: {
+                        userId: id
+                    },
+                    transaction
+                })
+
+                if (updatedRecord !== undefined || updatedRecord !== null || updatedProfileRecord !== undefined || updatedProfileRecord !== null) {
                     apiResponse = new ApiResponseDto()
                     apiResponse.status = 1;
                     apiResponse.data = { status: parseInt(updatedRecord[0]), message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
-                    return apiResponse;
+                    
                 }
                 else {
                     return undefined
@@ -694,11 +793,13 @@ export class UserService extends BaseService implements IUserService {
                 errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_RECORD_NOT_FOUND].toString();
                 errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_RECORD_NOT_FOUND]
                 apiResponse.error = errorDto;
-                return apiResponse;
             }
 
+            await transaction.commit();
+            return apiResponse;
         }
         catch (error: any) {
+            await transaction.rollback();
             apiResponse = new ApiResponseDto();
             let errorDto = new ErrorDto();
             errorDto.errorCode = '400';
