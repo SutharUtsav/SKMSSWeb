@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import "./User.css";
-import { add, get, getByQueryParams } from "../../../service/api-service";
+import { add, edit, get, getByQueryParams } from "../../../service/api-service";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import FamilyLookUpModal from "../family/FamilyLookUpModal";
@@ -45,7 +45,8 @@ const UserForm = (props) => {
   const [familyLookUp, setFamilyLookUp] = useState([]);
   const [roleLookUp, setRoleLookUp] = useState([]);
   const [userLookUp, setUserLookUp] = useState([]);
-  const [inputMainFamilyMemberRelation, setinputMainFamilyMemberRelation] = useState(false);
+  const [inputMainFamilyMemberRelation, setinputMainFamilyMemberRelation] =
+    useState(false);
   const [selectedFamily, setselectedFamily] = useState(null);
   const [selectedFather, setselectedFather] = useState(null);
   const [selectedMother, setselectedMother] = useState(null);
@@ -95,8 +96,6 @@ const UserForm = (props) => {
       .catch((error) => {
         console.log(error);
       });
-
-
   }, []);
 
   //get Users profile details if user is updating
@@ -132,13 +131,17 @@ const UserForm = (props) => {
                               let fatherDetails = null;
                               let motherDetails = null;
                               let mainFamilyMemberDetails = null;
+                              console.log(user);
                               if (user.fatherId) {
                                 get(`/user-profile/look-up/${user.fatherId}`)
                                   .then((response) => {
                                     if (response.data.status === 1) {
                                       setselectedFather(response.data.data);
                                       fatherDetails = response.data.data;
-                                      console.log(fatherDetails)
+                                      console.log(
+                                        "fatherdetails",
+                                        fatherDetails
+                                      );
                                     } else {
                                       console.log(response.data);
                                     }
@@ -154,7 +157,7 @@ const UserForm = (props) => {
                                     if (response.data.status === 1) {
                                       setselectedMother(response.data.data);
                                       motherDetails = response.data.data;
-                                      console.log(motherDetails)
+                                      console.log(motherDetails);
                                     } else {
                                       console.log(response.data);
                                     }
@@ -165,10 +168,13 @@ const UserForm = (props) => {
                               }
 
                               if (user.mainFamilyMemberId) {
-                                get(`/user-profile/look-up/${user.mainFamilyMemberId}`)
+                                get(
+                                  `/user-profile/look-up/${user.mainFamilyMemberId}`
+                                )
                                   .then((response) => {
                                     if (response.data.status === 1) {
-                                      mainFamilyMemberDetails = response.data.data;
+                                      mainFamilyMemberDetails =
+                                        response.data.data;
 
                                       setUserForm({
                                         ...userForm,
@@ -177,26 +183,52 @@ const UserForm = (props) => {
                                         wifeSurname: user.wifeSurname,
                                         marriedStatus: user.marriedStatus,
                                         birthDate: user.birthDate.split("T")[0],
-                                        weddingDate: user.weddingDate.split("T")[0],
+                                        weddingDate:
+                                          user.weddingDate.split("T")[0],
                                         education: user.education,
                                         occupation: user.occupation,
                                         mobileNumber: user.mobileNumber,
                                         countryCode: user.countryCode,
                                         email: user.email,
                                         gender: user.gender,
-                                        mainFamilyMemberRelation: user.mainFamilyMemberRelation,
+                                        mainFamilyMemberRelation:
+                                          user.mainFamilyMemberRelation,
                                         surname: family.surname,
                                         village: family.village,
                                         villageGuj: family.villageGuj,
-                                        mainFamilyMemberName: user.mainFamilyMemberRelation === "SELF" ? user.name : mainFamilyMemberDetails.name,
-                                        mainFamilyMemberSurname: user.mainFamilyMemberRelation === "SELF" ? user.surname : mainFamilyMemberDetails.surname,
-                                        mainFamilyMemberVillage: user.mainFamilyMemberRelation === "SELF" ? user.value : mainFamilyMemberDetails.village,
-                                        fatherName: fatherDetails ? fatherDetails.name : "",
-                                        fatherSurname: fatherDetails ? fatherDetails.surname : "",
-                                        fatherVillage: fatherDetails ? fatherDetails.village : "",
-                                        motherName: motherDetails ? motherDetails.name : "",
-                                        motherSurname: motherDetails ? motherDetails.surname : "",
-                                        motherVillage: motherDetails ? motherDetails.village : "",
+                                        mainFamilyMemberName:
+                                          user.mainFamilyMemberRelation ===
+                                          "SELF"
+                                            ? user.name
+                                            : mainFamilyMemberDetails.name,
+                                        mainFamilyMemberSurname:
+                                          user.mainFamilyMemberRelation ===
+                                          "SELF"
+                                            ? user.surname
+                                            : mainFamilyMemberDetails.surname,
+                                        mainFamilyMemberVillage:
+                                          user.mainFamilyMemberRelation ===
+                                          "SELF"
+                                            ? user.value
+                                            : mainFamilyMemberDetails.village,
+                                        fatherName: fatherDetails
+                                          ? fatherDetails.name
+                                          : "",
+                                        fatherSurname: fatherDetails
+                                          ? fatherDetails.surname
+                                          : "",
+                                        fatherVillage: fatherDetails
+                                          ? fatherDetails.village
+                                          : "",
+                                        motherName: motherDetails
+                                          ? motherDetails.name
+                                          : "",
+                                        motherSurname: motherDetails
+                                          ? motherDetails.surname
+                                          : "",
+                                        motherVillage: motherDetails
+                                          ? motherDetails.village
+                                          : "",
                                       });
                                     } else {
                                       console.log(response.data);
@@ -206,9 +238,6 @@ const UserForm = (props) => {
                                     console.log(error);
                                   });
                               }
-
-
-
                             } else {
                               console.log(response);
                             }
@@ -247,14 +276,13 @@ const UserForm = (props) => {
     //user's family selected
     if (userId) {
       setinputMainFamilyMemberRelation(true);
-    }
-    else {
+    } else {
       if (selectedFamily === null) {
         setUserForm({
           ...userForm,
           mainFamilyMemberRelation: "SELF",
         });
-        setinputMainFamilyMemberRelation(false)
+        setinputMainFamilyMemberRelation(false);
       } else {
         const mainFamilyMember = userLookUp.find((user) => {
           return user.name === selectedFamily.mainFamilyMemberName;
@@ -272,9 +300,7 @@ const UserForm = (props) => {
             mainFamilyMemberSurname: mainFamilyMember.surname,
             mainFamilyMemberVillage: mainFamilyMember.village,
           });
-
         } else {
-
           setUserForm({
             ...userForm,
             surname: selectedFamily.surname,
@@ -284,7 +310,6 @@ const UserForm = (props) => {
             mainFamilyMemberSurname: selectedFamily.surname,
             mainFamilyMemberName: userForm.name,
           });
-
         }
       }
     }
@@ -331,12 +356,16 @@ const UserForm = (props) => {
   }, [selectedMother]);
 
   const handleResetForm = () => {
-    setUserForm(defaultUserForm);
-    setselectedFather(null);
-    setselectedFamily(null);
-    setselectedMother(null);
-    setinputMainFamilyMemberRelation(false);
-    roleRef.current.value = "No Role Selected";
+    if (!userId) {
+      setUserForm(defaultUserForm);
+      setselectedFather(null);
+      setselectedFamily(null);
+      setselectedMother(null);
+      setinputMainFamilyMemberRelation(false);
+      roleRef.current.value = "No Role Selected";
+    } else {
+      navigate("/admin/users");
+    }
   };
 
   const handleChange = (e) => {
@@ -381,6 +410,18 @@ const UserForm = (props) => {
       console.log(userForm);
       if (!userId) {
         add("/user", userForm)
+          .then((response) => {
+            console.log(response);
+            navigate("/admin/users");
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+          .finally(() => {
+            handleResetForm();
+          });
+      } else {
+        edit("/user", userId, userForm)
           .then((response) => {
             console.log(response);
             navigate("/admin/users");
@@ -471,7 +512,6 @@ const UserForm = (props) => {
                       ? "Select Family..."
                       : `Surname : ${selectedFamily.surname}, Village :${selectedFamily.village}, MainFamilyMemberName: ${selectedFamily.mainFamilyMemberName}`
                   }
-
                 />
               </div>
 
@@ -706,7 +746,7 @@ const UserForm = (props) => {
                       key={index}
                       value={JSON.stringify(role)}
                       className="fs-2 fw-light"
-                    // defaultChecked = {userForm.roleName === role.name}
+                      // defaultChecked = {userForm.roleName === role.name}
                     >
                       Name: {role.name} RoleType : {role.roleType}
                     </option>
