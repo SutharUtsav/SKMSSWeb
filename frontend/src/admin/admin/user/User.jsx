@@ -211,8 +211,7 @@ export const User = () => {
                             title="User Details"
                             className="btn btn-sm btn-success"
                             onClick={()=>{
-                              console.log("first")
-                              dispatch({type : ActionTypes.SET_USER, payload : user})
+                              navigate(`/admin/user/details/${user.id}`)
                             }}
                           >
                             <BiSolidUserDetail

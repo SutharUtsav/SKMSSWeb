@@ -32,40 +32,45 @@ const PermissionModal = (props) => {
   const handleSubmitForm = (e) => {
     e.preventDefault();
 
-    if (props.updateRecordId === null) {
-      add("/role-permission", props.permissionForm)
-        .then((response) => {
-          if (response && response.data.status === 1) {
-            props.setisReloadData(true);
-          } else {
-            console.log(response);
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        })
-        .finally(() => {
-          props.setupdateRecordId(null);
-          props.setpermissionForm(defaultPermissionForm);
-          closeModal.current.click();
-        });
-    } else {
-      edit("/role-permission", props.updateRecordId, props.permissionForm)
-        .then((response) => {
-          if (response && response.data.status === 1) {
-            props.setisReloadData(true);
-          } else {
-            console.log(response);
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        })
-        .finally(() => {
-          props.setupdateRecordId(null);
-          props.setpermissionForm(defaultPermissionForm);
-          closeModal.current.click();
-        });
+    if(!props.permissionForm.permissionFor || props.permissionForm.permissionFor === "" || !props.permissionForm.permissions || props.permissionForm.permissions === ""){
+      console.log("Permission fields is not selected")
+    }
+    else{
+      if (props.updateRecordId === null) {
+        add("/role-permission", props.permissionForm)
+          .then((response) => {
+            if (response && response.data.status === 1) {
+              props.setisReloadData(true);
+            } else {
+              console.log(response);
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          })
+          .finally(() => {
+            props.setupdateRecordId(null);
+            props.setpermissionForm(defaultPermissionForm);
+            closeModal.current.click();
+          });
+      } else {
+        edit("/role-permission", props.updateRecordId, props.permissionForm)
+          .then((response) => {
+            if (response && response.data.status === 1) {
+              props.setisReloadData(true);
+            } else {
+              console.log(response);
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+          })
+          .finally(() => {
+            props.setupdateRecordId(null);
+            props.setpermissionForm(defaultPermissionForm);
+            closeModal.current.click();
+          });
+      }
     }
   };
 
@@ -105,6 +110,7 @@ const PermissionModal = (props) => {
                   id="permissionForInput"
                   aria-describedby="permissionForInput"
                   name="permissionFor"
+                  required={true}
                   value={props.permissionForm.permissionFor}
                   onChange={handleChange}
                 />
@@ -120,6 +126,7 @@ const PermissionModal = (props) => {
                   id="permissionInput"
                   aria-describedby="permissionInput"
                   name="permissions"
+                  required={true}
                   value={props.permissionForm.permissions}
                   onChange={(e) => {
                     props.setpermissionForm({

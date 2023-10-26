@@ -75,40 +75,45 @@ const RoleModal = (props) => {
   const handleSubmitForm = (e) => {
     e.preventDefault();
 
-    console.log(props.updateRecordId)
-    if (props.updateRecordId === null) {
-      add("/role", props.roleForm)
-        .then((response) => {
-          if (response && response.data.status === 1) {
-            props.setisReloadData(true);
-          }
-          console.log(response);
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          props.setupdateRecordId(null);
-          props.setroleForm(defaultRoleForm);
-          closeModal.current.click();
-        });
-    } else {
-      edit("/role", props.updateRecordId, props.roleForm)
-        .then((response) => {
-          if (response && response.data.status === 1) {
-            props.setisReloadData(true);
-          }
-          console.log(response);
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          props.setupdateRecordId(null);
-          props.setroleForm(defaultRoleForm);
-          closeModal.current.click();
-        });
+    if (!props.roleForm.name || props.roleForm.name === "" || !props.roleForm.description || props.roleForm.description === "") {
+      console.log("Role name or description is not selected");
     }
+    else {
+      if (props.updateRecordId === null) {
+        add("/role", props.roleForm)
+          .then((response) => {
+            if (response && response.data.status === 1) {
+              props.setisReloadData(true);
+            }
+            console.log(response);
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+          .finally(() => {
+            props.setupdateRecordId(null);
+            props.setroleForm(defaultRoleForm);
+            closeModal.current.click();
+          });
+      } else {
+        edit("/role", props.updateRecordId, props.roleForm)
+          .then((response) => {
+            if (response && response.data.status === 1) {
+              props.setisReloadData(true);
+            }
+            console.log(response);
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+          .finally(() => {
+            props.setupdateRecordId(null);
+            props.setroleForm(defaultRoleForm);
+            closeModal.current.click();
+          });
+      }
+    }
+
   };
 
   return (
@@ -147,6 +152,7 @@ const RoleModal = (props) => {
                   name="name"
                   aria-describedby="roleNameInput"
                   value={props.roleForm.name}
+                  required={true}
                   onChange={handleChange}
                 />
               </div>
@@ -162,6 +168,7 @@ const RoleModal = (props) => {
                   name="description"
                   aria-describedby="roleDescInput"
                   value={props.roleForm.description}
+                  required={true}
                   onChange={handleChange}
                 />
               </div>

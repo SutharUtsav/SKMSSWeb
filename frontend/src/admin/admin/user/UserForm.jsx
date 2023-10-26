@@ -6,8 +6,6 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import FamilyLookUpModal from "../family/FamilyLookUpModal";
 import UserLookUpModal from "./UserLookUpModal";
-import { useDispatch, useSelector } from "react-redux";
-import { ActionTypes } from "../../../redux/action-type";
 
 const UserForm = (props) => {
   const defaultUserForm = {
@@ -109,12 +107,7 @@ const UserForm = (props) => {
             get(`/role/look-up/${roleId}`)
               .then((response) => {
                 if (response.data.status === 1) {
-                  setUserForm({
-                    ...userForm,
-                    roleName: response.data.data.name,
-                    roleDescription: response.data.data.description,
-                    roleType: response.data.data.roleType,
-                  });
+                  let role = response.data.data;
                   roleRef.current.value = JSON.stringify(response.data.data);
 
                   getByQueryParams("/user-profile", queryParams)
@@ -131,17 +124,14 @@ const UserForm = (props) => {
                               let fatherDetails = null;
                               let motherDetails = null;
                               let mainFamilyMemberDetails = null;
-                              console.log(user);
+                              
                               if (user.fatherId) {
                                 get(`/user-profile/look-up/${user.fatherId}`)
                                   .then((response) => {
                                     if (response.data.status === 1) {
                                       setselectedFather(response.data.data);
                                       fatherDetails = response.data.data;
-                                      console.log(
-                                        "fatherdetails",
-                                        fatherDetails
-                                      );
+                                      
                                     } else {
                                       console.log(response.data);
                                     }
@@ -157,7 +147,7 @@ const UserForm = (props) => {
                                     if (response.data.status === 1) {
                                       setselectedMother(response.data.data);
                                       motherDetails = response.data.data;
-                                      console.log(motherDetails);
+                                      
                                     } else {
                                       console.log(response.data);
                                     }
@@ -196,19 +186,22 @@ const UserForm = (props) => {
                                         surname: family.surname,
                                         village: family.village,
                                         villageGuj: family.villageGuj,
+                                        roleName: role.name,
+                                        roleDescription: role.description,
+                                        roleType: role.roleType,
                                         mainFamilyMemberName:
                                           user.mainFamilyMemberRelation ===
-                                          "SELF"
+                                            "SELF"
                                             ? user.name
                                             : mainFamilyMemberDetails.name,
                                         mainFamilyMemberSurname:
                                           user.mainFamilyMemberRelation ===
-                                          "SELF"
+                                            "SELF"
                                             ? user.surname
                                             : mainFamilyMemberDetails.surname,
                                         mainFamilyMemberVillage:
                                           user.mainFamilyMemberRelation ===
-                                          "SELF"
+                                            "SELF"
                                             ? user.value
                                             : mainFamilyMemberDetails.village,
                                         fatherName: fatherDetails
@@ -412,7 +405,9 @@ const UserForm = (props) => {
         add("/user", userForm)
           .then((response) => {
             console.log(response);
-            navigate("/admin/users");
+            if (response.status === 1) {
+              navigate("/admin/users");
+            }
           })
           .catch((error) => {
             console.log(error);
@@ -424,7 +419,9 @@ const UserForm = (props) => {
         edit("/user", userId, userForm)
           .then((response) => {
             console.log(response);
-            navigate("/admin/users");
+            if (response.status === 1) {
+              navigate("/admin/users");
+            }
           })
           .catch((error) => {
             console.log(error);
@@ -746,7 +743,7 @@ const UserForm = (props) => {
                       key={index}
                       value={JSON.stringify(role)}
                       className="fs-2 fw-light"
-                      // defaultChecked = {userForm.roleName === role.name}
+                    // defaultChecked = {userForm.roleName === role.name}
                     >
                       Name: {role.name} RoleType : {role.roleType}
                     </option>
