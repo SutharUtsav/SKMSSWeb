@@ -10,8 +10,8 @@ import {Role} from "../../admin/role/Role";
 import Family from "../../admin/family/Family";
 import Permission from "../../admin/permission/Permission";
 import UserForm from "../../admin/user/UserForm";
-import CreateFamily from "../../admin/family/CreateFamily";
 import UserDetails from "../../admin/user/UserDetails";
+import FamilyForm from "../../admin/family/FamilyForm";
 export const HomeAdmin = () => {
   return (
     <div className="admin-panel d-flex">
@@ -29,7 +29,8 @@ export const HomeAdmin = () => {
             <Route path="/roles" element={<Role/>}></Route>
             <Route path="/permissions" element={<Permission/>}></Route>
             <Route path="/families" element={<Family/>}></Route>
-            <Route path="/families/create" element={<CreateFamily/>}></Route>
+            <Route path="/families/create" element={<FamilyForm/>}></Route>
+            <Route path="/families/edit/:id" element={<FamilyForm/>}></Route>
           </Routes>
         </div>
 

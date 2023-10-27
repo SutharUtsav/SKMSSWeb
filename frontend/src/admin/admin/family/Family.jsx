@@ -6,7 +6,7 @@ import { BiRefresh } from "react-icons/bi";
 import { BiEdit } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
 import useApiCall from "../../../hooks/useApiCall";
-import CreateFamily from "./CreateFamily";
+import CreateFamily from "./FamilyForm";
 const Family = () => {
   let { data, setData, error, setError, loading, setLoading } = useApiCall(() =>
     get("/family")
@@ -281,8 +281,7 @@ const Family = () => {
                               title="Edit"
                               className="btn btn-sm btn-primary btn-edit"
                               onClick={() => {
-                                setbeforeUpdateData(family);
-                                setisUpdateClicked(true)
+                                navigate(`/admin/families/edit/${family.id}`)
                               }}
                             >
                               <BiEdit fill="#fff" size={"2.5rem"} className="m-1" />
@@ -309,9 +308,9 @@ const Family = () => {
           </div>
         </div>
       </div>
-      {!isUpdateClicked ? null : (
+      {/* {!isUpdateClicked ? null : (
         <CreateFamily beforeUpdateData={beforeUpdateData} setbeforeUpdateData={setbeforeUpdateData} setisUpdateClicked={setisUpdateClicked} setisReloadData={setisReloadData}/>
-      )}
+      )} */}
     </>
   );
 };

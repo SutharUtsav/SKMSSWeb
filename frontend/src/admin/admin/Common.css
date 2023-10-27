@@ -68,9 +68,9 @@
 
 
 .admin-panel .table-responsive::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
-    background-color: #fff;
+    /* width: 15px; */
+    height: 8px;
+    background-color: #eee;
 }
 
 .admin-panel .table-responsive::-webkit-scrollbar-thumb {
