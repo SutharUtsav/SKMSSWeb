@@ -26,7 +26,18 @@ const FamilyForm = (props) => {
       get(`/family/${familyId}`)
       .then((response)=> {
         if(response.data.status === 1){
-          setfamilyForm(response.data.data)
+          const family = response.data.data;
+          setfamilyForm({
+            surname : family.surname ? family.surname : "",
+            village : family.village ? family.village : "",
+            villageGuj : family.villageGuj ? family.villageGuj : "",
+            currResidency : family.currResidency ? family.currResidency : "",
+            adobeOfGod : family.adobeOfGod ? family.adobeOfGod : "",
+            goddess : family.goddess ? family.goddess : "",
+            lineage : family.lineage ? family.lineage : "",
+            residencyAddress : family.residencyAddress ? family.residencyAddress : "",
+            mainFamilyMemberName : family.mainFamilyMemberName ? family.mainFamilyMemberName : ""
+          })
         }
         console.log(response.data.data)
       })

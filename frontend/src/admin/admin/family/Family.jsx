@@ -6,7 +6,7 @@ import { BiRefresh } from "react-icons/bi";
 import { BiEdit } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
 import useApiCall from "../../../hooks/useApiCall";
-import CreateFamily from "./FamilyForm";
+
 const Family = () => {
   let { data, setData, error, setError, loading, setLoading } = useApiCall(() =>
     get("/family")
@@ -15,15 +15,7 @@ const Family = () => {
   const navigate = useNavigate();
 
   const [isReloadData, setisReloadData] = useState(false);
-  const [isUpdateClicked, setisUpdateClicked] = useState(false)
-  const [beforeUpdateData, setbeforeUpdateData] = useState(null)
 
-  useEffect(() => {
-    setisUpdateClicked(false)
-    return () => {
-      setisUpdateClicked(false)
-    }
-  }, [])
 
   //Reload Data on isReloadData is true
   useEffect(() => {
@@ -308,9 +300,7 @@ const Family = () => {
           </div>
         </div>
       </div>
-      {/* {!isUpdateClicked ? null : (
-        <CreateFamily beforeUpdateData={beforeUpdateData} setbeforeUpdateData={setbeforeUpdateData} setisUpdateClicked={setisUpdateClicked} setisReloadData={setisReloadData}/>
-      )} */}
+      
     </>
   );
 };
