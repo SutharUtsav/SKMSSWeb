@@ -6,6 +6,8 @@ import { MdDelete } from "react-icons/md";
 import { useEffect } from "react";
 import PermissionModal from "./PermissionModal";
 import useApiCall from "../../../hooks/useApiCall";
+import DecisionModal from "../../master/decisionmodal/DecisionModal";
+import { EnumConsts } from "../../../consts/EnumConsts";
 
 const Permission = () => {
   let { data, setData, error, setError, loading, setLoading } = useApiCall(() =>
@@ -20,6 +22,14 @@ const Permission = () => {
   const [isReloadData, setisReloadData] = useState(false);
   const [permissionForm, setpermissionForm] = useState(defaultPermissionForm);
   const [updateRecordId, setupdateRecordId] = useState(null);
+  const [deleteRecordId, setdeleteRecordId] = useState(null);
+
+
+  useEffect(() => {
+    return () => {
+      setdeleteRecordId(null);
+    }
+  }, [])
 
   //Reload Data on isReloadData is true
   useEffect(() => {
@@ -222,7 +232,11 @@ const Permission = () => {
                             <button
                               title="Delete"
                               className="btn btn-sm btn-danger btn-delete"
-                              onClick={() => handleDelete(permission.id)}
+                              data-bs-toggle="modal"
+                              data-bs-target={`#${EnumConsts.DECISIONMODALID}`}
+                              onClick={() => {
+                                setdeleteRecordId(permission.id);
+                              }}
                             >
                               <MdDelete
                                 fill="#fff"
@@ -255,6 +269,10 @@ const Permission = () => {
         updateRecordId={updateRecordId}
         setupdateRecordId={setupdateRecordId}
       />
+      <DecisionModal onYes={() => {
+        handleDelete(deleteRecordId)
+      }} deleteRecordId={deleteRecordId} setdeleteRecordId={setdeleteRecordId} topic="Delete Permission" message="Are you sure you want to delete this Permission?"/>
+      
     </>
   );
 };

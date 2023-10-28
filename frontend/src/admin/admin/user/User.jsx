@@ -6,16 +6,23 @@ import { BiEdit } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
 import useApiCall from "../../../hooks/useApiCall";
 import { useDispatch } from "react-redux";
-import { ActionTypes } from "../../../redux/action-type";
+import { EnumConsts } from "../../../consts/EnumConsts";
+import DecisionModal from "../../master/decisionmodal/DecisionModal";
 export const User = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   let { data, setData, error, setError, loading, setLoading } = useApiCall(() =>
     get("/user")
   );
 
   const [isReloadData, setisReloadData] = useState(false);
+  const [deleteRecordId, setdeleteRecordId] = useState(null);
+
+  useEffect(() => {
+    return () => {
+      setdeleteRecordId(null);
+    }
+  }, [])
 
   //Reload Data on isReloadData is true
   useEffect(() => {
@@ -210,7 +217,7 @@ export const User = () => {
                           <button
                             title="User Details"
                             className="btn btn-sm btn-success"
-                            onClick={()=>{
+                            onClick={() => {
                               navigate(`/admin/user/details/${user.id}`)
                             }}
                           >
@@ -223,7 +230,7 @@ export const User = () => {
                           <button
                             title="Edit"
                             className="btn btn-sm btn-primary btn-edit"
-                            onClick={()=> {
+                            onClick={() => {
                               // dispatch({type : ActionTypes.SET_USER, payload : user})
                               navigate(`/admin/users/edit/${user.id}`)
                               // navigate("edit")
@@ -238,7 +245,12 @@ export const User = () => {
                           <button
                             title="Delete"
                             className="btn btn-sm btn-danger btn-delete"
-                            onClick={() => handleDelete(user.id)}
+                            data-bs-toggle="modal"
+                            data-bs-target={`#${EnumConsts.DECISIONMODALID}`}
+                            onClick={() => {
+                              setdeleteRecordId(user.id);
+                            }}
+
                           >
                             <MdDelete
                               fill="#fff"
@@ -258,6 +270,10 @@ export const User = () => {
           )}
         </div>
       </div>
+      <DecisionModal onYes={() => {
+        handleDelete(deleteRecordId)
+      }} deleteRecordId={deleteRecordId} setdeleteRecordId={setdeleteRecordId} topic="Delete User" message="Are you sure you want to delete this User?" />
+
     </div>
   );
 };

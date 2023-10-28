@@ -6,6 +6,8 @@ import { BiRefresh } from "react-icons/bi";
 import { BiEdit } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
 import useApiCall from "../../../hooks/useApiCall";
+import DecisionModal from "../../master/decisionmodal/DecisionModal";
+import { EnumConsts } from "../../../consts/EnumConsts";
 
 const Family = () => {
   let { data, setData, error, setError, loading, setLoading } = useApiCall(() =>
@@ -15,7 +17,13 @@ const Family = () => {
   const navigate = useNavigate();
 
   const [isReloadData, setisReloadData] = useState(false);
+  const [deleteRecordId, setdeleteRecordId] = useState(null);
 
+  useEffect(() => {
+    return () => {
+      setdeleteRecordId(null);
+    }
+  }, [])
 
   //Reload Data on isReloadData is true
   useEffect(() => {
@@ -38,20 +46,20 @@ const Family = () => {
     }
   }, [isReloadData]);
 
- //Delete Api Call
- const handleDelete = (id) => {
-  console.log(id);
-  del("/family", id)
-    .then((response) => {
-      if (response && response.data.status === 1) {
-        setisReloadData(true);
-      }
-      console.log(response);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
+  //Delete Api Call
+  const handleDelete = (id) => {
+    console.log(id);
+    del("/family", id)
+      .then((response) => {
+        if (response && response.data.status === 1) {
+          setisReloadData(true);
+        }
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
 
   return (
@@ -281,7 +289,11 @@ const Family = () => {
                             <button
                               title="Delete"
                               className="btn btn-sm btn-danger btn-delete"
-                              onClick={()=>handleDelete(family.id)}
+                              data-bs-toggle="modal"
+                              data-bs-target={`#${EnumConsts.DECISIONMODALID}`}
+                              onClick={() => {
+                                setdeleteRecordId(family.id);
+                              }}
                             >
                               <MdDelete fill="#fff" size={"2.5rem"} className="m-1" />
                             </button>
@@ -300,7 +312,10 @@ const Family = () => {
           </div>
         </div>
       </div>
-      
+      <DecisionModal onYes={() => {
+        handleDelete(deleteRecordId)
+      }} deleteRecordId={deleteRecordId} setdeleteRecordId={setdeleteRecordId} topic="Delete User" message="Are you sure you want to delete this User?" />
+
     </>
   );
 };

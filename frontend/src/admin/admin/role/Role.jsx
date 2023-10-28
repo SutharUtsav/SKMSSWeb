@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Role.css";
 import "../Common.css";
@@ -8,6 +8,8 @@ import { MdDelete } from "react-icons/md";
 import { BiRefresh } from "react-icons/bi";
 import RoleModal from "./RoleModal";
 import useApiCall from "../../../hooks/useApiCall";
+import DecisionModal from "../../master/decisionmodal/DecisionModal";
+import { EnumConsts } from "../../../consts/EnumConsts";
 
 export const Role = () => {
   const defaultRoleForm = {
@@ -24,6 +26,15 @@ export const Role = () => {
   const [isReloadData, setisReloadData] = useState(false);
   const [roleForm, setroleForm] = useState(defaultRoleForm);
   const [updateRecordId, setupdateRecordId] = useState(null);
+  const [deleteRecordId, setdeleteRecordId] = useState(null);
+
+
+  useEffect(() => {
+    return () => {
+      setdeleteRecordId(null);
+    }
+  }, [])
+  
 
   //Reload Data on isReloadData is true
   useEffect(() => {
@@ -47,9 +58,9 @@ export const Role = () => {
   }, [isReloadData]);
 
 
+
   //Delete Api Call
   const handleDelete = (id) => {
-    console.log(id);
     del("/role", id)
       .then((response) => {
         if (response && response.data.status === 1) {
@@ -253,7 +264,11 @@ export const Role = () => {
                             <button
                               title="Delete"
                               className="btn btn-sm btn-danger btn-delete"
-                              onClick={() => handleDelete(role.id)}
+                              data-bs-toggle="modal"
+                              data-bs-target={`#${EnumConsts.DECISIONMODALID}`}
+                              onClick={() => {
+                                setdeleteRecordId(role.id);
+                              }}
                             >
                               <MdDelete
                                 fill="#fff"
@@ -281,6 +296,10 @@ export const Role = () => {
         updateRecordId={updateRecordId}
         setupdateRecordId={setupdateRecordId}
       />
+      <DecisionModal onYes={() => {
+        handleDelete(deleteRecordId)
+      }} deleteRecordId={deleteRecordId} setdeleteRecordId={setdeleteRecordId} topic="Delete Role" message="Are you sure you want to delete this Role?"/>
+      
     </>
   );
 };
