@@ -302,12 +302,6 @@ router.put('/', upload, async (req: any, res: any) => {
         roleDto.description = req.body.roleDescription;
         roleDto.roleType = req.body.roleType;
     }
-    
-
-    console.log("userDto",userDto);
-    console.log("userProfileDto",userProfileDto);
-    console.log("familyDto",familyDto);
-    console.log("roleDto",roleDto);
 
     if (!userDto || !userProfileDto || !familyDto || !roleDto || !id) {
         res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
