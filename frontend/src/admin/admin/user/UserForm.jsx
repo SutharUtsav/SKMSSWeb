@@ -59,41 +59,42 @@ const UserForm = (props) => {
 
   //Api call on page load to get all entities look up list
   useEffect(() => {
-    get("/family/look-up")
-      .then((response) => {
-        if (response.data.status === 1) {
-          setFamilyLookUp(response.data.data);
-        } else {
-          console.log(response);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      get("/family/look-up")
+        .then((response) => {
+          if (response.data.status === 1) {
+            setFamilyLookUp(response.data.data);
+          } else {
+            console.log(response);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
 
-    get("/role/look-up")
-      .then((response) => {
-        if (response.data.status === 1) {
-          setRoleLookUp(response.data.data);
-        } else {
-          console.log(response);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      get("/role/look-up")
+        .then((response) => {
+          if (response.data.status === 1) {
+            setRoleLookUp(response.data.data);
+          } else {
+            console.log(response);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
 
-    get("/user-profile/look-up")
-      .then((response) => {
-        if (response.data.status === 1) {
-          setUserLookUp(response.data.data);
-        } else {
-          console.log(response);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      get("/user-profile/look-up")
+        .then((response) => {
+          if (response.data.status === 1) {
+            setUserLookUp(response.data.data);
+          } else {
+            console.log(response);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    
   }, []);
 
   //get Users profile details if user is updating
@@ -124,14 +125,14 @@ const UserForm = (props) => {
                               let fatherDetails = null;
                               let motherDetails = null;
                               let mainFamilyMemberDetails = null;
-                              
-                              if (user.fatherId) {
+
+                              if (user.fatherId && user.fatherId !== 0) {
                                 get(`/user-profile/look-up/${user.fatherId}`)
                                   .then((response) => {
                                     if (response.data.status === 1) {
                                       setselectedFather(response.data.data);
                                       fatherDetails = response.data.data;
-                                      
+
                                     } else {
                                       console.log(response.data);
                                     }
@@ -141,13 +142,13 @@ const UserForm = (props) => {
                                   });
                               }
 
-                              if (user.motherId) {
+                              if (user.motherId && user.motherId !== 0) {
                                 get(`/user-profile/look-up/${user.motherId}`)
                                   .then((response) => {
                                     if (response.data.status === 1) {
                                       setselectedMother(response.data.data);
                                       motherDetails = response.data.data;
-                                      
+
                                     } else {
                                       console.log(response.data);
                                     }
@@ -157,7 +158,8 @@ const UserForm = (props) => {
                                   });
                               }
 
-                              if (user.mainFamilyMemberId) {
+                              if (user.mainFamilyMemberId && user.mainFamilyMemberId !== 0) {
+                                
                                 get(
                                   `/user-profile/look-up/${user.mainFamilyMemberId}`
                                 )
@@ -399,15 +401,18 @@ const UserForm = (props) => {
       console.log("No Role Selected");
     } else if (selectedFamily === null) {
       console.log("Family is not Selected");
-    } else {
+    } else if(userForm.gender === ""){
+      console.log("Gender is not Selected");
+    } 
+    else {
       console.log(userForm);
       if (!userId) {
         add("/user", userForm)
           .then((response) => {
             console.log(response);
             if (response.status === 1) {
-              navigate("/admin/users");
             }
+            navigate("/admin/users");
           })
           .catch((error) => {
             console.log(error);
@@ -420,8 +425,8 @@ const UserForm = (props) => {
           .then((response) => {
             console.log(response);
             if (response.status === 1) {
-              navigate("/admin/users");
             }
+            navigate("/admin/users");
           })
           .catch((error) => {
             console.log(error);
@@ -627,6 +632,7 @@ const UserForm = (props) => {
 
               <div className="col-md-6">
                 <label htmlFor="userInputEmail">User Gender</label>
+                <i className="text-danger">*</i>
                 <select
                   id="userInputGender"
                   type="email"
@@ -634,6 +640,7 @@ const UserForm = (props) => {
                   className="form-control fs-2 fw-light"
                   name="email"
                   value={userForm.gender}
+                  required={true}
                   onChange={(e) => {
                     if (e.target.value === "Gender is not Selected") {
                       setUserForm({
@@ -712,6 +719,7 @@ const UserForm = (props) => {
                   id="userInputRole"
                   ref={roleRef}
                   onChange={(e) => {
+                    
                     if (e.target.value === "No Role Selected") {
                       setUserForm({
                         ...userForm,

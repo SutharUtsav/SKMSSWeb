@@ -109,6 +109,7 @@ const FamilyForm = (props) => {
               }
             }
             console.log(response);
+            navigate("/admin/families")
           })
           .catch((error) => {
             console.log(error);
