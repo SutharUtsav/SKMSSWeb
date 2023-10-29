@@ -97,7 +97,7 @@ export interface IUserService {
      * @param village 
      * @param surname 
      */
-    findUserIdByDetails(name: string, village: string, surname: string): Promise<ApiResponseDto | undefined>;
+    findUserIdByDetails(name: string, village: string, surname: string, mainFamilyMemberName:string): Promise<ApiResponseDto | undefined>;
 }
 
 export class UserService extends BaseService implements IUserService {
@@ -545,13 +545,16 @@ export class UserService extends BaseService implements IUserService {
                 dtoProfileRecord.mainFamilyMemberId = user.id;
             }
             else {
-                const maniFamilyMember = await this.findUserIdByDetails(dtoProfileRecord.mainFamilyMemberName, dtoProfileRecord.mainFamilyMemberVillage, dtoProfileRecord.mainFamilyMemberSurname);
+                const maniFamilyMember = await this.findUserIdByDetails(dtoProfileRecord.mainFamilyMemberName, dtoProfileRecord.mainFamilyMemberVillage, dtoProfileRecord.mainFamilyMemberSurname, dtoProfileRecord.mainFamilyMemberName);
+
+                console.log("MainFamilyMember",maniFamilyMember)
 
                 if (maniFamilyMember?.status === 0) {
                     return maniFamilyMember
                 }
                 else if (maniFamilyMember?.data?.status === 0) {
                     dtoProfileRecord.mainFamilyMemberId = Number(null);
+                    throw maniFamilyMember.data.message;
                 }
                 else {
                     dtoProfileRecord.mainFamilyMemberId = maniFamilyMember?.data.userId;
@@ -559,7 +562,7 @@ export class UserService extends BaseService implements IUserService {
             }
 
             //set mother Id
-            const motherId = await this.findUserIdByDetails(dtoProfileRecord.motherName, dtoProfileRecord.motherVillage, dtoProfileRecord.motherSurname);
+            const motherId = await this.findUserIdByDetails(dtoProfileRecord.motherName, dtoProfileRecord.motherVillage, dtoProfileRecord.motherSurname, dtoProfileRecord.mainFamilyMemberName);
             if (motherId?.status === 0) {
                 return motherId
             }
@@ -571,7 +574,7 @@ export class UserService extends BaseService implements IUserService {
             }
 
             //set father Id
-            const fatherId = await this.findUserIdByDetails(dtoProfileRecord.fatherName, dtoProfileRecord.fatherVillage, dtoProfileRecord.fatherSurname);
+            const fatherId = await this.findUserIdByDetails(dtoProfileRecord.fatherName, dtoProfileRecord.fatherVillage, dtoProfileRecord.fatherSurname, dtoProfileRecord.mainFamilyMemberName);
 
             if (fatherId?.status === 0) {
                 return fatherId
@@ -630,7 +633,7 @@ export class UserService extends BaseService implements IUserService {
             return apiResponse;
         }
         catch (error: any) {
-
+            console.log("ERROR", error)
             await transaction.rollback();
             apiResponse = new ApiResponseDto();
             let errorDto = new ErrorDto();
@@ -726,7 +729,7 @@ export class UserService extends BaseService implements IUserService {
                     dtoProfileRecord.mainFamilyMemberId = id;
                 }
                 else {
-                    const maniFamilyMember = await this.findUserIdByDetails(dtoProfileRecord.mainFamilyMemberName, dtoProfileRecord.mainFamilyMemberVillage, dtoProfileRecord.mainFamilyMemberSurname);
+                    const maniFamilyMember = await this.findUserIdByDetails(dtoProfileRecord.mainFamilyMemberName, dtoProfileRecord.mainFamilyMemberVillage, dtoProfileRecord.mainFamilyMemberSurname, dtoProfileRecord.mainFamilyMemberName);
 
                     if (maniFamilyMember?.status === 0) {
                         return maniFamilyMember
@@ -740,7 +743,7 @@ export class UserService extends BaseService implements IUserService {
                 }
 
                 //set mother Id
-                const motherId = await this.findUserIdByDetails(dtoProfileRecord.motherName, dtoProfileRecord.motherVillage, dtoProfileRecord.motherSurname);
+                const motherId = await this.findUserIdByDetails(dtoProfileRecord.motherName, dtoProfileRecord.motherVillage, dtoProfileRecord.motherSurname, dtoProfileRecord.mainFamilyMemberName);
                 if (motherId?.status === 0) {
                     return motherId
                 }
@@ -752,7 +755,7 @@ export class UserService extends BaseService implements IUserService {
                 }
 
                 //set father Id
-                const fatherId = await this.findUserIdByDetails(dtoProfileRecord.fatherName, dtoProfileRecord.fatherVillage, dtoProfileRecord.fatherSurname);
+                const fatherId = await this.findUserIdByDetails(dtoProfileRecord.fatherName, dtoProfileRecord.fatherVillage, dtoProfileRecord.fatherSurname, dtoProfileRecord.mainFamilyMemberName);
 
                 if (fatherId?.status === 0) {
                     return fatherId
@@ -1156,14 +1159,14 @@ export class UserService extends BaseService implements IUserService {
      * @param village 
      * @param surname 
      */
-    public async findUserIdByDetails(name: string | null, village: string | undefined, surname: string | undefined, familyId: number | null = null): Promise<ApiResponseDto | undefined> {
+    public async findUserIdByDetails(name: string | null, village: string | undefined, surname: string | undefined, mainFamilyMemberName : string | undefined, familyId: number | null = null): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
 
         try {
 
             let userProfile = null;
 
-            if (!name || !surname || !village) {
+            if (!name || !surname || !village || !mainFamilyMemberName) {
                 return undefined;
             }
 
@@ -1173,7 +1176,8 @@ export class UserService extends BaseService implements IUserService {
                 let tmpfamily = await Family.findOne({
                     where: {
                         surname: surname,
-                        village: village
+                        village: village,
+                        mainFamilyMemberName : mainFamilyMemberName
                     },
                     attribute: ['id']
                 })
@@ -1192,6 +1196,7 @@ export class UserService extends BaseService implements IUserService {
                 }
             }
 
+            console.log("FamilyID", familyId)
             userProfile = await UserProfile.findOne({
                 where: {
                     name: name,
@@ -1209,7 +1214,7 @@ export class UserService extends BaseService implements IUserService {
             else {
                 apiResponse.data = {
                     status: 0,
-                    message: EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND] + 'for name: ' + name
+                    message: EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND] + ' for name: ' + name
                 }
             }
             return apiResponse;

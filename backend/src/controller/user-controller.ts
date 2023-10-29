@@ -29,6 +29,7 @@ router.get('/findid', async (req: any, res: any) => {
     const name = req.query.name;
     const surname = req.query.surname;
     const village = req.query.village;
+    const mainFamilyMemberName = req.query.mainFamilyMemberName
 
     if (name === undefined || name === null || surname === undefined || surname === null || village === undefined || village === null) {
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
@@ -38,7 +39,7 @@ router.get('/findid', async (req: any, res: any) => {
     }
     else {
         const userService: IUserService = new UserService();
-        const response = await userService.findUserIdByDetails(name, surname, village);
+        const response = await userService.findUserIdByDetails(name, surname, village, mainFamilyMemberName);
 
         if (!response) {
             res.status(EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
