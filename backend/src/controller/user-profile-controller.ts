@@ -2,6 +2,7 @@ import { upload } from "../config/multer";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { UserProfileDto, UserProfileImageDto } from "../dtos/user-dto";
+import { RemoveFilesFromDirectory } from "../helper/file-handling";
 import { validateUserProfile } from "../helper/validationCheck";
 import { IUserService, UserService } from "../service/user-service";
 
@@ -75,24 +76,24 @@ router.get('/', async (req: any, res: any) => {
  * Get UserProfile Details based on userId
  */
 router.get('/look-up', async (req: any, res: any) => {
-        const userService: IUserService = new UserService();
-        const response = await userService.GetUserProfiles(true);
+    const userService: IUserService = new UserService();
+    const response = await userService.GetUserProfiles(true);
 
-        if (!response) {
-            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
-                status: 0,
-                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
-            })
-        }
-        else {
-            res.send(response)
-        }
+    if (!response) {
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+        })
+    }
+    else {
+        res.send(response)
+    }
 })
 
 router.get('/look-up/:id', async (req: any, res: any) => {
     const id = req.params.id;
     const userService: IUserService = new UserService();
-    const response = await userService.GetUserProfiles(true,id);
+    const response = await userService.GetUserProfiles(true, id);
 
     if (!response) {
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
@@ -150,6 +151,8 @@ const uploadProfilePicture = multer({
 router.post('/upload-image', uploadProfilePicture, async (req: any, res: any) => {
     const id = req.query.userId;
 
+
+
     if (id === undefined || id === null) {
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
             status: 0,
@@ -167,24 +170,25 @@ router.post('/upload-image', uploadProfilePicture, async (req: any, res: any) =>
             fs.mkdirSync(outputDir, { recursive: true });
         }
 
-        const outputFilePath = path.join(outputDir,outputFile);
+        const outputFilePath = path.join(outputDir, outputFile);
 
         sharp(imageURL)
             .rotate()
             .webp({ quality: 60 }) // convert to webp format
             .toFile(outputFilePath)
             .then(async (data: any) => {
-
                 const body: UserProfileImageDto = req.body;
-                body.image = outputFilePath;
+                body.image = outputFile;
                 body.originalImage = imageURL;
                 if (!body) {
+                    await RemoveFilesFromDirectory(process.cwd() +'/Images/Profile');
                     res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
                 }
                 else {
                     const userService: IUserService = new UserService();
                     const response = await userService.UploadUserProfileImage(id, body);
 
+                    await RemoveFilesFromDirectory(process.cwd() + '/Images/Profile');
                     if (!response) {
                         res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
                             status: 0,
@@ -196,14 +200,13 @@ router.post('/upload-image', uploadProfilePicture, async (req: any, res: any) =>
                     }
                 }
             })
-            .catch((error: any) => {
+            .catch(async (error: any) => {
+                await RemoveFilesFromDirectory(process.cwd() +'/Images/Profile');
                 res.status(400).send({
                     status: 0,
                     message: String(error)
                 })
             })
-
-
     }
 })
 
@@ -212,6 +215,7 @@ router.post('/upload-image', uploadProfilePicture, async (req: any, res: any) =>
  */
 router.get('/profile-image', async (req: any, res: any) => {
     const id = req.query.userId;
+
 
     if (id === undefined || id === null) {
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({

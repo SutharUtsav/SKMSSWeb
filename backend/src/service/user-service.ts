@@ -97,7 +97,7 @@ export interface IUserService {
      * @param village 
      * @param surname 
      */
-    findUserIdByDetails(name: string, village: string, surname: string, mainFamilyMemberName:string): Promise<ApiResponseDto | undefined>;
+    findUserIdByDetails(name: string, village: string, surname: string, mainFamilyMemberName: string): Promise<ApiResponseDto | undefined>;
 }
 
 export class UserService extends BaseService implements IUserService {
@@ -419,9 +419,10 @@ export class UserService extends BaseService implements IUserService {
             });
 
             if (userProfileImage) {
+                userProfileImage.image = `localhost:3303/api/v1/image/profile-image/${userProfileImage.image}`
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                apiResponse.data = { userProfileImage: userProfileImage }
+                apiResponse.data = userProfileImage;
             }
             else {
                 apiResponse = new ApiResponseDto();
@@ -547,7 +548,7 @@ export class UserService extends BaseService implements IUserService {
             else {
                 const maniFamilyMember = await this.findUserIdByDetails(dtoProfileRecord.mainFamilyMemberName, dtoProfileRecord.mainFamilyMemberVillage, dtoProfileRecord.mainFamilyMemberSurname, dtoProfileRecord.mainFamilyMemberName);
 
-                console.log("MainFamilyMember",maniFamilyMember)
+                console.log("MainFamilyMember", maniFamilyMember)
 
                 if (maniFamilyMember?.status === 0) {
                     return maniFamilyMember
@@ -783,7 +784,7 @@ export class UserService extends BaseService implements IUserService {
                     apiResponse = new ApiResponseDto()
                     apiResponse.status = 1;
                     apiResponse.data = { status: parseInt(updatedRecord[0]), message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
-                    
+
                 }
                 else {
                     return undefined
@@ -1036,12 +1037,7 @@ export class UserService extends BaseService implements IUserService {
                     if (userProfileImage !== undefined || userProfileImage !== null || updateUser !== undefined || updateUser !== null) {
                         apiResponse = new ApiResponseDto();
                         apiResponse.status = 1;
-                        apiResponse.data = {
-                            userProfileImage: {
-                                status: 1,
-                                message: EnumApiResponseMsg[EnumApiResponse.IMG_UPLOAD_SUCCESS]
-                            }
-                        }
+                        apiResponse.data = EnumApiResponseMsg[EnumApiResponse.IMG_UPLOAD_SUCCESS]
                         return apiResponse;
                     }
 
@@ -1095,7 +1091,7 @@ export class UserService extends BaseService implements IUserService {
                 return apiResponse;
             }
 
-            const fileRemoveResp: any = await RemoveFile(foundUserProfile.image);
+            const fileRemoveResp: any = await RemoveFile('Images/Profile-Webp' + foundUserProfile.image);
             const originalFileRemoveResp: any = await RemoveFile(foundUserProfile.originalImage);
 
             if (fileRemoveResp.status === 0 || originalFileRemoveResp.status === 0) {
@@ -1159,7 +1155,7 @@ export class UserService extends BaseService implements IUserService {
      * @param village 
      * @param surname 
      */
-    public async findUserIdByDetails(name: string | null, village: string | undefined, surname: string | undefined, mainFamilyMemberName : string | undefined, familyId: number | null = null): Promise<ApiResponseDto | undefined> {
+    public async findUserIdByDetails(name: string | null, village: string | undefined, surname: string | undefined, mainFamilyMemberName: string | undefined, familyId: number | null = null): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
 
         try {
@@ -1177,7 +1173,7 @@ export class UserService extends BaseService implements IUserService {
                     where: {
                         surname: surname,
                         village: village,
-                        mainFamilyMemberName : mainFamilyMemberName
+                        mainFamilyMemberName: mainFamilyMemberName
                     },
                     attribute: ['id']
                 })
