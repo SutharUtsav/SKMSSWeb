@@ -11,6 +11,7 @@ const UserDetails = () => {
 
   const [userProfileImage, setuserProfileImage] = useState(null);
   const [userProfile, setuserProfile] = useState(null);
+  const [isReloadProfileImage, setisReloadProfileImage] = useState(false)
 
   useEffect(() => {
     if (userId) {
@@ -19,8 +20,8 @@ const UserDetails = () => {
       };
       getByQueryParams("/user-profile/profile-image", queryJson)
         .then((response) => {
-          if (response.status === 1) {
-            setuserProfileImage(response.data.data);
+          if (response.data.status === 1) {
+            setuserProfileImage(response.data.data.image);
           }
           console.log(response.data);
         })
@@ -41,16 +42,42 @@ const UserDetails = () => {
     }
   }, [userId]);
 
+  useEffect(()=>{
+    if(isReloadProfileImage && userId){
+      const queryJson = {
+        userId: userId,
+      };
+      getByQueryParams("/user-profile/profile-image", queryJson)
+        .then((response) => {
+          if (response.data.status === 1) {
+            setuserProfileImage(response.data.data.image);
+            setisReloadProfileImage(false)
+          }
+          else{
+            setuserProfileImage(null)
+          }
+          console.log(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+    }
+
+  },[isReloadProfileImage])
+
   return (
     <div className="user-details p-5 m-4 d-flex flex-column justify-content-center align-items-center">
       <div className="user-image shadow">
-        <img src={UserImage} alt="user-profile" />
+        {userProfileImage 
+        ? <img src={'http://'+userProfileImage} alt="user-profile" />
+        : <img src={UserImage} alt="user-profile" />
+        }
         <button title="Upload Image" className="edit-btn" data-bs-toggle="modal" data-bs-target="#uploadProfileImageModal">
           <BiEditAlt size={"15px"} fill="#fff"  />
         </button>
       </div>
 
-      <UserProfileImageModal userId={userId}/>
+      <UserProfileImageModal userId={userId} setisReloadProfileImage={setisReloadProfileImage}/>
 
       {userProfile ? (
         <div className="user-detail-wrapper">

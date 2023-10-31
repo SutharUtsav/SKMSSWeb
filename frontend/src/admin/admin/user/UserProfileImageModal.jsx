@@ -11,8 +11,6 @@ const UserProfileImageModal = (props) => {
   const handleSubmitForm = (e) => {
     e.preventDefault();
     if (error === null && selectedFile) {
-      console.log(selectedFile);
-
       if (props.userId) {
         console.log(props.userId);
 
@@ -28,20 +26,51 @@ const UserProfileImageModal = (props) => {
           data: formData,
         };
 
-        axios.request(config)
-        .then((response) => {
-          if (response.data.status === 1) {
-            closeModalRef.current.click();
-          }
-          console.log(response.data);
-        })
-        .catch((error)=>{
-          console.log(error)
-        })
+        axios
+          .request(config)
+          .then((response) => {
+            if (response.data.status === 1) {
+              props.setisReloadProfileImage(true);
+              closeModalRef.current.click();
+            }
+            console.log(response.data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       } else {
         seterror("user id is not selected");
       }
     }
+  };
+
+  const handleRemoveProfileImage = () => {
+
+    if (props.userId) {
+      let config = {
+        method: "delete",
+        maxBodyLength: Infinity,
+        url: `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}/user-profile/remove-image?userId=${props.userId}`,
+        headers: {},
+      };
+    
+      axios.request(config)
+      .then((response)=>{
+        if (response.data.status === 1) {
+          props.setisReloadProfileImage(true);
+          closeModalRef.current.click();
+        }
+        console.log(response.data);
+      })
+      .catch((error)=>{
+        console.log(error)
+      })
+    }
+    else {
+      seterror("user id is not selected");
+    }
+
+
   };
 
   return (
@@ -57,7 +86,7 @@ const UserProfileImageModal = (props) => {
               ref={closeModalRef}
               onClick={() => {
                 setselectedFile(null);
-                seterror(null)
+                seterror(null);
               }}
             ></button>
           </div>
@@ -130,6 +159,13 @@ const UserProfileImageModal = (props) => {
                 </button>
               </div>
             </form>
+            <button
+              type="button"
+              className="upload-button bg-danger"
+              onClick={handleRemoveProfileImage}
+            >
+              Remove Image
+            </button>
           </div>
         </div>
       </div>
