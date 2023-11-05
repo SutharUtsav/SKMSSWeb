@@ -29,6 +29,7 @@ export class UserWithPermissionsDto extends UserDto{
 export class UserProfileDto extends BaseDtoWithCommonFields{
     name!: string;
     surname!:string;
+    password!:string;
     wifeSurname!:string;
     village!:string;
     villageGuj!:string;

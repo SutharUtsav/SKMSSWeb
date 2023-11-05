@@ -11,7 +11,7 @@ export interface IAuthService {
     /**
      * Login to System
      */
-    Login(mobileNumber: string): Promise<ApiResponseDto | undefined>;
+    LoginWithMobile(mobileNumber: string): Promise<ApiResponseDto | undefined>;
 }
 
 
@@ -20,7 +20,7 @@ export class AuthService extends BaseService implements IAuthService {
      * Login to System
      */
 
-    public async Login(mobileNumber: string): Promise<ApiResponseDto | undefined> {
+    public async LoginWithMobile(mobileNumber: string): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
         try {
 

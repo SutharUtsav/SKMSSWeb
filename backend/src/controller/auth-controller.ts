@@ -8,7 +8,15 @@ const router = express.Router();
 
 //#region Handle Authentication Apis
 
-router.post('/', upload, async (req:any, res:any) => {
+/**
+ * Authenticate with Email
+ * 
+ */
+
+/** 
+ * Authenticate with Mobile NUmber
+ */
+router.post('/mobile-auth', upload, async (req:any, res:any) => {
 
     const mobileNumber = req.body.mobileNumber;
     
@@ -21,7 +29,7 @@ router.post('/', upload, async (req:any, res:any) => {
     else{
 
         const authService = new AuthService();
-        const response = await authService.Login(mobileNumber);
+        const response = await authService.LoginWithMobile(mobileNumber);
 
         if (!response) {
             res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({

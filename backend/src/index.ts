@@ -48,7 +48,7 @@ const initApp = async () => {
         app.use(`${commonURL}/user`, userController);
         app.use(`${commonURL}/user-profile`, userProfileController);
         app.use(`${commonURL}/vastipatrak`, vastipatrakController);
-        app.use(`${commonURL}/login`,authController);
+        app.use(`${commonURL}/auth`,authController);
         app.use(`${commonURL}/image`, imageController)
 
 

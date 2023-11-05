@@ -3,6 +3,7 @@ const secretKey = process.env['SECRET_HASH_KEY']
 
 
 export const encrypt =  (text: string): string => {
+    console.log(text)
     let encryptedText: string =   CryptoJS.AES.encrypt(text, secretKey).toString();
     return encryptedText;
 }

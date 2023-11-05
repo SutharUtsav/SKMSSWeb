@@ -5,12 +5,14 @@ import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { FamilyDto } from "../dtos/family-dto";
 import { RoleDto, RoleLookUpDto } from "../dtos/role-dto";
 import { UserDto, UserProfileDto, UserProfileImageDto, UserProfileLookUpDto } from "../dtos/user-dto";
+import { encrypt } from "../helper/encryption-handling";
 import { RemoveFile } from "../helper/file-handling";
 import { Family } from "../model/family";
 import { Role } from "../model/role";
 import { User } from "../model/user";
 import { UserProfile, UserProfileImage } from "../model/userProfile";
 import { BaseService } from "./base-service";
+import { CommunicationService, ICommunicationService } from "./communication-service";
 
 const sequelize = require('../config/db')
 
@@ -478,24 +480,24 @@ export class UserService extends BaseService implements IUserService {
             }
             dtoRecord.roleId = role.id;
 
-            //check if user already exist with that same phone number
-            const userWithSameDetails = await UserProfile.findOne({
-                where: {
-                    name: dtoProfileRecord.name,
-                    mobileNumber: dtoProfileRecord.mobileNumber,
-                    countryCode: dtoProfileRecord.countryCode
-                }
-            })
+            // //check if user already exist with that same phone number
+            // const userWithSameDetails = await UserProfile.findOne({
+            //     where: {
+            //         name: dtoProfileRecord.name,
+            //         mobileNumber: dtoProfileRecord.mobileNumber,
+            //         countryCode: dtoProfileRecord.countryCode
+            //     }
+            // })
 
-            if (userWithSameDetails) {
-                apiResponse = new ApiResponseDto();
-                apiResponse.status = 1;
-                apiResponse.data = {
-                    status: 0,
-                    message: EnumApiResponseMsg[EnumApiResponse.USER_EXIST]
-                }
-                return apiResponse;
-            }
+            // if (userWithSameDetails) {
+            //     apiResponse = new ApiResponseDto();
+            //     apiResponse.status = 1;
+            //     apiResponse.data = {
+            //         status: 0,
+            //         message: EnumApiResponseMsg[EnumApiResponse.USER_EXIST]
+            //     }
+            //     return apiResponse;
+            // }
 
             //Check if Family not exist or not
             let family = await Family.findOne({
@@ -587,7 +589,7 @@ export class UserService extends BaseService implements IUserService {
                 dtoProfileRecord.fatherId = fatherId?.data.userId;
             }
 
-
+            dtoProfileRecord.password = encrypt(`Family${family.id}@User${user.id}`);
 
             const userProfile = await UserProfile.create({
                 ...dtoProfileRecord,
@@ -630,6 +632,11 @@ export class UserService extends BaseService implements IUserService {
             }
 
             await transaction.commit();
+
+            const communicationService: ICommunicationService = new CommunicationService();
+            const response = await communicationService.SendMail(dtoProfileRecord.email, dtoProfileRecord.name);
+
+            console.log(response);
 
             return apiResponse;
         }

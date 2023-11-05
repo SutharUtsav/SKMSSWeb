@@ -137,6 +137,10 @@ export const UserProfile = sequelize.define('UserProfile', {
     fatherName: { 
         type: DataTypes.TEXT
     },
+    password : {
+        type : DataTypes.STRING,
+        require : true
+    },
     /**
      * Common Fields
      */
