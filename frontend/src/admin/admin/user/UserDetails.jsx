@@ -23,6 +23,9 @@ const UserDetails = () => {
           if (response.data.status === 1) {
             setuserProfileImage(response.data.data.image);
           }
+          else{
+            setuserProfileImage(null);
+          }
           console.log(response.data);
         })
         .catch((error) => {

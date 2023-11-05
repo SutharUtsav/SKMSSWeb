@@ -10,6 +10,7 @@ import Event from "./components/Events/Event";
 import NotFound from "./components/NotFound/NotFound";
 import Contact from "./components/contact/Contact";
 import { HomeAdmin } from "./admin/master/home/Home";
+import Login from "./components/Login/Login";
 
 const Layout = (Component) => {
   return (
@@ -40,6 +41,7 @@ function App() {
         <Route path="/trustees" element={<Layout Component={Trustees} />}></Route>
         <Route path="/contact" element={<Layout Component={Contact} />}></Route>
         <Route path="/admin/*" element={<HomeAdmin />}></Route>
+        <Route path="/login" element={<Login />}></Route>
         <Route path="*" element={<Layout Component={NotFound} />}></Route>
       </Routes>
 
