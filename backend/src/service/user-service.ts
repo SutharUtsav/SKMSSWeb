@@ -633,8 +633,15 @@ export class UserService extends BaseService implements IUserService {
 
             await transaction.commit();
 
+            //Sent Mail
+            //Mail Body
+            const mailBody = `
+            User Created:
+            UserName: ${dtoProfileRecord.name},
+            Password: ${dtoProfileRecord.password}
+            `
             const communicationService: ICommunicationService = new CommunicationService();
-            const response = await communicationService.SendMail(dtoProfileRecord.email, dtoProfileRecord.name);
+            const response = await communicationService.SendMail(dtoProfileRecord.email, mailBody);
 
             console.log(response);
 

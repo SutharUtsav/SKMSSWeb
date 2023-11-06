@@ -8,7 +8,7 @@ export interface ICommunicationService {
      * Send Mail to gmail account
      * @param toEmail 
      */
-    SendMail(toEmail : string, username : string) : Promise<ApiResponseDto | undefined>;
+    SendMail(toEmail : string, mailBody : string) : Promise<ApiResponseDto | undefined>;
 
     /**
      * Send Whatsapp Message
@@ -22,7 +22,7 @@ export class CommunicationService implements ICommunicationService {
      * Send Mail to gmail account
      * @param toEmail 
      */
-    public async SendMail(toEmail: string, username : string): Promise<ApiResponseDto | undefined> {
+    public async SendMail(toEmail: string, mailBody : string): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
 
         console.log("In sendMail")
@@ -46,7 +46,7 @@ export class CommunicationService implements ICommunicationService {
                 from : process.env['MAIL_USERNAME'],
                 to : toEmail,
                 subject : "Test Mail",
-                text : username
+                text : mailBody
             }
             transporter.sendMail(mailOptions, (error:any, data:any)=> {
                 if(error){
