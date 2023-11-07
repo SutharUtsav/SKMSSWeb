@@ -589,7 +589,8 @@ export class UserService extends BaseService implements IUserService {
                 dtoProfileRecord.fatherId = fatherId?.data.userId;
             }
 
-            dtoProfileRecord.password = encrypt(`Family${family.id}@User${user.id}`);
+            const password = `Family${family.id}@User${user.id}`;
+            dtoProfileRecord.password = encrypt(password);
 
             const userProfile = await UserProfile.create({
                 ...dtoProfileRecord,
@@ -637,8 +638,8 @@ export class UserService extends BaseService implements IUserService {
             //Mail Body
             const mailBody = `
             User Created:
-            UserName: ${dtoProfileRecord.name},
-            Password: ${dtoProfileRecord.password}
+            UserName: ${dtoProfileRecord.name}
+            Password: ${password}
             `
             const communicationService: ICommunicationService = new CommunicationService();
             const response = await communicationService.SendMail(dtoProfileRecord.email, mailBody);
