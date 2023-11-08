@@ -272,6 +272,20 @@
     text-transform: capitalize;
 }
 
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    width: 130px;
+    aspect-ratio: 4/3;
+    object-fit: contain;
+}
+
+
+
 @media screen and (max-width:426px) {
     .hero-section .hero-container {
         flex-direction: column-reverse;
