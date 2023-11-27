@@ -1,6 +1,7 @@
 import { EnumApiResponse, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { UserDto, UserProfileDto } from "../dtos/user-dto";
+import { encrypt } from "../helper/encryption-handling";
 import { User } from "../model/user";
 import { UserProfile } from "../model/userProfile";
 import { BaseService } from "./base-service";
@@ -12,10 +13,79 @@ export interface IAuthService {
      * Login to System
      */
     LoginWithMobile(mobileNumber: string): Promise<ApiResponseDto | undefined>;
+
+    /**
+     * Authenticate Community MeMber
+     */
+    AuthCommunityMember(email: string, password: string): Promise<ApiResponseDto | undefined>;
 }
 
 
 export class AuthService extends BaseService implements IAuthService {
+   
+    /**
+     * Authenticate Community MeMber
+     */
+    public async AuthCommunityMember(email: string, password: string): Promise<ApiResponseDto | undefined> {
+        let apiResponse!: ApiResponseDto;
+        
+        try{
+
+            const encryptedPassword = encrypt(password);
+
+            let userProfile : UserProfileDto = await UserProfile.findOne({
+                where : {
+                    email: email,
+                    password: encryptedPassword
+                }
+            })
+
+            if (userProfile) {
+                //userProfile found with given credentials
+                
+                let user: UserDto = await User.findOne({
+                    where: {
+                        id: userProfile.userId
+                    }
+                })
+
+                if (user) {
+                    // Generate an access token and a refresh token for the user.
+                    const accessToken = jwt.sign({ user }, process.env['JWT_SECRET'], { expiresIn: '1h' });
+
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 1;
+                    apiResponse.data = {
+                        user: user,
+                        accessToken: accessToken,
+                    }
+                    
+                }
+                else {
+                    return undefined;
+                }
+            }
+            else {
+                apiResponse = new ApiResponseDto();
+                let errorDto = new ErrorDto();
+                apiResponse.status = 0;
+                errorDto.errorCode = '200';
+                errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                apiResponse.error = errorDto;
+            }
+            return apiResponse;
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
+
     /**
      * Login to System
      */
