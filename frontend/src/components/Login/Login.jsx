@@ -7,7 +7,7 @@ const Login = () => {
   return (
     <div className="login-wrapper">
       <div className="login-container">
-        <div className="d-flex flex-column align-items-center justify-content-center">
+        <div className="login-card d-flex flex-column align-items-center justify-content-center">
           <div className="logo my-auto">
             <img src={logo} alt="logo" />
           </div>
@@ -53,27 +53,26 @@ const Login = () => {
 
               <button
                 type="submit"
-                className="btn btn-submit m-2 px-4 py-2 mt-4 fs-3 fw-normal rounded"
+                className="btn btn-submit px-4 py-2 my-5 w-100 fs-3 fw-normal rounded"
               >
                 Login
               </button>
             </div>
-
-            <div className="oval-container">
-              <div className="oval">
-                <span className="separator-text">
-                  <div className="or">OR</div>
-                </span>
-              </div>
-            </div>
-
-            <div className="google-sign-in text-center mt-2">
-              <span className="fs-4 fw-light">Sign In with</span>
-              <button className="border p-3 ml-3 bg-none">
-                <FcGoogle size={"2rem"}/>
-              </button>
-            </div>
           </form>
+          <div className="oval-container">
+            <div className="oval">
+              <span className="separator-text">
+                <div className="or">OR</div>
+              </span>
+            </div>
+          </div>
+
+          <div className="google-sign-in text-center mt-2">
+            <span className="fs-4 fw-light">Sign In with</span>
+            <button className="border p-3 mx-3 ">
+              <FcGoogle size={"2rem"} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

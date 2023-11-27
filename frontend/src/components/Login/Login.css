@@ -9,13 +9,15 @@
     background-color: var(--body-background);
 }
 
-.login-first-form{
-    margin-top: 35px;
-    padding: 25px;
+.login-card{
     background-color: #fff;
     border-radius: 8px;
     width: 400px;
+    margin-top: 35px;
+    padding: 25px;
 }
+
+
 
 .btn-submit {
     background-color: var(--secondary-color);
@@ -25,6 +27,7 @@
 
 .btn-submit:hover {
     background-color: var(--secondary-color-hover);
+    color: #fff;
 }
 
 
