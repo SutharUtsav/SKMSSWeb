@@ -30,6 +30,12 @@ export interface IUserService {
     GetRecordById(id: number): Promise<ApiResponseDto | undefined>
 
     /**
+     * Get Record of User by email
+     * @param email 
+     */
+    GetRecordByEmail(email: string): Promise<ApiResponseDto | undefined>
+
+    /**
      * Create Record for Entity User
      * @param dtoRecord 
      */
@@ -277,6 +283,47 @@ export class UserService extends BaseService implements IUserService {
             return apiResponse;
         }
     }
+
+    /**
+     * Get Record of User Entity by email
+     * @param email 
+     */
+    public async GetRecordByEmail(email: string): Promise<ApiResponseDto | undefined>{
+        let apiResponse!: ApiResponseDto;
+        try {
+            let users: UserDto[] = await UserProfile.findAll({
+                where: {
+                    email: email
+                },
+                attributes: ['name']
+            });
+
+            if (users.length !== 0) {
+                apiResponse = new ApiResponseDto();
+                apiResponse.status = 1;
+                apiResponse.data = users;
+            }
+            else {
+                apiResponse = new ApiResponseDto();
+                let errorDto = new ErrorDto();
+                apiResponse.status = 0;
+                errorDto.errorCode = '200';
+                errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                apiResponse.error = errorDto;
+
+            }
+            return apiResponse;
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    } 
 
     /**
      * Get User Details based on userId

@@ -17,7 +17,7 @@ export interface IAuthService {
     /**
      * Authenticate Community MeMber
      */
-    AuthCommunityMember(email: string, password: string): Promise<ApiResponseDto | undefined>;
+    AuthCommunityMember(email: string, name: string, password: string): Promise<ApiResponseDto | undefined>;
 }
 
 
@@ -26,16 +26,18 @@ export class AuthService extends BaseService implements IAuthService {
     /**
      * Authenticate Community MeMber
      */
-    public async AuthCommunityMember(email: string, password: string): Promise<ApiResponseDto | undefined> {
+    public async AuthCommunityMember(email: string, name:string, password: string): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
         
         try{
 
             const encryptedPassword = encrypt(password);
 
+            console.log("password ",encryptedPassword)
             let userProfile : UserProfileDto = await UserProfile.findOne({
                 where : {
                     email: email,
+                    name: name,
                     password: encryptedPassword
                 }
             })

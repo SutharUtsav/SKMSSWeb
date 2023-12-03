@@ -177,7 +177,32 @@ router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
 
 })
 
+/**
+ * Get User From Emails
+ */
+router.post('/getUsersByEmail', upload,async (req:any, res:any) => {
+    const email = req.body.email;
 
+    if (email === undefined || email === null) {
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
+    const userService: IUserService = new UserService();
+    const response = await userService.GetRecordByEmail(email);
+
+    if (!response) {
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+        })
+    }
+    else {
+        res.send(response)
+    }
+
+})
 
 //#endregion
 
@@ -331,6 +356,9 @@ router.put('/', upload, async (req: any, res: any) => {
     }
 })
 
+/**
+ * Delete User
+ */
 router.delete('/', async (req: any, res: any) => {
     const id = req.query.id;
     if (id === undefined || id === null) {

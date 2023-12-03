@@ -15,6 +15,7 @@ const router = express.Router();
 router.post('/auth-member', upload, async (req:any, res:any)=>{
     const email = req.body.email;
     const password = req.body.password;
+    const name = req.body.name;
 
     if(!password || !email || !regexEmail.test(email)){
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
@@ -24,7 +25,7 @@ router.post('/auth-member', upload, async (req:any, res:any)=>{
     }
     else{
         const authService = new AuthService();
-        const response = await authService.AuthCommunityMember(email,password);
+        const response = await authService.AuthCommunityMember(email,name,password);
 
         if (!response) {
             res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
