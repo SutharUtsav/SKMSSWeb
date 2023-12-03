@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { add, edit, get } from "../../../service/api-service";
+import { post, edit, get } from "../../../service/api-service";
 
 const FamilyForm = (props) => {
   const navigate = useNavigate();
@@ -80,7 +80,7 @@ const FamilyForm = (props) => {
     }
     else{
       if (!familyId) {
-        add("/family", familyForm)
+        post("/family", familyForm)
           .then((response) => {
             // if(response.data.status === 1){
   

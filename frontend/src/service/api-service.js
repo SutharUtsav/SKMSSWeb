@@ -46,7 +46,7 @@ export const getByQueryParams = async (endpoint, params) => {
  * @param {*} jsonData
  * @returns
  */
-export const add = async (endpoint, jsonData = null) => {
+export const post = async (endpoint, jsonData = null) => {
   if (jsonData === null) {
     return null;
   }

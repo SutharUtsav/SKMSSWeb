@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import "./User.css";
-import { add, edit, get, getByQueryParams } from "../../../service/api-service";
+import { post, edit, get, getByQueryParams } from "../../../service/api-service";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import FamilyLookUpModal from "../family/FamilyLookUpModal";
@@ -407,7 +407,7 @@ const UserForm = (props) => {
     else {
       console.log(userForm);
       if (!userId) {
-        add("/user", userForm)
+        post("/user", userForm)
           .then((response) => {
             console.log(response);
             if (response.status === 1) {

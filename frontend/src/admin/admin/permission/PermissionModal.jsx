@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { add, edit } from "../../../service/api-service";
+import { post, edit } from "../../../service/api-service";
 import { useRef } from "react";
 
 const PermissionModal = (props) => {
@@ -37,7 +37,7 @@ const PermissionModal = (props) => {
     }
     else{
       if (props.updateRecordId === null) {
-        add("/role-permission", props.permissionForm)
+        post("/role-permission", props.permissionForm)
           .then((response) => {
             if (response && response.data.status === 1) {
               props.setisReloadData(true);

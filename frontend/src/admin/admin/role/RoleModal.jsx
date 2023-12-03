@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { RolePermissionEntity } from "../../../consts/RolePermissioEntity";
-import { add, edit, get } from "../../../service/api-service";
+import { post, edit, get } from "../../../service/api-service";
 
 const RoleModal = (props) => {
   const defaultRoleForm = {
@@ -80,7 +80,7 @@ const RoleModal = (props) => {
     }
     else {
       if (props.updateRecordId === null) {
-        add("/role", props.roleForm)
+        post("/role", props.roleForm)
           .then((response) => {
             if (response && response.data.status === 1) {
               props.setisReloadData(true);

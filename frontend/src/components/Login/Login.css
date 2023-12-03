@@ -17,7 +17,17 @@
     padding: 25px;
 }
 
+.login-card .username-list .username{
+    cursor: pointer;
+    font-weight: lighter;
+}
 
+
+.login-card .username-list .username:hover,
+.login-card .username-list .username.active{
+    color: var(--secondary-color);
+    font-weight: bold;
+}
 
 .btn-submit {
     background-color: var(--secondary-color);
