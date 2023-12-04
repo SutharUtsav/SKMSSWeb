@@ -1,98 +1,123 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Login.css";
 import logo from "../../icons/SamajLogo.png";
 import { FcGoogle } from "react-icons/fc";
 import { post } from "../../service/api-service";
-import { setMaxListeners } from "form-data";
 
 const Login = () => {
-
   const defaultForm = {
-    name: '',
-    email: '',
-    password: ''
-  }
+    name: "",
+    email: "",
+    password: "",
+  };
 
-  const [passwordEnable, setpasswordEnable] = useState(false)
-  const [userList, setuserList] = useState([])
-  const [selectedUser, setselectedUser] = useState(null)
-  const [enableSubmit, setenableSubmit] = useState(false)
-  const [authForm, setauthForm] = useState(defaultForm)
+  const [passwordEnable, setpasswordEnable] = useState(false);
+  const [userList, setuserList] = useState([]);
+  const [selectedUser, setselectedUser] = useState(null);
+  const [enableSubmit, setenableSubmit] = useState(false);
+  const [authForm, setauthForm] = useState(defaultForm);
+
+  const emailInputRef = useRef();
 
   const handleEmailChange = (e) => {
     const email = e.target.value;
-    const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;   
+    const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    setselectedUser(null)
-    setuserList([])
-    setpasswordEnable(false)
-    setenableSubmit(false)
-    setauthForm(defaultForm)
-    if(regexEmail.test(email)){
+    setselectedUser(null);
+    setuserList([]);
+    setpasswordEnable(false);
+    setenableSubmit(false);
+    setauthForm(defaultForm);
+    if (regexEmail.test(email)) {
       const emailForm = {
-        email : email
-      }
+        email: email,
+      };
 
       setauthForm({
         ...defaultForm,
-        email: email
-      })
+        email: email,
+      });
       //POST Request
       post("/user/getUsersByEmail", emailForm)
-          .then((response) => {
-            if(response.data.status === 1){
-              console.log(response.data.data)
-              setuserList(response.data.data)
-            }  
-            else{
-              console.log("No User Found with this Email Address")
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-          })
+        .then((response) => {
+          if (response.data.status === 1) {
+            console.log(response.data.data);
+            setuserList(response.data.data);
+          } else {
+            console.log("No User Found with this Email Address");
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
-  }
+  };
+
+  const setCookie = (token) => {
+    let expires = "";
+    const days = 1;
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    expires = `; expires=${date.toUTCString()}`;
+
+    document.cookie = `${"token"}=Bearer ${
+      token || ""
+    }${expires};`
+    
+    // Check if the connection is secure (HTTPS) before setting the Secure flag
+    //const secureFlag = window.location.protocol === "https:" || window.location.protocol === "http:"  ? "; Secure" : "";
+    
+    // Set the cookie with HttpOnly and Secure flags
+    // document.cookie = `${"token"}=${
+    //   token || ""
+    // }${expires}; path=/; HttpOnly${secureFlag}`;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(authForm)
-    if(authForm.email === "" || authForm.name === "" || authForm.password === ""){
+    console.log(authForm);
+    if (
+      authForm.email === "" ||
+      authForm.name === "" ||
+      authForm.password === ""
+    ) {
       console.log("Invalid email, name or password");
+    } else {
+      post("/auth/auth-member", authForm)
+        .then((response) => {
+          console.log(response);
+          if (response.data.status === 1) {
+            const token = response.data.data.accessToken;
+
+            console.log(token);
+            setCookie(token)
+          } else {
+            console.log(response.data.error.errorMsg);
+            setselectedUser(null);
+            setuserList([]);
+            setauthForm(defaultForm);
+            emailInputRef.current.value = "";
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
-    else{
-      post('/auth/auth-member', authForm)
-      .then((response) => {
-        console.log(response)
-        if(response.data.status === 1){
-          
-        }  
-        else{
-          selectedUser(null)
-          setuserList([])
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-    }
-  }
+  };
 
   useEffect(() => {
-    if(selectedUser!=null){
-      setpasswordEnable(true)
+    if (selectedUser != null) {
+      setpasswordEnable(true);
       setauthForm({
         ...authForm,
-        name:selectedUser
-      })
+        name: selectedUser,
+      });
+    } else {
+      setpasswordEnable(false);
+      setenableSubmit(false);
+      setauthForm(defaultForm);
     }
-    else{
-      setpasswordEnable(false)
-      setenableSubmit(false)
-      setauthForm(defaultForm)
-    }
-  }, [selectedUser])
-
+  }, [selectedUser]);
 
   return (
     <div className="login-wrapper">
@@ -124,51 +149,59 @@ const Login = () => {
                   className="form-control fs-3 fw-light mt-1"
                   name="email"
                   onChange={handleEmailChange}
+                  ref={emailInputRef}
                 />
               </div>
 
-              {userList && userList.length > 0 ?  (
+              {userList && userList.length > 0 ? (
                 <div className="mt-4 username-list">
-                  <span className="fs-3 text-capitalize">User Profiles associated with Email:</span>
-                  {userList.map((user,index)=>(
-                    <div key={index} className={`fs-3 mt-1 username ${selectedUser=== user.name ? 'active' : ''}`} onClick={()=>{
-                      setselectedUser(user.name)
-                    }}>
+                  <span className="fs-3 text-capitalize">
+                    User Profiles associated with Email:
+                  </span>
+                  {userList.map((user, index) => (
+                    <div
+                      key={index}
+                      className={`fs-3 mt-1 username ${
+                        selectedUser === user.name ? "active" : ""
+                      }`}
+                      onClick={() => {
+                        setselectedUser(user.name);
+                      }}
+                    >
                       {user.name}
                     </div>
                   ))}
                 </div>
-              ): null}
+              ) : null}
 
               {passwordEnable ? (
                 <div className="mt-4">
-                <label htmlFor="password" className="form-label fs-3">
-                  Password
-                </label>
-                <i className="text-danger fs-3">*</i>
-                <input
-                  id="password"
-                  type="password"
-                  required={true}
-                  placeholder="Enter Your Password"
-                  className="form-control fs-3 fw-light mt-1"
-                  name="password"
-                  onChange={(e)=>{
-                    setauthForm({
-                      ...authForm,
-                      password:e.target.value
-                    })
-                    if(e.target.value!==""){
-                      setenableSubmit(true)
-                    }
-                    else{
-                      setenableSubmit(false)
-                    }
-                  }}
-                />
-              </div>
+                  <label htmlFor="password" className="form-label fs-3">
+                    Password
+                  </label>
+                  <i className="text-danger fs-3">*</i>
+                  <input
+                    id="password"
+                    type="password"
+                    required={true}
+                    placeholder="Enter Your Password"
+                    className="form-control fs-3 fw-light mt-1"
+                    name="password"
+                    value={authForm.password}
+                    onChange={(e) => {
+                      setauthForm({
+                        ...authForm,
+                        password: e.target.value,
+                      });
+                      if (e.target.value !== "") {
+                        setenableSubmit(true);
+                      } else {
+                        setenableSubmit(false);
+                      }
+                    }}
+                  />
+                </div>
               ) : null}
-              
 
               <button
                 type="submit"
