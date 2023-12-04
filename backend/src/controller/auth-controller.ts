@@ -17,7 +17,9 @@ router.post('/auth-member', upload, async (req:any, res:any)=>{
     const password = req.body.password;
     const name = req.body.name;
 
-    if(!password || !email || !regexEmail.test(email)){
+
+    if(!password || !name || !email || !regexEmail.test(email)){
+        
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
             status: 0,
             message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
@@ -26,6 +28,7 @@ router.post('/auth-member', upload, async (req:any, res:any)=>{
     else{
         const authService = new AuthService();
         const response = await authService.AuthCommunityMember(email,name,password);
+
 
         if (!response) {
             res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({

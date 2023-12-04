@@ -15,7 +15,7 @@ import { BaseService } from "./base-service";
 import { CommunicationService, ICommunicationService } from "./communication-service";
 
 const sequelize = require('../config/db')
-
+const bcrypt = require('bcrypt');
 export interface IUserService {
 
     /**
@@ -637,7 +637,9 @@ export class UserService extends BaseService implements IUserService {
             }
 
             const password = `Family${family.id}@User${user.id}`;
-            dtoProfileRecord.password = encrypt(password);
+            const saltRounds = 12;
+            dtoProfileRecord.password = await bcrypt.hash(password, saltRounds)
+            
 
             const userProfile = await UserProfile.create({
                 ...dtoProfileRecord,

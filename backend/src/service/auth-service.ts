@@ -7,6 +7,7 @@ import { UserProfile } from "../model/userProfile";
 import { BaseService } from "./base-service";
 
 var jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 export interface IAuthService {
     /**
@@ -22,49 +23,70 @@ export interface IAuthService {
 
 
 export class AuthService extends BaseService implements IAuthService {
-   
+
     /**
      * Authenticate Community MeMber
      */
-    public async AuthCommunityMember(email: string, name:string, password: string): Promise<ApiResponseDto | undefined> {
+    public async AuthCommunityMember(email: string, name: string, password: string): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
-        
-        try{
 
-            const encryptedPassword = encrypt(password);
+        try {
 
-            console.log("password ",encryptedPassword)
-            let userProfile : UserProfileDto = await UserProfile.findOne({
-                where : {
+
+            let userProfile: UserProfileDto = await UserProfile.findOne({
+                where: {
                     email: email,
-                    name: name,
-                    password: encryptedPassword
+                    name: name
                 }
             })
 
             if (userProfile) {
-                //userProfile found with given credentials
-                
-                let user: UserDto = await User.findOne({
-                    where: {
-                        id: userProfile.userId
-                    }
-                })
 
-                if (user) {
-                    // Generate an access token and a refresh token for the user.
-                    const accessToken = jwt.sign({ user }, process.env['JWT_SECRET'], { expiresIn: '1h' });
+                //check for user's password
 
-                    apiResponse = new ApiResponseDto();
-                    apiResponse.status = 1;
-                    apiResponse.data = {
-                        user: user,
-                        accessToken: accessToken,
+                console.log(userProfile.password);
+                console.log(password)
+                const match = await bcrypt.compare(password, userProfile.password);
+
+                if (match) {
+
+
+                    //userProfile found with given credentials
+
+                    let user: UserDto = await User.findOne({
+                        where: {
+                            id: userProfile.userId
+                        }
+                    })
+
+                    if (user) {
+                        // Generate an access token and a refresh token for the user.
+                        const accessToken = jwt.sign({ user }, process.env['JWT_SECRET'], { expiresIn: '1h' });
+
+                        apiResponse = new ApiResponseDto();
+                        apiResponse.status = 1;
+                        apiResponse.data = {
+                            user: user,
+                            accessToken: accessToken,
+                        }
+
                     }
-                    
+                    else {
+                        apiResponse = new ApiResponseDto();
+                        let errorDto = new ErrorDto();
+                        apiResponse.status = 0;
+                        errorDto.errorCode = '200';
+                        errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                        apiResponse.error = errorDto;
+                    }
                 }
                 else {
-                    return undefined;
+                    apiResponse = new ApiResponseDto();
+                    let errorDto = new ErrorDto();
+                    apiResponse.status = 0;
+                    errorDto.errorCode = '200';
+                    errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                    apiResponse.error = errorDto;
                 }
             }
             else {
