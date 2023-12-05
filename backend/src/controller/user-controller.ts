@@ -6,6 +6,7 @@ import { FamilyDto } from "../dtos/family-dto";
 import { RoleDto, RoleLookUpDto } from "../dtos/role-dto";
 import { UserDto, UserProfileDto } from "../dtos/user-dto";
 import { RemoveFile } from "../helper/file-handling";
+import { validatePermissions } from "../helper/heper";
 import { createTable } from "../helper/stagingTable";
 import { validateBulkEntries, validateFamily, validateRole, validateUser, validateUserProfile } from "../helper/validationCheck";
 import { authMiddleware } from "../middleware/auth-middleware";
@@ -212,7 +213,14 @@ router.post('/getUsersByEmail', upload,async (req:any, res:any) => {
 /**
  * Get All Records of User
  */
-router.get('/', async (req: any, res: any) => {
+router.get('/', authMiddleware, async (req: any, res: any) => {
+
+    if(!validatePermissions(req.permissions, 'xyz')){
+        return res.status(EnumErrorMsgCode[EnumErrorMsg.API_UNAUTHORIZED]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_UNAUTHORIZED]
+        });
+    }
     const userService: IUserService = new UserService();
     const response = await userService.GetRecords();
 

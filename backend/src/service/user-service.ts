@@ -1239,7 +1239,7 @@ export class UserService extends BaseService implements IUserService {
                         village: village,
                         mainFamilyMemberName: mainFamilyMemberName
                     },
-                    attribute: ['id']
+                    attributes: ['id']
                 })
 
                 familyId = tmpfamily.id

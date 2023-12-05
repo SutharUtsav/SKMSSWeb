@@ -1,5 +1,6 @@
 import { EnumErrorMsg } from "../consts/enumErrors";
 
+
 /**
  * Check required field of Object are filled or not
  * @param obj Object whose fields should be checked
@@ -23,4 +24,15 @@ export const areAllFieldsFilled = <T>(obj: T, allowNullFields: Record<keyof T, b
         }
     }
     return true;
+}
+
+
+const lodash = require('lodash')
+/**
+ * Validate Permission 
+ * @param permissions 
+ * @param permissionFor 
+ */
+export const validatePermissions = (permissions: any, permissionFor: string): boolean => {
+    return lodash.compact(lodash.map(permissions, (obj:any)=> obj['permissionFor'])).filter( (localPermissionFor:any)=>localPermissionFor === permissionFor)
 }

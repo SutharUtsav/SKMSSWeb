@@ -1,7 +1,9 @@
 import { EnumApiResponse, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
+import { PermissionDto, RoleDto } from "../dtos/role-dto";
 import { UserDto, UserProfileDto } from "../dtos/user-dto";
 import { encrypt } from "../helper/encryption-handling";
+import { Role, RolePermission, RoleRolePermission } from "../model/role";
 import { User } from "../model/user";
 import { UserProfile } from "../model/userProfile";
 import { BaseService } from "./base-service";
@@ -37,15 +39,13 @@ export class AuthService extends BaseService implements IAuthService {
                 where: {
                     email: email,
                     name: name
-                }
+                },
+                attributes: ['userId', 'password']
             })
 
             if (userProfile) {
 
                 //check for user's password
-
-                console.log(userProfile.password);
-                console.log(password)
                 const match = await bcrypt.compare(password, userProfile.password);
 
                 if (match) {
@@ -56,20 +56,44 @@ export class AuthService extends BaseService implements IAuthService {
                     let user: UserDto = await User.findOne({
                         where: {
                             id: userProfile.userId
-                        }
+                        },
+                        attributes: ['roleId', 'name', 'userType']
                     })
 
                     if (user) {
-                        // Generate an access token and a refresh token for the user.
-                        const accessToken = jwt.sign({ user }, process.env['JWT_SECRET'], { expiresIn: '1h' });
 
-                        apiResponse = new ApiResponseDto();
-                        apiResponse.status = 1;
-                        apiResponse.data = {
-                            user: user,
-                            accessToken: accessToken,
+                        let role: RoleDto = await Role.findOne({
+                            where: {
+                                id: user.roleId
+                            },
+                            attributes: ['id', 'name']
+                        })
+
+                        if (role) {
+
+                            // Generate an access token and a refresh token for the user.
+                            const accessToken = jwt.sign({
+                                name: user.name,
+                                role: role.name,
+                                userType: user.userType,
+                            }, process.env['JWT_SECRET'], { expiresIn: '1h' });
+
+                            apiResponse = new ApiResponseDto();
+                            apiResponse.status = 1;
+                            apiResponse.data = {
+                                user: user,
+                                accessToken: accessToken,
+                            }
+                            
                         }
-
+                        else {
+                            apiResponse = new ApiResponseDto();
+                            let errorDto = new ErrorDto();
+                            apiResponse.status = 0;
+                            errorDto.errorCode = '200';
+                            errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                            apiResponse.error = errorDto;
+                        }
                     }
                     else {
                         apiResponse = new ApiResponseDto();
