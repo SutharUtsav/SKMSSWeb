@@ -73,8 +73,6 @@ export const authMiddleware = async (req: any, res: any,next:any) => {
         else{
             throw "";
         }
-
-        // next()
        
     } catch (error) {
         return res.status(EnumErrorMsgCode[EnumErrorMsg.API_UNAUTHORIZED]).send({

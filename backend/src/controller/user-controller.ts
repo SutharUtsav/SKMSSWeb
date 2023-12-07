@@ -1,5 +1,7 @@
 import { upload } from "../config/multer";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
+import { EnumPermission, EnumPermissionName } from "../consts/enumPermission";
+import { EnumPermissionFor, EnumPermissionForName } from "../consts/enumPermissionFor";
 import { EnumRoleType, EnumRoleTypeName } from "../consts/enumRoleType";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { FamilyDto } from "../dtos/family-dto";
@@ -215,7 +217,8 @@ router.post('/getUsersByEmail', upload,async (req:any, res:any) => {
  */
 router.get('/', authMiddleware, async (req: any, res: any) => {
 
-    if(!validatePermissions(req.permissions, 'xyz')){
+    //Check for Permissions
+    if(!validatePermissions(req.permissions, EnumPermissionForName[EnumPermissionFor.USER], EnumPermissionName[EnumPermission.ViewAccess])){
         return res.status(EnumErrorMsgCode[EnumErrorMsg.API_UNAUTHORIZED]).send({
             status: 0,
             message: EnumErrorMsgText[EnumErrorMsg.API_UNAUTHORIZED]

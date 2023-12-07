@@ -32,7 +32,9 @@ const lodash = require('lodash')
  * Validate Permission 
  * @param permissions 
  * @param permissionFor 
+ * @param permission 
+ * @returns return true if permission found else returns false
  */
-export const validatePermissions = (permissions: any, permissionFor: string): boolean => {
-    return lodash.compact(lodash.map(permissions, (obj:any)=> obj['permissionFor'])).filter( (localPermissionFor:any)=>localPermissionFor === permissionFor)
+export const validatePermissions = (permissions: any, permissionFor: string, permission: string): boolean => {
+    return ( lodash.compact(permissions).filter( (localPermission: any)=> localPermission.permissionFor === permissionFor && localPermission.permissions === permission).length > 0 )
 }
