@@ -29,6 +29,39 @@ export class CommunicationService implements ICommunicationService {
 
         try{
 
+            let config ={
+                service: 'gmail',
+                auth: {
+                    user: process.env['MAIL_USERNAME'],
+                    pass: process.env['GMAIL_APP_PASSWORD']
+                }
+            }
+
+            let transporter = nodemailer.createTransport(config);
+            let message = {
+                from: process.env['MAIL_USERNAME'],
+                to : toEmail,
+                subject : "Test Mail",
+                text : mailBody
+            }
+
+            transporter.sendMail(message, (error:any, data:any)=> {
+                if(error){
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 0;
+                    apiResponse.data = error.toString();
+                    console.log(error)
+                }
+                else{
+                    console.log(data)
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 1;
+                    apiResponse.data = 'Mail send successfuly';
+                    console.log("Mail send successfull")
+                }
+            })
+
+            /* 
             let transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
@@ -63,7 +96,7 @@ export class CommunicationService implements ICommunicationService {
                     console.log("Mail send successfull")
                 }
             })
-
+            */
             return apiResponse;
 
 
