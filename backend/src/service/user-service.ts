@@ -106,6 +106,22 @@ export interface IUserService {
      * @param surname 
      */
     findUserIdByDetails(name: string, village: string, surname: string, mainFamilyMemberName: string): Promise<ApiResponseDto | undefined>;
+
+    /**
+     * Change User's Password 
+     * @param name 
+     * @param email 
+     * @param oldPassword 
+     * @param password 
+     */
+    ChangePassword(name: string, email: string, oldPassword: string, password: string): Promise<ApiResponseDto | undefined>;
+
+    /**
+     * Forgot User Password
+     * @param name 
+     * @param email 
+     */
+    ForgotPassword(name: string, email: string): Promise<ApiResponseDto | undefined>
 }
 
 export class UserService extends BaseService implements IUserService {
@@ -207,6 +223,172 @@ export class UserService extends BaseService implements IUserService {
         }
     }
 
+    /**
+      * Change User's Password 
+      * @param name 
+      * @param email 
+      * @param oldPassword 
+      * @param password 
+     */
+    public async ChangePassword(name: string, email: string, oldPassword: string, password: string): Promise<ApiResponseDto | undefined> {
+        let apiResponse !: ApiResponseDto;
+        const transaction = await sequelize.transaction();
+
+        try {
+            let user = await UserProfile.findOne({
+                where: {
+                    name: name,
+                    email: email
+                },
+                attributes: ['userId', 'password']
+            })
+
+
+            console.log("User", user);
+            if (user) {
+
+                //check for user's password
+                const match = await bcrypt.compare(oldPassword, user.password);
+
+                if (match) {
+                    const saltRounds = 12;
+                    const newPassword = await bcrypt.hash(password, saltRounds);
+
+                    let updateRecord = await UserProfile.update({
+                        password: newPassword
+                    }, {
+                        where: {
+                            userId: user.userId
+                        },
+                        transaction
+                    })
+
+                    if (updateRecord === null || updateRecord === undefined) {
+                        return undefined;
+                    }
+
+                    else {
+                        apiResponse = new ApiResponseDto();
+                        apiResponse.status = 1;
+                        apiResponse.data = {
+                            status: 1,
+                            message: "Successfully Changed Password"
+                        }
+                    }
+                }
+                else {
+                    apiResponse = new ApiResponseDto();
+                    let errorDto = new ErrorDto();
+                    apiResponse.status = 0;
+                    errorDto.errorCode = '200';
+                    errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                    apiResponse.error = errorDto;
+                }
+            } else {
+                apiResponse = new ApiResponseDto();
+                let errorDto = new ErrorDto();
+                apiResponse.status = 0;
+                errorDto.errorCode = '200';
+                errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                apiResponse.error = errorDto;
+
+            }
+            await transaction.commit();
+            return apiResponse;
+        } catch (error: any) {
+            await transaction.rollback();
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
+
+    /**
+     * Forgot Password
+     * @param name 
+     * @param email 
+     */
+    public async ForgotPassword(name: string, email: string): Promise<ApiResponseDto | undefined> {
+        let apiResponse !: ApiResponseDto;
+        const transaction = await sequelize.transaction();
+
+        try {
+
+            let user = await UserProfile.findOne({
+                where: {
+                    name: name,
+                    email: email
+                },
+                attributes: ['userId', 'familyId', 'password']
+            })
+
+            console.log("User", user);
+
+            if (user) {
+                const password = `Family${user.familyId}@User${user.userId}`;
+                const saltRounds = 12;
+                const newPassword = await bcrypt.hash(password, saltRounds);
+
+                let updateRecord = await UserProfile.update({
+                    password: newPassword
+                }, {
+                    where: {
+                        userId: user.userId
+                    },
+                    transaction
+                })
+
+                if (updateRecord === null || updateRecord === undefined) {
+                    return undefined;
+                }
+
+                else {
+
+                    //Sent Mail
+                    //Mail Body
+                    const mailBody = `
+                    Password Updated:
+                    UserName: ${name}
+                    Password: ${password}`
+
+                    const communicationService: ICommunicationService = new CommunicationService();
+                    const response = await communicationService.SendMail(email, mailBody);
+
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 1;
+                    apiResponse.data = {
+                        status: 1,
+                        message: "Password Sent to your Email"
+                    }
+                }
+            } else {
+                apiResponse = new ApiResponseDto();
+                let errorDto = new ErrorDto();
+                apiResponse.status = 0;
+                errorDto.errorCode = '200';
+                errorDto.errorMsg = EnumApiResponseMsg[EnumApiResponse.NO_DATA_FOUND]
+                apiResponse.error = errorDto;
+            }
+
+            await transaction.commit();
+            return apiResponse;
+        } catch (error: any) {
+            await transaction.rollback();
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+
+    }
+
 
     //#endregion
 
@@ -288,7 +470,7 @@ export class UserService extends BaseService implements IUserService {
      * Get Record of User Entity by email
      * @param email 
      */
-    public async GetRecordByEmail(email: string): Promise<ApiResponseDto | undefined>{
+    public async GetRecordByEmail(email: string): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
         try {
             let users: UserDto[] = await UserProfile.findAll({
@@ -323,7 +505,7 @@ export class UserService extends BaseService implements IUserService {
             apiResponse.error = errorDto;
             return apiResponse;
         }
-    } 
+    }
 
     /**
      * Get User Details based on userId
@@ -639,7 +821,7 @@ export class UserService extends BaseService implements IUserService {
             const password = `Family${family.id}@User${user.id}`;
             const saltRounds = 12;
             dtoProfileRecord.password = await bcrypt.hash(password, saltRounds)
-            
+
 
             const userProfile = await UserProfile.create({
                 ...dtoProfileRecord,

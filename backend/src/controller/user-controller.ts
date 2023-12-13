@@ -181,7 +181,7 @@ router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
 })
 
 /**
- * Get User From Emails
+ * Get Users From Emails
  */
 router.post('/getUsersByEmail', upload,async (req:any, res:any) => {
     const email = req.body.email;
@@ -207,6 +207,59 @@ router.post('/getUsersByEmail', upload,async (req:any, res:any) => {
 
 })
 
+/**
+ * Change Password
+ */
+router.post('/change-password', upload, async (req:any, res:any)=>{
+    const name = req.body.name;
+    const email = req.body.email;
+    const oldPass = req.body.oldPassword;
+    const newPass = req.body.password;
+    
+    if(!name || !email || !oldPass || !newPass){
+        res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
+    }
+    else{
+        const userService: IUserService = new UserService();
+        const response = await userService.ChangePassword(name, email, oldPass, newPass);
+
+        if (!response) {
+            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                status: 0,
+                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+            })
+        }
+        else if (response instanceof ApiResponseDto) {
+            res.send(response)
+        }
+    }
+})
+
+/**
+ * Forgot Password 
+ */
+router.post('/forgot-password', upload, async (req:any, res:any)=>{
+    const name = req.body.name;
+    const email = req.body.email;
+
+    if(!name || !email){
+        res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
+    }
+    else{
+        const userService: IUserService = new UserService();
+        const response = await userService.ForgotPassword(name, email);
+
+        if (!response) {
+            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                status: 0,
+                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+            })
+        }
+        else if (response instanceof ApiResponseDto) {
+            res.send(response)
+        }
+    }
+})
 //#endregion
 
 
