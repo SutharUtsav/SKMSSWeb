@@ -12,27 +12,20 @@ import Permission from "../../admin/permission/Permission";
 import UserForm from "../../admin/user/UserForm";
 import UserDetails from "../../admin/user/UserDetails";
 import FamilyForm from "../../admin/family/FamilyForm";
+import { authMiddleWare } from "../../../middleware/authMiddleWare";
+
+
 export const HomeAdmin = () => {
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    let cookie;
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; token=`);
-    if (parts.length === 2){
-      cookie = parts.pop().split(';').shift();
-    } 
-      
-    console.log(cookie)
-    if (cookie) {
+    if (authMiddleWare()) {
 
     }
     else {
       navigate("/");
     }
-
-
   }, [])
 
 

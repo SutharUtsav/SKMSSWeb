@@ -5,6 +5,8 @@ import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash  } from "react-icons/fa";
 import { post } from "../../service/api-service";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { ActionTypes } from "../../redux/action-type";
 
 const Login = () => {
   const defaultForm = {
@@ -21,6 +23,7 @@ const Login = () => {
   const [showPassword, setshowPassword] = useState(false);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const emailInputRef = useRef();
 
   const handleEmailChange = (e) => {
@@ -95,7 +98,8 @@ const Login = () => {
 
             const token = response.data.data.accessToken;
             console.log(token);
-            setCookie(token)
+            setCookie(token);
+            dispatch({type: ActionTypes.SET_AUTH_USER, payload: response.data.data});            
 
             if(String(response.data.data.roleName).toLowerCase() !== "admin"){
               navigate("/");

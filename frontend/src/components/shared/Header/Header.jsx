@@ -4,20 +4,14 @@ import './Header.css'
 import whatsappLogo from '../../../icons/whatsapp-logo.png'
 import emailLogo from '../../../icons/email-logo.png'
 import logo from '../../../icons/SamajLogo.png'
+import { useSelector } from 'react-redux'
 
 const Header = (props) => {
 
   const navigate = useNavigate();
+  const authUser = useSelector(data => data.user);
 
-  useEffect(()=>{
-    const cookie = document.cookie.split('=');
-
-    if(cookie){
-
-    }
-    
-
-  },[])
+  console.log(authUser)
 
   return (
     <>
