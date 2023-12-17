@@ -819,7 +819,7 @@ export class UserService extends BaseService implements IUserService {
             }
 
             const password = `Family${family.id}@User${user.id}`;
-            const saltRounds = 12;
+            const saltRounds = await bcrypt.genSaltSync(12);
             dtoProfileRecord.password = await bcrypt.hash(password, saltRounds)
 
 

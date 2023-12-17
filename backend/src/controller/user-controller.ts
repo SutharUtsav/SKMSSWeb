@@ -268,15 +268,16 @@ router.post('/forgot-password', upload, async (req:any, res:any)=>{
 /**
  * Get All Records of User
  */
-router.get('/', authMiddleware, async (req: any, res: any) => {
+/** Use authMiddleware for authentications */
+router.get('/', async (req: any, res: any) => {
 
     //Check for Permissions
-    if(!validatePermissions(req.permissions, EnumPermissionForName[EnumPermissionFor.USER], EnumPermissionName[EnumPermission.ViewAccess])){
-        return res.status(EnumErrorMsgCode[EnumErrorMsg.API_UNAUTHORIZED]).send({
-            status: 0,
-            message: EnumErrorMsgText[EnumErrorMsg.API_UNAUTHORIZED]
-        });
-    }
+    // if(!validatePermissions(req.permissions, EnumPermissionForName[EnumPermissionFor.USER], EnumPermissionName[EnumPermission.ViewAccess])){
+    //     return res.status(EnumErrorMsgCode[EnumErrorMsg.API_UNAUTHORIZED]).send({
+    //         status: 0,
+    //         message: EnumErrorMsgText[EnumErrorMsg.API_UNAUTHORIZED]
+    //     });
+    // }
     const userService: IUserService = new UserService();
     const response = await userService.GetRecords();
 

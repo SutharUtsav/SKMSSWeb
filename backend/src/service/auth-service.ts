@@ -49,7 +49,7 @@ export class AuthService extends BaseService implements IAuthService {
                 const match = await bcrypt.compare(password, userProfile.password);
 
                 if (match) {
-
+                    
 
                     //userProfile found with given credentials
 
@@ -81,7 +81,7 @@ export class AuthService extends BaseService implements IAuthService {
                             apiResponse = new ApiResponseDto();
                             apiResponse.status = 1;
                             apiResponse.data = {
-                                user: user,
+                                user: {...user, roleName : role.name},
                                 accessToken: accessToken,
                             }
                             
