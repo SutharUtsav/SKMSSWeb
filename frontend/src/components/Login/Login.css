@@ -95,3 +95,16 @@
     top: 50%;
     width: 7pc;
 }
+
+.password-container{
+
+}
+
+.password-container button{
+    float: right;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-top: -27px;    
+    background: none;
+    font-size: 2rem;
+}

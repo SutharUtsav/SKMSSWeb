@@ -1,11 +1,23 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import './Header.css'
 import whatsappLogo from '../../../icons/whatsapp-logo.png'
 import emailLogo from '../../../icons/email-logo.png'
 import logo from '../../../icons/SamajLogo.png'
 
 const Header = (props) => {
+
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    const cookie = document.cookie.split('=');
+
+    if(cookie){
+
+    }
+    
+
+  },[])
 
   return (
     <>

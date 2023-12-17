@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import "./Login.css";
 import logo from "../../icons/SamajLogo.png";
 import { FcGoogle } from "react-icons/fc";
+import { FaEye, FaEyeSlash  } from "react-icons/fa";
 import { post } from "../../service/api-service";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const defaultForm = {
@@ -16,7 +18,9 @@ const Login = () => {
   const [selectedUser, setselectedUser] = useState(null);
   const [enableSubmit, setenableSubmit] = useState(false);
   const [authForm, setauthForm] = useState(defaultForm);
+  const [showPassword, setshowPassword] = useState(false);
 
+  const navigate = useNavigate();
   const emailInputRef = useRef();
 
   const handleEmailChange = (e) => {
@@ -60,13 +64,14 @@ const Login = () => {
     date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
     expires = `; expires=${date.toUTCString()}`;
 
-    document.cookie = `${"token"}=Bearer ${
-      token || ""
-    }${expires};`
-    
+    document.cookie = `${"token"}=Bearer ${token || ""
+      }${expires};`
+
+    // console.log("Cookie: ", document.cookie)
+
     // Check if the connection is secure (HTTPS) before setting the Secure flag
     //const secureFlag = window.location.protocol === "https:" || window.location.protocol === "http:"  ? "; Secure" : "";
-    
+
     // Set the cookie with HttpOnly and Secure flags
     // document.cookie = `${"token"}=${
     //   token || ""
@@ -87,10 +92,17 @@ const Login = () => {
         .then((response) => {
           console.log(response);
           if (response.data.status === 1) {
-            const token = response.data.data.accessToken;
 
+            const token = response.data.data.accessToken;
             console.log(token);
             setCookie(token)
+
+            if(String(response.data.data.roleName).toLowerCase() !== "admin"){
+              navigate("/");
+            }
+            else{
+              navigate("/admin");
+            }
           } else {
             console.log(response.data.error.errorMsg);
             setselectedUser(null);
@@ -161,9 +173,8 @@ const Login = () => {
                   {userList.map((user, index) => (
                     <div
                       key={index}
-                      className={`fs-3 mt-1 username ${
-                        selectedUser === user.name ? "active" : ""
-                      }`}
+                      className={`fs-3 mt-1 username ${selectedUser === user.name ? "active" : ""
+                        }`}
                       onClick={() => {
                         setselectedUser(user.name);
                       }}
@@ -180,26 +191,31 @@ const Login = () => {
                     Password
                   </label>
                   <i className="text-danger fs-3">*</i>
-                  <input
-                    id="password"
-                    type="password"
-                    required={true}
-                    placeholder="Enter Your Password"
-                    className="form-control fs-3 fw-light mt-1"
-                    name="password"
-                    value={authForm.password}
-                    onChange={(e) => {
-                      setauthForm({
-                        ...authForm,
-                        password: e.target.value,
-                      });
-                      if (e.target.value !== "") {
-                        setenableSubmit(true);
-                      } else {
-                        setenableSubmit(false);
-                      }
-                    }}
-                  />
+                  <div className="password-container">
+                    <input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      required={true}
+                      placeholder="Enter Your Password"
+                      className="form-control fs-3 fw-light mt-1"
+                      name="password"
+                      value={authForm.password}
+                      onChange={(e) => {
+                        setauthForm({
+                          ...authForm,
+                          password: e.target.value,
+                        });
+                        if (e.target.value !== "") {
+                          setenableSubmit(true);
+                        } else {
+                          setenableSubmit(false);
+                        }
+                      }}
+                    />
+                    <button type="button" onClick={()=>setshowPassword(!showPassword)}>
+                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                    </button>
+                  </div>
                 </div>
               ) : null}
 
