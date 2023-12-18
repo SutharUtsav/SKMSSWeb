@@ -57,12 +57,14 @@ export class AuthService extends BaseService implements IAuthService {
                         where: {
                             id: userProfile.userId
                         },
-                        attributes: ['roleId', 'name', 'userType']
+                        attributes: ['roleId', 'name', 'userType'],
+                        raw: true
                     })
 
                     if (user) {
 
                         let role: RoleDto = await Role.findOne({
+                            raw: true,
                             where: {
                                 id: user.roleId
                             },
@@ -74,10 +76,12 @@ export class AuthService extends BaseService implements IAuthService {
                             // Generate an access token and a refresh token for the user.
                             const accessToken = jwt.sign({
                                 name: user.name,
+                                roleId: role.id,
                                 role: role.name,
                                 userType: user.userType,
                             }, process.env['JWT_SECRET'], { expiresIn: '1h' });
 
+                            
                             apiResponse = new ApiResponseDto();
                             apiResponse.status = 1;
                             apiResponse.data = {
