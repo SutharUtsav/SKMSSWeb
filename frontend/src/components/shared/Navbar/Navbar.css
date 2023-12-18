@@ -17,13 +17,16 @@ nav.navbar {
     padding: 20px 5px;
 }
 
-.navbar .links div a:hover{
+.navbar .links div a:hover, .navbar .links div button:hover{
     background-color: var(--secondary-color);
     border-radius: 8px;
 }
 
+.navbar .links div button{
+    background: none;
+}
 
-.navbar .links div a{
+.navbar .links div a, .navbar .links div button{
     padding: 10px 20px;
     font-size: 1.965rem;
     font-weight: 300;

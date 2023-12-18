@@ -4,14 +4,16 @@ import './Header.css'
 import whatsappLogo from '../../../icons/whatsapp-logo.png'
 import emailLogo from '../../../icons/email-logo.png'
 import logo from '../../../icons/SamajLogo.png'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { ActionTypes } from '../../../redux/action-type'
 
 const Header = (props) => {
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const authUser = useSelector(data => data.user);
 
-  console.log(authUser)
+
 
   return (
     <>
@@ -40,7 +42,15 @@ const Header = (props) => {
 
 
           <div className='hide-desktop'>
-            <button className='login-btn shadow'>Login</button>
+            <button className='login-btn shadow' onClick={()=>{
+              if(authUser.user){
+                document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                dispatch({type: ActionTypes.SET_AUTH_USER, payload: null});
+              }
+              else{
+                navigate("/login");
+              }
+            }}>{authUser.user ? "Logout" :"Login"}</button>
           </div>
 
           <div className='hide-mobile'>

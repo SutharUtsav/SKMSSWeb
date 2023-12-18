@@ -1,9 +1,15 @@
 import React from 'react'
 import './Navbar.css'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux';
+import { ActionTypes } from '../../../redux/action-type';
 
 
 const Navbar = (props) => {
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const authUser = useSelector(data => data.user);
 
   return (
     <nav className='navbar'>
@@ -15,7 +21,15 @@ const Navbar = (props) => {
           <div className='hide-mobile'><NavLink to='/trustees'>Trustees</NavLink></div>
           <div className='hide-mobile'><NavLink to='/infrastructure'>Infrastructure</NavLink></div>
           <div className='hide-mobile'><NavLink to='/gallery'>Gallery</NavLink></div>
-          <div className='hide-mobile'><NavLink to='/login'>Login</NavLink></div>
+          <div className='hide-mobile'>
+            {authUser.user 
+            ? <button onClick={()=>{
+              document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                dispatch({type: ActionTypes.SET_AUTH_USER, payload: null});
+            }}>Logout</button> 
+            :<NavLink to='/login'>Login</NavLink>
+            }
+          </div>
           <div className="dropdown more-links hide-desktop">
             <button className="dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
               More Pages

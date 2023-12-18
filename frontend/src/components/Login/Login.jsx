@@ -5,10 +5,26 @@ import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash  } from "react-icons/fa";
 import { post } from "../../service/api-service";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ActionTypes } from "../../redux/action-type";
 
 const Login = () => {
+
+  let authUser = useSelector((data) => data.user);
+
+  useEffect(() => {
+    if(authUser.user){
+      
+      if(String(authUser.user.roleName).toLowerCase() === 'admin'){
+          navigate('/admin');
+      }
+      else{
+        navigate('/')
+      }
+    }
+  }, [])
+
+  
   const defaultForm = {
     name: "",
     email: "",
@@ -99,7 +115,7 @@ const Login = () => {
             const token = response.data.data.accessToken;
             console.log(token);
             setCookie(token);
-            dispatch({type: ActionTypes.SET_AUTH_USER, payload: response.data.data});            
+            dispatch({type: ActionTypes.SET_AUTH_USER, payload: response.data.data.user});            
 
             if(String(response.data.data.roleName).toLowerCase() !== "admin"){
               navigate("/");
@@ -112,6 +128,7 @@ const Login = () => {
             setselectedUser(null);
             setuserList([]);
             setauthForm(defaultForm);
+            setshowPassword(false);
             emailInputRef.current.value = "";
           }
         })
