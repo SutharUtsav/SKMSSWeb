@@ -1,0 +1,11 @@
+Pre Required: Create an Entry of Role with Admin name;
+
+Query to Create an Admin:
+
+INSERT INTO public."User"(
+	 name, "userType", "isImageAvailable", "createdAt", "createdById", "updatedAt", "updatedById", disabled, "enabledDisabledOn", "roleId", surname, village)
+	VALUES ('Admin', 'ADMINCREATED', 'FALSE', CURRENT_DATE, 0, CURRENT_DATE, 0, 'FALSE', CURRENT_DATE, (SELECT id from public."Role" WHERE name='Admin'), 'admin', 'admin');
+
+INSERT INTO public."UserProfile"(
+	"userId", name, surname, village, "mobileNumber", email, "createdAt", "createdById", "updatedAt", "updatedById", disabled, "enabledDisabledOn", "countryCode", password)
+	VALUES ((SELECT id from public."User" WHERE name='Admin' AND surname='admin'), 'Admin', 'admin', 'admin', '7069052544', 'skmsweb111@gmail.com', CURRENT_DATE, '0', CURRENT_DATE, '0', 'FALSE', CURRENT_DATE, '91', 'KMS@web1');

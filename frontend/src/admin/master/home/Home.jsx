@@ -12,7 +12,7 @@ import Permission from "../../admin/permission/Permission";
 import UserForm from "../../admin/user/UserForm";
 import UserDetails from "../../admin/user/UserDetails";
 import FamilyForm from "../../admin/family/FamilyForm";
-import { authMiddleWare } from "../../../middleware/authMiddleWare";
+import { authorizeAdmin } from "../../../middleware/authMiddleWare";
 
 
 export const HomeAdmin = () => {
@@ -20,12 +20,12 @@ export const HomeAdmin = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (authMiddleWare()) {
+    if (authorizeAdmin()) {
 
     }
     else {
       navigate("/");
-    }
+    }    
   }, [])
 
 

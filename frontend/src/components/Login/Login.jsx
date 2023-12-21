@@ -117,7 +117,7 @@ const Login = () => {
             setCookie(token);
             dispatch({type: ActionTypes.SET_AUTH_USER, payload: response.data.data.user});            
 
-            if(String(response.data.data.roleName).toLowerCase() !== "admin"){
+            if(String(response.data.data.user.roleName).toLowerCase() !== "admin"){
               navigate("/");
             }
             else{
