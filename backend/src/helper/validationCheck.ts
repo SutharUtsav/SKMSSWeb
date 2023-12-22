@@ -3,6 +3,7 @@
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { EnumUserStatus, EnumUserStatusText } from "../consts/enumUserStatus";
 import { ErrorDto } from "../dtos/api-response-dto";
+import { EventDto } from "../dtos/event-dto";
 import { FamilyDto } from "../dtos/family-dto";
 import { PermissionDto, RoleDto } from "../dtos/role-dto";
 import { UserDto, UserProfileDto } from "../dtos/user-dto";
@@ -16,6 +17,31 @@ export const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export const regexDate = /^\d{4}-\d{2}-\d{2}$/;
 
 //#endregion
+
+/**
+ * Validation Check Function for Event Entity
+ * @param body 
+ */
+export const validateEvent = (body : EventDto) : EventDto | ErrorDto | undefined => {
+    let eventDto: EventDto = new EventDto();
+
+    //check for all required fields
+    if(!body.title || !body.description || !body.eventOn){
+        let errorDto = new ErrorDto();
+        errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+        errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        return errorDto;
+    }
+
+    // set fields for EventDto
+    eventDto.title = body.title;
+    eventDto.description = body.description;
+    eventDto.eventOn = body.eventOn;
+    eventDto.isActivity = body.isActivity;
+    eventDto.activityCategory = body.activityCategory;
+    eventDto.mainImageURL = body.mainImageURL;
+    eventDto.imageURLs = body.imageURLs;
+}
 
 /**
  * Validation Check Function for Family Entity

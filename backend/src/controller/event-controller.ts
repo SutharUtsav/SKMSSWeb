@@ -1,5 +1,8 @@
 import { upload } from "../config/multer";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
+import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
+import { EventDto } from "../dtos/event-dto";
+import { validateEvent } from "../helper/validationCheck";
 import { EventService, IEventService } from "../service/event-service";
 
 const express = require('express');
@@ -89,30 +92,30 @@ router.get('/:id', async (req: any, res: any) => {
  * Add Event Detail
  */
 router.post('/', upload, async (req: any, res: any) => {
-    // let familyDto: FamilyDto | ErrorDto | undefined = validateFamily(req.body);
+    let eventDto: EventDto | ErrorDto | undefined = validateEvent(req.body);
 
 
-    // if (!familyDto) {
-    //     res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
-    // }
-    // else if(familyDto instanceof ErrorDto){
-    //     res.status(parseInt(familyDto.errorCode)).send(familyDto);
-    // }
-    // else {
-    //     const familyService: IFamilyService = new FamilyService();
-    //     const response = await familyService.Create(familyDto);
+    if (!eventDto) {
+        res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
+    }
+    else if(eventDto instanceof ErrorDto){
+        res.status(parseInt(eventDto.errorCode)).send(eventDto);
+    }
+    else {
+        const eventService: IEventService = new EventService();
+        const response = await eventService.Create(eventDto);
 
-    //     if (!response) {
-    //         res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
-    //             status: 0,
-    //             message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
-    //         })
-    //     }
-    //     else if (response instanceof ApiResponseDto) {
-    //         res.send(response)
-    //     }
+        if (!response) {
+            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                status: 0,
+                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+            })
+        }
+        else if (response instanceof ApiResponseDto) {
+            res.send(response)
+        }
 
-    // }
+    }
 });
 
 /**
