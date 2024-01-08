@@ -41,6 +41,7 @@ export const validateEvent = (body : EventDto) : EventDto | ErrorDto | undefined
     eventDto.activityCategory = body.activityCategory;
     eventDto.mainImageURL = body.mainImageURL;
     eventDto.imageURLs = body.imageURLs;
+    return eventDto;
 }
 
 /**
