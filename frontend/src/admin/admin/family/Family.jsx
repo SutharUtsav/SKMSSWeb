@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { del, get } from "../../../service/api-service";
 import { BiRefresh } from "react-icons/bi";
 import { BiEdit } from "react-icons/bi";
+import { FaUpload } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import useApiCall from "../../../hooks/useApiCall";
 import DecisionModal from "../../master/decisionmodal/DecisionModal";
@@ -107,6 +108,24 @@ const Family = () => {
                 </button>
               </div>
             </div>
+
+            {/* <div className="bulk-upload-menu">
+            <h4>Bulk Upload</h4>
+            <p>Family Bulk Upload Form</p>
+            <div className="row">
+              <div className="col-md-12">
+                <div className="form-group">
+                  <label htmlFor="upload_file">Excel File</label>
+                  <input type="file" name="upload_file" id="upload_file" required="required" accept=".xls, .xlsx" className="form-control" onChange={(e)=>{
+                    console.log(e.ta)
+                  }}/>
+                </div>
+              </div>
+              <div className="col-md-12">
+                <button type="submit" className="btn" name='btnAdd' id="submit_btn"> <FaUpload fill="#fff"/> Upload</button>
+              </div>
+            </div>
+          </div> */}
 
             {data && data.status === 1 ? (
               <div className="table-responsive mt-5">

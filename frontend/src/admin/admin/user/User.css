@@ -149,3 +149,32 @@
 	padding: 7.5px 50px;
 	cursor: pointer;
 }
+
+.bulk-upload-menu h4{
+	font-size: 2rem;
+
+}
+
+.bulk-upload-menu p{
+	font-size: 1.565rem;
+}
+
+
+.bulk-upload-menu label{
+	font-size: 1.365rem;
+}
+
+.bulk-upload-menu button{
+	font-size: 1.565rem;
+	background-color: var(--secondary-color);
+	border: 1px solid var(--secondary-color);
+	margin-top: 5px;
+	color: #fff;
+}
+
+.bulk-upload-menu button:hover,	.bulk-upload-menu button:focus{
+	background-color: var(--secondary-color-hover);
+	border: 1px solid var(--secondary-color);
+	color: #fff;
+
+}

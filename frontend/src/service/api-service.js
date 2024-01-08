@@ -67,6 +67,29 @@ export const post = async (endpoint, jsonData = null) => {
   return await axios.request(config);
 };
 
+
+export const bulkInsert = async (endpoint, jsonData = null) => {
+  if (jsonData === null) {
+    return null;
+  }
+
+  let formData = new FormData();
+  Object.keys(jsonData).forEach((data) => {
+    formData.append(data.toString(), jsonData[data]);
+  });
+
+  let config = {
+    method: "post",
+    maxBodyLength: Infinity,
+    url: `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}`,
+    headers: {},
+    data: formData,
+  };
+
+  return await axios.request(config);
+};
+
+
 /**
  * Method to call PUT request to update record
  * @param {*} endpoint 

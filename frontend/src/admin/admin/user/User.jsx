@@ -8,6 +8,7 @@ import useApiCall from "../../../hooks/useApiCall";
 import { useDispatch } from "react-redux";
 import { EnumConsts } from "../../../consts/EnumConsts";
 import DecisionModal from "../../master/decisionmodal/DecisionModal";
+import BulkUser from "./BulkUser";
 export const User = () => {
   const navigate = useNavigate();
 
@@ -17,6 +18,8 @@ export const User = () => {
 
   const [isReloadData, setisReloadData] = useState(false);
   const [deleteRecordId, setdeleteRecordId] = useState(null);
+
+
 
   useEffect(() => {
     return () => {
@@ -108,6 +111,8 @@ export const User = () => {
               </button>
             </div>
           </div>
+
+          <BulkUser setisReloadData={setisReloadData}/>
 
           {data && data.status === 1 ? (
             <div className="table-responsive mt-5">
