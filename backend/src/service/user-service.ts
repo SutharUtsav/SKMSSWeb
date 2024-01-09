@@ -138,9 +138,13 @@ export class UserService extends BaseService implements IUserService {
     public async BulkInsert(dtoUsersRecord: Array<UserDto>, dtoProfilesRecord: Array<UserProfileDto>, dtoFamiliesRecord: Array<FamilyDto>): Promise<ApiResponseDto | undefined> {
         let apiResponse !: ApiResponseDto;
 
+        // console.log("dtoUsersRecord: ", dtoUsersRecord);
+        // console.log("dtoProfilesRecord: ", dtoProfilesRecord);
+        // console.log("dtoFamiliesRecord: ", dtoFamiliesRecord);
+
         const transaction = await sequelize.transaction();
         try {
-            const families = await Family.bulkCreate(dtoFamiliesRecord, { fields: ['surname', 'village', 'currResidency', 'adobeOfGod', 'goddess', 'lineage', 'residencyAddress', 'villageGuj', 'mainFamilyMemberName'], transaction })
+            const families = await Family.bulkCreate(dtoFamiliesRecord, { fields: ['surname', 'village', 'currResidency', 'adobeOfGod', 'goddess', 'lineage', 'residencyAddress', 'villageGuj', 'mainFamilyMemberName'], transaction, updateOnDuplicate: ['surname', 'village', 'villageGuj', 'mainFamilyMemberName'] })
 
             if (!families) {
                 throw new Error("Error Occurs while Inserting Into Family Entity")
@@ -148,14 +152,14 @@ export class UserService extends BaseService implements IUserService {
             const familyArray = families.map((family: any) => family.dataValues)
 
 
-            const users = await User.bulkCreate(dtoUsersRecord, { fields: ['name', 'userType', 'isImageAvailable', 'roleId', 'surname', 'village'], transaction })
+            const users = await User.bulkCreate(dtoUsersRecord, { fields: ['name', 'surname', 'village'], transaction, updateOnDuplicate: ['name', 'surname', 'village'] })
             if (!users) {
                 throw new Error("Error Occurs while Inserting Into User Entity")
             }
             const userArray = users.map((user: any) => user.dataValues);
 
 
-            dtoProfilesRecord.forEach((profileRecord: UserProfileDto) => {
+            await dtoProfilesRecord.forEach(async (profileRecord: UserProfileDto) => {
                 profileRecord.familyId = familyArray.find((family: FamilyDto) => family.surname === profileRecord.surname && family.village === profileRecord.village && family.currResidency === profileRecord.currResidency && profileRecord.mainFamilyMemberName === family.mainFamilyMemberName)?.id;
 
                 if (profileRecord.mainFamilyMemberRelation?.toUpperCase() !== EnumFamilyMemberRelationName[EnumFamilyMemberRelation.SELF]) {
@@ -173,6 +177,11 @@ export class UserService extends BaseService implements IUserService {
 
                 profileRecord.userId = userArray.find((user: UserDto) => user.name === profileRecord.name && user.surname === profileRecord.surname && user.village === profileRecord.village)?.id
 
+                const password = `Family${profileRecord.familyId}@User${profileRecord.userId}`;
+                // console.log(password);
+                const saltRounds = await bcrypt.genSaltSync(12);
+                profileRecord.password = await bcrypt.hash(password, saltRounds)
+                // console.log(profileRecord.password)
                 const father: UserDto = userArray.find((user: UserDto) => user.name === profileRecord.fatherName && user.surname === profileRecord.fatherSurname && user.village === profileRecord.fatherVillage);
                 if (father) {
                     profileRecord.fatherId = father.id;
@@ -194,14 +203,28 @@ export class UserService extends BaseService implements IUserService {
                 }
             })
 
-            const userProfiles = await UserProfile.bulkCreate(dtoProfilesRecord, { fields: ['userId', 'name', 'wifeSurname', 'marriedStatus', 'birthDate', 'weddingDate', 'education', 'occupation', 'mobileNumber', 'email', 'countryCode', 'familyId', 'gender', 'isMainFamilyMember', 'mainFamilyMemberRelation', 'mainFamilyMemberId', 'motherId', 'motherName', 'fatherId', 'fatherName', 'surname', 'village'], transaction })
+
+            console.log("dtoProfilesRecord: ", dtoProfilesRecord);
+            const userProfiles = await UserProfile.bulkCreate(dtoProfilesRecord, { fields: ['userId', 'name', 'wifeSurname', 'marriedStatus', 'birthDate', 'weddingDate', 'education', 'occupation', 'mobileNumber', 'email', 'countryCode', 'familyId', 'gender', 'isMainFamilyMember', 'mainFamilyMemberRelation', 'mainFamilyMemberId', 'motherId', 'motherName', 'fatherId', 'fatherName', 'surname', 'village', 'password'], transaction, updateOnDuplicate: [ 'name', 'surname', 'village'] })
             if (!userProfiles) {
                 throw new Error("Error Occurs while Inserting Into UserProfile Entity")
             }
 
+            // dtoProfilesRecord.forEach((profileRecord: UserProfileDto) => {
+            //     //Sent Mail
+            //     //Mail Body
+            //     const mailBody = `
+            //     User Created:
+            //     UserName: ${profileRecord.name}
+            //     Password: ${profileRecord.password}
+            //     `
+            //     const communicationService: ICommunicationService = new CommunicationService();
+            //     const response = communicationService.SendMail(profileRecord.email, mailBody);
+            // })
+
 
             await transaction.commit();
-
+            // await transaction.rollback();
             apiResponse = new ApiResponseDto()
             apiResponse.status = 1;
             apiResponse.data = {
@@ -211,7 +234,7 @@ export class UserService extends BaseService implements IUserService {
             return apiResponse;
         }
         catch (error: any) {
-
+            console.log("Error", error)
             await transaction.rollback();
             apiResponse = new ApiResponseDto();
             let errorDto = new ErrorDto();

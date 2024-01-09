@@ -318,7 +318,7 @@ export const validateBulkEntries = (row: any): any => {
     userProfileDto.occupation = String(row[15])?.trim();
     userProfileDto.countryCode = String(row[16])?.trim();
     userProfileDto.mobileNumber = String(row[17])?.trim();
-    userProfileDto.email = row[18].text ? row[18].text : String(row[18]).trim;
+    userProfileDto.email = row[18].text ? row[18].text : String(row[18]).trim();
     userProfileDto.gender = String(row[19])?.trim().toUpperCase();
     userProfileDto.mainFamilyMemberRelation = String(row[20])?.trim();
     userProfileDto.surname = String(row[2])?.trim();
