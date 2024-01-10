@@ -5,13 +5,16 @@ const sequelize = require('../config/db')
 
 export const Family = sequelize.define('Family', {
     surname: {
-        type: DataTypes.TEXT
+        type: DataTypes.TEXT,
+        unique: 'compositeKey'
     },
     village: {
-        type: DataTypes.TEXT
+        type: DataTypes.TEXT,
+        unique: 'compositeKey'
     },
     villageGuj: {
-        type: DataTypes.TEXT
+        type: DataTypes.TEXT,
+        unique: 'compositeKey'
     },
     currResidency: {
         type: DataTypes.TEXT
@@ -28,8 +31,18 @@ export const Family = sequelize.define('Family', {
     residencyAddress: {
         type: DataTypes.TEXT
     },
-    mainFamilyMemberName : {
-        type : DataTypes.TEXT
+    mainFamilyMemberName: {
+        type: DataTypes.TEXT,
+        unique: 'compositeKey'
     },
     ...ModelBaseWithCommonFields
-}, { tableName: 'Family' })
+}, {
+    tableName: 'Family',
+    indexes: [
+        {
+            unique: true,
+            fields: ['surname', 'village', 'villageGuj', 'mainFamilyMemberName'],
+            name: 'Family_compositeKey' // Example index for uniqueness
+        }
+    ]
+})

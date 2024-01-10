@@ -3,25 +3,37 @@ import { ModelBaseWithCommonFields } from "./modelBase"
 
 const sequelize = require('../config/db')
 
-export const User = sequelize.define('User',{
-    name : {
-        type : DataTypes.STRING,
-        allowNull : false
+export const User = sequelize.define('User', {
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: 'compositeKey'
     },
-    userType : {
-        type : DataTypes.STRING
+    userType: {
+        type: DataTypes.STRING
     },
-    isImageAvailable : {
-        type : DataTypes.BOOLEAN
+    isImageAvailable: {
+        type: DataTypes.BOOLEAN
     },
-    surname : {
-        type : DataTypes.STRING,
-        allowNull : false
+    surname: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: 'compositeKey'
     },
     village: {
-        type : DataTypes.STRING,
-        allowNull : false
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: 'compositeKey'
     },
     ...ModelBaseWithCommonFields
-},{tableName : 'User'})
+}, {
+    tableName: 'User',
+    indexes: [
+        {
+            unique: true,
+            fields: ['name', 'surname', 'village'],
+            name: 'User_compositeKey' // Example index for uniqueness
+        }
+    ]
+})
 

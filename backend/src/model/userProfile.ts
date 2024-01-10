@@ -8,14 +8,16 @@ export const UserProfile = sequelize.define('UserProfile', {
      */
     name: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: 'compositeKey'
     },
     /**
      * Person's Surname
      */
     surname: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: 'compositeKey'
     },
     /**
      * Surname of Person's Wife  
@@ -26,9 +28,10 @@ export const UserProfile = sequelize.define('UserProfile', {
     /**
      * City/Village
      */
-    village:{
+    village: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: 'compositeKey'
     },
     /**
      * Current Residency
@@ -79,20 +82,20 @@ export const UserProfile = sequelize.define('UserProfile', {
     /**
      * Country Code of Person's mobile number
      */
-    countryCode : {
+    countryCode: {
         type: DataTypes.STRING,
         allowNull: false
     },
     /**
      * Person's email address
      */
-    email :{
-        type : DataTypes.STRING,
+    email: {
+        type: DataTypes.STRING,
     },
     /**
      * Person's gender
      */
-    gender :{
+    gender: {
         type: DataTypes.STRING
     },
     /**
@@ -110,7 +113,7 @@ export const UserProfile = sequelize.define('UserProfile', {
     /**
      * Person's relation to Main Family Member
      */
-    mainFamilyMemberRelation :{
+    mainFamilyMemberRelation: {
         type: DataTypes.STRING
     },
     /**
@@ -128,36 +131,45 @@ export const UserProfile = sequelize.define('UserProfile', {
     /**
      * Father's Id
      */
-    fatherId :{
+    fatherId: {
         type: DataTypes.BIGINT
     },
     /**
      * Father's Name
      */
-    fatherName: { 
+    fatherName: {
         type: DataTypes.TEXT
     },
-    password : {
-        type : DataTypes.STRING,
-        require : true
+    password: {
+        type: DataTypes.STRING,
+        require: true
     },
     /**
      * Common Fields
      */
     ...ModelBaseWithCommonFields
-},{tableName : 'UserProfile'})
+}, {
+    tableName: 'UserProfile',
+    indexes: [
+        {
+            unique: true,
+            fields: ['name', 'surname', 'village'],
+            name: 'UserProfile_compositeKey' // Example index for uniqueness
+        }
+    ]
+})
 
 
 export const UserProfileImage = sequelize.define('UserProfileImage', {
     /**
      * Image Url of User Profile
      */
-    image : {
-        type : DataTypes.STRING,
+    image: {
+        type: DataTypes.STRING,
         allowNull: false
     },
-    originalImage :{ 
-        type : DataTypes.STRING
+    originalImage: {
+        type: DataTypes.STRING
     },
     ...ModelBaseWithCommonFields
-},{tableName : 'UserProfileImage'})
+}, { tableName: 'UserProfileImage' })

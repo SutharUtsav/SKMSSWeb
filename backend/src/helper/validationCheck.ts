@@ -333,6 +333,7 @@ export const validateBulkEntries = (row: any): any => {
     userProfileDto.fatherName = String(row[27])?.trim();
     userProfileDto.fatherSurname = String(row[28])?.trim();
     userProfileDto.fatherVillage = String(row[29])?.trim();
+    userProfileDto.password=""
 
     familyDto.surname = String(row[2])?.trim() === "undefined" ? null : String(row[2])?.trim();
     familyDto.village = String(row[3])?.trim() === "undefined" ? null : String(row[3])?.trim();
