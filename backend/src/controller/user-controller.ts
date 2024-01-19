@@ -117,7 +117,7 @@ router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
             
 
             const baseService = new BaseService();
-            await worksheet.eachRow((row: any, rowNumber: number) => {
+            worksheet.eachRow((row: any, rowNumber: number) => {
                 // rowNumber starts with 1
                 if (rowNumber !== 1) {
                     let { userDto, userProfileDto, familyDto } = validateBulkEntries(row.values);
@@ -147,7 +147,6 @@ router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
             
             const userService: IUserService = new UserService();
             response = await userService.BulkInsert(userDtos, userProfileDtos, familyDtos);
-
             if (!response) {
                 RemoveFile(req.file.path);
                 res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
@@ -161,9 +160,6 @@ router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
                 }
                 res.status(200).send(response)
             }
-
-
-
         }
     }
     catch (err: any) {

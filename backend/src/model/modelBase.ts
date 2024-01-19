@@ -75,3 +75,6 @@ export const ModelBaseWithCommonFields = {
 }
 
 //#endregion
+
+
+export const commonFieldsArr = ['createdAt', 'createdById', 'updatedAt', 'updatedById', 'disabled', 'enabledDisabledOn', 'rowVersion']

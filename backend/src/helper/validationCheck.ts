@@ -305,34 +305,35 @@ export const validateBulkEntries = (row: any): any => {
     let familyDto: FamilyDto = new FamilyDto();
 
     userDto.userType = EnumUserStatusText[EnumUserStatus.ADMINCREATED];
-    userDto.name = String(row[1])?.trim();
-    userDto.surname = String(row[2])?.trim();
-    userDto.village = String(row[3])?.trim();
-
-    userProfileDto.name = String(row[1])?.trim();
-    userProfileDto.wifeSurname = String(row[10])?.trim();
-    userProfileDto.marriedStatus = String(row[11])?.trim();
+    userDto.name = row[1] ? String(row[1])?.trim() : "";
+    userDto.surname = row[2] ? String(row[2])?.trim() : "";
+    userDto.village = row[3] ? String(row[3])?.trim() : "";
+    userDto.isImageAvailable = false;
+    
+    userProfileDto.name = row[1] ? String(row[1])?.trim(): "";
+    userProfileDto.wifeSurname = row[10] ? String(row[10])?.trim() : null;
+    userProfileDto.marriedStatus = row[11] ? String(row[11])?.trim() : "";
     userProfileDto.birthDate = !isNaN(Date.parse(row[12])) ? new Date(row[12]).toISOString() : '';
     userProfileDto.weddingDate = !isNaN(Date.parse(row[13])) ? new Date(row[13]).toISOString() : '';;
-    userProfileDto.education = String(row[14])?.trim();
-    userProfileDto.occupation = String(row[15])?.trim();
-    userProfileDto.countryCode = String(row[16])?.trim();
-    userProfileDto.mobileNumber = String(row[17])?.trim();
+    userProfileDto.education = row[14] ? String(row[14])?.trim() : "";
+    userProfileDto.occupation = row[15] ? String(row[15])?.trim() : "";
+    userProfileDto.countryCode = row[16] ? String(row[16])?.trim() : "";
+    userProfileDto.mobileNumber = row[17] ? String(row[17])?.trim() : "";
     userProfileDto.email = row[18].text ? row[18].text : String(row[18]).trim();
-    userProfileDto.gender = String(row[19])?.trim().toUpperCase();
-    userProfileDto.mainFamilyMemberRelation = String(row[20])?.trim();
-    userProfileDto.surname = String(row[2])?.trim();
-    userProfileDto.village = String(row[3])?.trim();
-    userProfileDto.currResidency = String(row[5])?.trim();
-    userProfileDto.mainFamilyMemberName = String(row[21])?.trim();
-    userProfileDto.mainFamilyMemberSurname = String(row[22])?.trim();
-    userProfileDto.mainFamilyMemberVillage = String(row[23])?.trim();
-    userProfileDto.motherName = String(row[24])?.trim();
-    userProfileDto.motherSurname = String(row[25])?.trim();
-    userProfileDto.motherVillage = String(row[26])?.trim();
-    userProfileDto.fatherName = String(row[27])?.trim();
-    userProfileDto.fatherSurname = String(row[28])?.trim();
-    userProfileDto.fatherVillage = String(row[29])?.trim();
+    userProfileDto.gender = row[19] ? String(row[19])?.trim().toUpperCase() : "";
+    userProfileDto.mainFamilyMemberRelation = row[20] ? String(row[20])?.trim() : "";
+    userProfileDto.surname = row[2] ? String(row[2])?.trim() : "";
+    userProfileDto.village = row[3] ? String(row[3])?.trim() : "";
+    userProfileDto.currResidency = row[5] ? String(row[5])?.trim() : "";
+    userProfileDto.mainFamilyMemberName = row[21] ? String(row[21])?.trim(): "";
+    userProfileDto.mainFamilyMemberSurname = row[22] ? String(row[22])?.trim() : "";
+    userProfileDto.mainFamilyMemberVillage = row[23] ? String(row[23])?.trim() : "";
+    userProfileDto.motherName = row[24] ? String(row[24])?.trim() : "";
+    userProfileDto.motherSurname = row[25] ? String(row[25])?.trim() : "";
+    userProfileDto.motherVillage = row[26] ? String(row[26])?.trim(): "";
+    userProfileDto.fatherName = row[27] ? String(row[27])?.trim() : "";
+    userProfileDto.fatherSurname = row[28] ? String(row[28])?.trim() : "";
+    userProfileDto.fatherVillage = row[29] ? String(row[29])?.trim() : "";
     userProfileDto.password=""
 
     familyDto.surname = String(row[2])?.trim() === "undefined" ? null : String(row[2])?.trim();

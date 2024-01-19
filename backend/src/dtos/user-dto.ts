@@ -10,6 +10,7 @@ export class UserDto extends BaseDtoWithCommonFields{
     villageGuj!:string;
     userType!:string;
     roleId!:RoleDto;
+    isImageAvailable!:boolean;
 }
 //#endregion
 
@@ -30,7 +31,7 @@ export class UserProfileDto extends BaseDtoWithCommonFields{
     name!: string;
     surname!:string;
     password!:string;
-    wifeSurname!:string;
+    wifeSurname!:string | null;
     village!:string;
     villageGuj!:string;
     currResidency!:string;

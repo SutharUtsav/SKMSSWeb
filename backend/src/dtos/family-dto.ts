@@ -1,3 +1,4 @@
+import { commonFieldsArr } from "../model/modelBase";
 import { BaseDto, BaseDtoWithCommonFields } from "./base-dto";
 
 //#region Family Detail Dto
@@ -29,3 +30,5 @@ export class FamilyLookupDto{
     }
 }
 //#endregion
+
+export const familyFieldsArr = [...commonFieldsArr, 'surname', 'village', 'currResidency', 'adobeOfGod', 'goddess', 'lineage', 'residencyAddress', 'villageGuj', 'mainFamilyMemberName']

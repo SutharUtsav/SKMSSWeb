@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize"
-import { ModelBaseWithCommonFields } from "./modelBase"
+import { ModelBaseWithCommonFields, commonFieldsArr } from "./modelBase"
 
 const sequelize = require('../config/db')
 
@@ -37,3 +37,5 @@ export const User = sequelize.define('User', {
     ]
 })
 
+
+export const userFieldsArr = [...commonFieldsArr, 'name', 'userType', 'isImageAvailable', 'roleId','surname', 'village', ];

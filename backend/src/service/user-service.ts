@@ -2,15 +2,15 @@ import { EnumApiResponse, EnumApiResponseCode, EnumApiResponseMsg } from "../con
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { EnumFamilyMemberRelation, EnumFamilyMemberRelationName } from "../consts/enumFamilyMemberRelation";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
-import { FamilyDto } from "../dtos/family-dto";
+import { FamilyDto, familyFieldsArr } from "../dtos/family-dto";
 import { RoleDto, RoleLookUpDto } from "../dtos/role-dto";
 import { UserDto, UserProfileDto, UserProfileImageDto, UserProfileLookUpDto } from "../dtos/user-dto";
 import { encrypt } from "../helper/encryption-handling";
 import { RemoveFile } from "../helper/file-handling";
 import { Family } from "../model/family";
 import { Role } from "../model/role";
-import { User } from "../model/user";
-import { UserProfile, UserProfileImage } from "../model/userProfile";
+import { User, userFieldsArr } from "../model/user";
+import { UserProfile, UserProfileFieldsArr, UserProfileImage } from "../model/userProfile";
 import { BaseService } from "./base-service";
 import { CommunicationService, ICommunicationService } from "./communication-service";
 
@@ -144,15 +144,17 @@ export class UserService extends BaseService implements IUserService {
 
         const transaction = await sequelize.transaction();
         try {
-            const families = await Family.bulkCreate(dtoFamiliesRecord, { fields: ['surname', 'village', 'currResidency', 'adobeOfGod', 'goddess', 'lineage', 'residencyAddress', 'villageGuj', 'mainFamilyMemberName'], transaction, updateOnDuplicate: ['surname', 'village', 'villageGuj', 'mainFamilyMemberName'] })
+            const families = await Family.bulkCreate(dtoFamiliesRecord, { fields: familyFieldsArr, transaction, updateOnDuplicate: ['surname', 'village', 'villageGuj', 'mainFamilyMemberName'] })
 
             if (!families) {
                 throw new Error("Error Occurs while Inserting Into Family Entity")
             }
             const familyArray = families.map((family: any) => family.dataValues)
 
-
-            const users = await User.bulkCreate(dtoUsersRecord, { fields: ['name', 'surname', 'village'], transaction, updateOnDuplicate: ['name', 'surname', 'village'] })
+            console.log("dtoUsersRecord: ", dtoUsersRecord);
+            console.log("UserFieldsArr: ", userFieldsArr)
+            const users = await User.bulkCreate(dtoUsersRecord, { fields: userFieldsArr, transaction, updateOnDuplicate: ['name', 'surname', 'village'] })
+            
             if (!users) {
                 throw new Error("Error Occurs while Inserting Into User Entity")
             }
@@ -207,22 +209,23 @@ export class UserService extends BaseService implements IUserService {
             await Promise.all(dtoProfileRecordPromise);
 
             console.log("dtoProfilesRecord: ", dtoProfilesRecord);
-            const userProfiles = await UserProfile.bulkCreate(dtoProfilesRecord, { fields: ['userId', 'name', 'wifeSurname', 'marriedStatus', 'birthDate', 'weddingDate', 'education', 'occupation', 'mobileNumber', 'email', 'countryCode', 'familyId', 'gender', 'isMainFamilyMember', 'mainFamilyMemberRelation', 'mainFamilyMemberId', 'motherId', 'motherName', 'fatherId', 'fatherName', 'surname', 'village', 'password'], transaction, updateOnDuplicate: [ 'name', 'surname', 'village'] })
+            const userProfiles = await UserProfile.bulkCreate(dtoProfilesRecord, { fields: UserProfileFieldsArr, transaction, updateOnDuplicate: [ 'name', 'surname', 'village'] })
             if (!userProfiles) {
                 throw new Error("Error Occurs while Inserting Into UserProfile Entity")
             }
 
-            dtoProfilesRecord.forEach((profileRecord: UserProfileDto) => {
-                //Sent Mail
-                //Mail Body
-                const mailBody = `
-                User Created:
-                UserName: ${profileRecord.name}
-                Password: ${profileRecord.password}
-                `
-                const communicationService: ICommunicationService = new CommunicationService();
-                const response = communicationService.SendMail(profileRecord.email, mailBody);
-            });
+            //Send mail to each users
+            // dtoProfilesRecord.forEach((profileRecord: UserProfileDto) => {
+            //     //Sent Mail
+            //     //Mail Body
+            //     const mailBody = `
+            //     User Created:
+            //     UserName: ${profileRecord.name}
+            //     Password: ${profileRecord.password}
+            //     `
+            //     const communicationService: ICommunicationService = new CommunicationService();
+            //     const response = communicationService.SendMail(profileRecord.email, mailBody);
+            // });
 
 
             await transaction.commit();
