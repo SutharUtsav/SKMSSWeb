@@ -214,18 +214,18 @@ export class UserService extends BaseService implements IUserService {
                 throw new Error("Error Occurs while Inserting Into UserProfile Entity")
             }
 
-            //Send mail to each users
-            // dtoProfilesRecord.forEach((profileRecord: UserProfileDto) => {
-            //     //Sent Mail
-            //     //Mail Body
-            //     const mailBody = `
-            //     User Created:
-            //     UserName: ${profileRecord.name}
-            //     Password: ${profileRecord.password}
-            //     `
-            //     const communicationService: ICommunicationService = new CommunicationService();
-            //     const response = communicationService.SendMail(profileRecord.email, mailBody);
-            // });
+           // Send mail to each users
+            dtoProfilesRecord.forEach((profileRecord: UserProfileDto) => {
+                //Sent Mail
+                //Mail Body
+                const mailBody = `
+                User Created:
+                UserName: ${profileRecord.name}
+                Password: ${profileRecord.password}
+                `
+                const communicationService: ICommunicationService = new CommunicationService();
+                const response = communicationService.SendMail(profileRecord.email, mailBody);
+            });
 
 
             await transaction.commit();

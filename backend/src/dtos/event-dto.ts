@@ -1,5 +1,6 @@
 //#region Event Detail Dto
 
+import { commonFieldsArr } from "../model/modelBase";
 import { BaseDtoWithCommonFields } from "./base-dto";
 
 export class EventDto extends BaseDtoWithCommonFields{
@@ -8,11 +9,15 @@ export class EventDto extends BaseDtoWithCommonFields{
     eventOn!:Date | null;
     isActivity!:boolean | null;
     activityCategory!:string | null;
-    mainImageURL!:string | null;
-    imageURLs!:string[] | null;
+    // mainImageURL!:string | null;
+    // imageURLs!:string[] | null;
 }
 
-
+export class EventImageDto extends BaseDtoWithCommonFields{
+    eventId!:string;
+    imageURL!: string;
+    isCoverImage!:boolean;
+}
 export class EventLookupDto{
     title!:string | null;
     description!:string | null;
@@ -27,3 +32,5 @@ export class EventLookupDto{
 }
 
 //#endregion
+
+export const EventImageFieldsArr = [...commonFieldsArr, 'eventId', 'imageURL', 'isCoverImage']

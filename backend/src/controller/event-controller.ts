@@ -1,8 +1,8 @@
 import { upload } from "../config/multer";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
-import { EventDto } from "../dtos/event-dto";
-import { validateEvent } from "../helper/validationCheck";
+import { EventDto, EventImageDto } from "../dtos/event-dto";
+import { validateEvent, validateEventImages } from "../helper/validationCheck";
 import { EventService, IEventService } from "../service/event-service";
 
 const express = require('express');
@@ -92,18 +92,25 @@ router.get('/:id', async (req: any, res: any) => {
  * Add Event Detail
  */
 router.post('/', upload, async (req: any, res: any) => {
+    console.log("In controller");
     let eventDto: EventDto | ErrorDto | undefined = validateEvent(req.body);
+    let eventImageDtos : EventImageDto[] | ErrorDto | undefined = validateEventImages(req.body);
 
+    console.log("EventDto :", eventDto)
+    console.log("EventImageDtos :", eventImageDtos)
 
-    if (!eventDto) {
+    if (!eventDto || !eventImageDtos) {
         res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
     }
     else if(eventDto instanceof ErrorDto){
         res.status(parseInt(eventDto.errorCode)).send(eventDto);
     }
+    else if(eventImageDtos instanceof ErrorDto){
+        res.status(parseInt(eventImageDtos.errorCode)).send(eventImageDtos);
+    }
     else {
         const eventService: IEventService = new EventService();
-        const response = await eventService.Create(eventDto);
+        const response = await eventService.Create(eventDto, eventImageDtos);
 
         if (!response) {
             res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({

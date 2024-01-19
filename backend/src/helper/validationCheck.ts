@@ -3,7 +3,7 @@
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { EnumUserStatus, EnumUserStatusText } from "../consts/enumUserStatus";
 import { ErrorDto } from "../dtos/api-response-dto";
-import { EventDto } from "../dtos/event-dto";
+import { EventDto, EventImageDto } from "../dtos/event-dto";
 import { FamilyDto } from "../dtos/family-dto";
 import { PermissionDto, RoleDto } from "../dtos/role-dto";
 import { UserDto, UserProfileDto } from "../dtos/user-dto";
@@ -39,9 +39,36 @@ export const validateEvent = (body : EventDto) : EventDto | ErrorDto | undefined
     eventDto.eventOn = body.eventOn;
     eventDto.isActivity = body.isActivity;
     eventDto.activityCategory = body.activityCategory;
-    eventDto.mainImageURL = body.mainImageURL;
-    eventDto.imageURLs = body.imageURLs;
     return eventDto;
+}
+
+export const validateEventImages = (body : any) : EventImageDto[] | ErrorDto | undefined => {
+    let eventImageDtos: EventImageDto[] = [];
+
+    //check for all required fields
+    if(!body.mainImageURL){
+        let errorDto = new ErrorDto();
+        errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+        errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        return errorDto;
+    }
+
+    // set fields for EventImageDtos
+    let tmpEventImageDto : EventImageDto = new EventImageDto();
+    tmpEventImageDto.imageURL = body.mainImageURL;
+    tmpEventImageDto.isCoverImage = true;
+
+    eventImageDtos.push(tmpEventImageDto);
+
+    body.imageURLs.map((imageURL : string) => {
+        let eventImageDto : EventImageDto = new EventImageDto();
+        eventImageDto.imageURL = imageURL;
+        eventImageDto.isCoverImage = false;
+
+        eventImageDtos.push(eventImageDto);
+    })
+
+    return eventImageDtos;
 }
 
 /**

@@ -1,7 +1,9 @@
 import { EnumApiResponse, EnumApiResponseMsg } from "../consts/enumApiResponse";
+import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
-import { EventDto, EventLookupDto } from "../dtos/event-dto";
+import { EventDto, EventImageDto, EventImageFieldsArr, EventLookupDto } from "../dtos/event-dto";
 import { Events } from "../model/event";
+import { EventImages } from "../model/eventImage";
 import { BaseService } from "./base-service";
 
 export interface IEventService {
@@ -19,8 +21,9 @@ export interface IEventService {
     /**
      * Create Record for Entity Event
      * @param dtoRecord 
+     * @param dtoImageRecords 
      */
-    Create(dtoRecord: EventDto): Promise<ApiResponseDto | undefined>;
+    Create(dtoRecord: EventDto, dtoImageRecords: EventImageDto[]): Promise<ApiResponseDto | undefined>;
 
     /**
      * Update Record in Event
@@ -164,8 +167,66 @@ export class EventService extends BaseService implements IEventService {
      * Create Record for Entity Event
      * @param dtoRecord 
      */
-    public async Create(dtoRecord: EventDto): Promise<ApiResponseDto | undefined> {
-        throw new Error("Method not implemented.");
+    public async Create(dtoRecord: EventDto, dtoImageRecords: EventImageDto[]): Promise<ApiResponseDto | undefined> {
+        let apiResponse!: ApiResponseDto;
+
+        try {
+
+            const recordCreatedInfo = this.SetRecordCreatedInfo(dtoRecord);
+            const recordModifiedInfo = this.SetRecordModifiedInfo(dtoRecord);
+
+            const event = await Events.create({
+                ...dtoRecord,
+                createdAt: recordCreatedInfo.createdAt,
+                createdById: recordCreatedInfo.createdById,
+                updatedAt: recordModifiedInfo.updatedAt,
+                updatedById: recordModifiedInfo.updatedById,
+                disabled: false,
+                enabledDisabledOn: new Date(),
+            })
+
+            console.log("Event : ", event);
+
+            //if user is not created
+            if (!event) {
+                apiResponse = new ApiResponseDto();
+                apiResponse.status = 0;
+                let errorDto = new ErrorDto();
+                errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG].toString();
+                errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG];
+                apiResponse.error = errorDto;
+                return apiResponse;
+            }
+
+            for (const dtoImageRecord of dtoImageRecords) {
+                dtoImageRecord.createdAt = recordCreatedInfo.createdAt;
+                dtoImageRecord.createdById = recordCreatedInfo.createdById;
+                dtoImageRecord.updatedAt = recordModifiedInfo.updatedAt;
+                dtoImageRecord.updatedById = recordModifiedInfo.updatedById;
+            }
+
+            console.log("dtoImageRecords :", dtoImageRecords);
+
+            const eventImages = await EventImages.bulkCreate(dtoImageRecords, { fields: EventImageFieldsArr })
+
+            console.log("EventImages: ", eventImages)
+            apiResponse = new ApiResponseDto();
+            apiResponse.status = 1;
+            apiResponse.data = {
+                event: event
+            }
+            return apiResponse;
+
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
     }
 
     /**
