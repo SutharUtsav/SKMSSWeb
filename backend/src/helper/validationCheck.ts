@@ -38,29 +38,14 @@ export const validateEvent = (body : EventDto) : EventDto | ErrorDto | undefined
     eventDto.description = body.description;
     eventDto.eventOn = body.eventOn;
     eventDto.isActivity = body.isActivity;
-    eventDto.activityCategory = body.activityCategory;
+    eventDto.activityCategory = body.activityCategory ? body.activityCategory : null;
     return eventDto;
 }
 
-export const validateEventImages = (body : any) : EventImageDto[] | ErrorDto | undefined => {
+export const validateEventImages = (paths : string[]) : EventImageDto[] | ErrorDto | undefined => {
     let eventImageDtos: EventImageDto[] = [];
 
-    //check for all required fields
-    if(!body.mainImageURL){
-        let errorDto = new ErrorDto();
-        errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
-        errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
-        return errorDto;
-    }
-
-    // set fields for EventImageDtos
-    let tmpEventImageDto : EventImageDto = new EventImageDto();
-    tmpEventImageDto.imageURL = body.mainImageURL;
-    tmpEventImageDto.isCoverImage = true;
-
-    eventImageDtos.push(tmpEventImageDto);
-
-    body.imageURLs.map((imageURL : string) => {
+    paths?.map((imageURL : string) => {
         let eventImageDto : EventImageDto = new EventImageDto();
         eventImageDto.imageURL = imageURL;
         eventImageDto.isCoverImage = false;

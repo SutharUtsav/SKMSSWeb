@@ -1,3 +1,5 @@
+import { Events } from "./event";
+import { EventImages } from "./eventImage";
 import { Family } from "./family";
 import { Role, RolePermission, RoleRolePermission } from "./role"
 import { User } from "./user";
@@ -56,5 +58,14 @@ export const dbContext = () => {
     })
     UserProfile.belongsTo(Family, {
         foreignKey: 'familyId'
+    })
+
+    //One to Many relationship between Family and UserProfile
+    Events.hasMany(EventImages, {
+        foreignKey: 'id',
+        as: 'EventEventImageId'
+    })
+    EventImages.belongsTo(Events, {
+        foreignKey: 'eventId'
     })
 }

@@ -9,13 +9,13 @@ export class EventDto extends BaseDtoWithCommonFields{
     eventOn!:Date | null;
     isActivity!:boolean | null;
     activityCategory!:string | null;
-    // mainImageURL!:string | null;
+    mainImageURL!:string | null;
     // imageURLs!:string[] | null;
 }
 
 export class EventImageDto extends BaseDtoWithCommonFields{
     eventId!:string;
-    imageURL!: string;
+    imageURL!: string | null;
     isCoverImage!:boolean;
 }
 export class EventLookupDto{

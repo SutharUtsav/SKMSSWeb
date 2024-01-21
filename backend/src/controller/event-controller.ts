@@ -2,11 +2,172 @@ import { upload } from "../config/multer";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { EventDto, EventImageDto } from "../dtos/event-dto";
+import { RemoveFile, RemoveFilesFromDirectory } from "../helper/file-handling";
 import { validateEvent, validateEventImages } from "../helper/validationCheck";
 import { EventService, IEventService } from "../service/event-service";
 
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const fs = require('fs');
+const path = require('path');
+const sharp = require('sharp');
+const _ = require('lodash');
+
+
+
+// Multer setup for event images upload 
+
+const EventImagesStorage = multer.diskStorage({
+    destination: (req: any, file: any, cb: any) => {
+        const outputDir = `Images/Event`;
+
+        // Ensure the output directory exists
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, { recursive: true });
+        }
+
+        cb(null, outputDir)
+    },
+    filename: (req: any, file: any, cb: any) => {
+        // console.log(file)
+        cb(null, `${Date.now()}-${file.originalname}`)
+    }
+});
+
+
+//#region CRUD operation on EventImage Entity
+
+/**
+ * Get All Records of EventImages
+ */
+router.get('/images', async (req: any, res: any) => {
+    const eventId = req.query.eventId;
+
+    if (!eventId) {
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+        })
+    }
+    else {
+        const eventService: IEventService = new EventService();
+        const response = await eventService.GetEventImages(eventId);
+
+        if (!response) {
+            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                status: 0,
+                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+            })
+        }
+        else {
+            res.send(response)
+        }
+    }
+})
+
+
+const uploadEventImages = multer({
+    storage: EventImagesStorage,
+    limits: { fileSize: "5000000" }, //5 MB
+    fileFilter: (req: any, file: any, cb: any) => {
+        const fileTypes = /png|jpg|jpeg|webp/
+        const mimeType = fileTypes.test(file.mimetype)
+        const extname = fileTypes.test(path.extname(file.originalname))
+
+        if (mimeType && extname) {
+
+            return cb(null, true)
+        }
+        cb('Give proper file format to upload')
+    }
+}).any('imageURLs')
+
+/**
+ * Upload Images of Events
+ */
+router.post('/images', uploadEventImages, async (req: any, res: any) => {
+    const eventId = req.query.eventId;
+
+    if (eventId === undefined || eventId === null) {
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
+    else {
+
+        const paths = _.map(req.files, 'path');
+        // console.log(paths)
+        const outputDir = 'Images/Event-Webp';
+
+        convertToWebP(paths, outputDir)
+            .then(async (outputFilePaths: any) => {
+                console.log('Conversion completed successfully.');
+                console.log(outputFilePaths)
+                // await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
+
+                const eventImagesDto: EventImageDto[] | ErrorDto | undefined = validateEventImages(outputFilePaths);
+
+                if (!eventImagesDto || eventImagesDto instanceof ErrorDto) {
+                    await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
+                    res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
+                }
+                else {
+                    const eventService: IEventService = new EventService();
+                    const response = await eventService.UploadImages(eventImagesDto, eventId);
+
+                    await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
+                    if (!response) {
+                        res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                            status: 0,
+                            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+                        })
+                    }
+                    else if (response instanceof ApiResponseDto) {
+                        res.send(response)
+                    }
+
+                    res.send({});
+                }
+
+            })
+            .catch(async (error) => {
+                await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
+                console.error('Error during conversion:', error);
+            });
+    }
+
+})
+
+/**
+ * Remove Image of Event
+ */
+router.delete('/images', async (req: any, res: any) => {
+    const id = req.query.id;
+    if (id === undefined || id === null) {
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
+    else {
+        const eventService: IEventService = new EventService();
+        const response = await eventService.Remove(id);
+
+        if (!response) {
+            res.status(EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                status: 0,
+                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+            })
+        }
+        else {
+            res.send(response)
+        }
+    }
+})
+
+//#endregion
 
 
 //#region CRUD operation on Event Entity
@@ -68,7 +229,7 @@ router.get('/look-up/:id', async (req: any, res: any) => {
 */
 router.get('/:id', async (req: any, res: any) => {
     const id = req.params.id;
-    if(id===undefined || id===null){
+    if (id === undefined || id === null) {
         res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
             status: 0,
             message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
@@ -88,104 +249,218 @@ router.get('/:id', async (req: any, res: any) => {
     }
 })
 
+
+const uploadEventMainImage = multer({
+    storage: EventImagesStorage,
+    limits: { fileSize: "5000000" }, //5 MB
+    fileFilter: (req: any, file: any, cb: any) => {
+        const fileTypes = /png|jpg|jpeg|webp/
+        const mimeType = fileTypes.test(file.mimetype)
+        const extname = fileTypes.test(path.extname(file.originalname))
+
+        if (mimeType && extname) {
+
+            return cb(null, true)
+        }
+        cb('Give proper file format to upload')
+    }
+}).single('mainImageURL');
+
+
 /**
  * Add Event Detail
  */
-router.post('/', upload, async (req: any, res: any) => {
-    console.log("In controller");
+router.post('/', uploadEventMainImage, async (req: any, res: any) => {
+
     let eventDto: EventDto | ErrorDto | undefined = validateEvent(req.body);
-    let eventImageDtos : EventImageDto[] | ErrorDto | undefined = validateEventImages(req.body);
+    //let eventImageDtos : EventImageDto[] | ErrorDto | undefined = validateEventImages(req.body);
+    // console.log("EventDto :", eventDto)
 
-    console.log("EventDto :", eventDto)
-    console.log("EventImageDtos :", eventImageDtos)
-
-    if (!eventDto || !eventImageDtos) {
+    if (!eventDto) {
         res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
     }
-    else if(eventDto instanceof ErrorDto){
+    else if (eventDto instanceof ErrorDto) {
         res.status(parseInt(eventDto.errorCode)).send(eventDto);
     }
-    else if(eventImageDtos instanceof ErrorDto){
-        res.status(parseInt(eventImageDtos.errorCode)).send(eventImageDtos);
-    }
     else {
-        const eventService: IEventService = new EventService();
-        const response = await eventService.Create(eventDto, eventImageDtos);
+        const imageURL = req.file.path;
+        const outputDir = 'Images/Event-Webp';
+        const outputFile = `${Date.now()}-event.webp`;
 
-        if (!response) {
-            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
-                status: 0,
-                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+        // Ensure the output directory exists
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, { recursive: true });
+        }
+
+        const outputFilePath = path.join(outputDir, outputFile);
+
+        sharp(imageURL)
+            .rotate()
+            .webp({ quality: 60 }) // convert to webp format
+            .toFile(outputFilePath)
+            .then(async (data: any) => {
+                if (eventDto instanceof EventDto) {
+                    eventDto.mainImageURL = outputFilePath;
+
+                    if (!eventDto.mainImageURL) {
+                        await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
+                        res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
+                    }
+                    else {
+                        const eventService: IEventService = new EventService();
+                        const response = await eventService.Create(eventDto);
+
+                        await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
+                        if (!response) {
+                            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                                status: 0,
+                                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+                            })
+                        }
+                        else if (response instanceof ApiResponseDto) {
+                            res.send(response)
+                        }
+                    }
+
+                }
             })
-        }
-        else if (response instanceof ApiResponseDto) {
-            res.send(response)
-        }
-
+            .catch(async (error: any) => {
+                // await RemoveFile(process.cwd() + '/Images/Event');
+                res.status(400).send({
+                    status: 0,
+                    message: String(error)
+                })
+            })
     }
 });
+
+
 
 /**
  * Update Event Detail
  */
-router.put('/', upload, async (req: any, res: any) => {
-    // const id = req.query.id;
-    // if(id===undefined || id===null){
-    //     res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
-    //         status: 0,
-    //         message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
-    //     })
-    // }
+router.put('/', uploadEventMainImage, async (req: any, res: any) => {
+    const id = req.query.id;
+    if (id === undefined || id === null) {
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
+    else {
 
-    // let familyDto: FamilyDto | ErrorDto | undefined = validateFamily(req.body);
-    // if (!familyDto || !id) {
-    //     res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
-    // }
-    // else if (familyDto instanceof ErrorDto) {
-    //     res.status(parseInt(familyDto.errorCode)).send(familyDto);
-    // }
-    // else {
-    //     const familyService: IFamilyService = new FamilyService();
-    //     const response = await familyService.Update(familyDto, id);
+        let eventDto: EventDto | ErrorDto | undefined = validateEvent(req.body);
 
-    //     if (!response) {
-    //         res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
-    //             status: 0,
-    //             message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
-    //         })
-    //     }
-    //     else {
-    //         res.send(response)
-    //     }
-    // }
+        console.log(eventDto)
+
+        if (!eventDto || !id) {
+            res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
+        }
+        else if (eventDto instanceof ErrorDto) {
+            res.status(parseInt(eventDto.errorCode)).send(eventDto);
+        }
+        else {
+
+            const eventService: IEventService = new EventService();
+            let response;
+            if (req.body.mainImageURL) {
+                response = await eventService.RemoveEventMainImage(id);
+
+                if (response?.status == 1) {
+                    response = await eventService.Update(eventDto, id);
+                }
+            }
+            else {
+                response = await eventService.Update(eventDto, id);
+            }
+
+            if (!response) {
+                res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                    status: 0,
+                    message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+                })
+            }
+            else {
+                res.send(response)
+            }
+        }
+    }
 })
 
 /**
  * remove Event Entity by id
  */
 router.delete('/', async (req: any, res: any) => {
-    // const id = req.query.id;
-    // if(id===undefined || id===null){
-    //     res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
-    //         status: 0,
-    //         message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
-    //     })
-    // }
-    // else{
-    //     const familyService: IFamilyService = new FamilyService();
-    //     const response = await familyService.Remove(id);
-    
-    //     if (!response) {
-    //         res.status(EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
-    //             status: 0,
-    //             message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
-    //         })
-    //     }
-    //     else {
-    //         res.send(response)
-    //     }
-    // }
+    const id = req.query.id;
+    if (id === undefined || id === null) {
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
+    else {
+        const eventService: IEventService = new EventService();
+        const response = await eventService.Remove(id);
+
+        if (!response) {
+            res.status(EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                status: 0,
+                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+            })
+        }
+        else {
+            res.send(response)
+        }
+    }
 })
+
+//#endregion
+
+
+//#region Image Convertion function to Webp format  
+
+
+const convertToWebP = async (filePaths: string[], outputDir: string) => {
+
+    const outputFilePaths: string[] = [];
+
+    try {
+        // Ensure the output directory exists
+        if (!fs.existsSync(outputDir)) {
+            fs.mkdirSync(outputDir, { recursive: true });
+        }
+
+        const conversionPromises = filePaths.map(async (imageURL) => {
+            const outputFile = `${Date.now()}-${path.basename(imageURL, path.extname(imageURL))}.webp`;
+            const outputFilePath = path.join(outputDir, outputFile);
+
+            await sharp(imageURL)
+                .rotate()
+                .webp({ quality: 60 })
+                .toFile(outputFilePath)
+
+            outputFilePaths.push(outputFilePath);
+            console.log(`${imageURL} converted to ${outputFilePath}`);
+        });
+        await Promise.all(conversionPromises);
+
+        return outputFilePaths;
+    }
+    catch (error) {
+        // Handle exceptions by cleaning up created files
+        console.error('Error during conversion:', error);
+
+        // Remove all created files
+        outputFilePaths.forEach(async (filePath) => {
+            await RemoveFile(filePath);
+            console.log(`Removed file: ${filePath}`);
+        });
+
+        throw error; // Re-throw the error after cleanup
+    }
+
+
+}
 
 //#endregion
 
