@@ -333,7 +333,7 @@ const Family = () => {
       </div>
       <DecisionModal onYes={() => {
         handleDelete(deleteRecordId)
-      }} deleteRecordId={deleteRecordId} setdeleteRecordId={setdeleteRecordId} topic="Delete User" message="Are you sure you want to delete this User?" />
+      }} deleteRecordId={deleteRecordId} setdeleteRecordId={setdeleteRecordId} topic="Delete Family" message="Are you sure you want to delete this Family?" />
 
     </>
   );

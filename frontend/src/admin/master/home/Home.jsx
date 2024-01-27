@@ -13,6 +13,9 @@ import UserForm from "../../admin/user/UserForm";
 import UserDetails from "../../admin/user/UserDetails";
 import FamilyForm from "../../admin/family/FamilyForm";
 import { authorizeAdmin } from "../../../middleware/authMiddleWare";
+import Event from "../../admin/event/Event";
+import EventForm from "../../admin/event/EventForm";
+import EventDetails from "../../admin/event/EventDetails";
 
 
 export const HomeAdmin = () => {
@@ -25,7 +28,7 @@ export const HomeAdmin = () => {
     }
     else {
       navigate("/");
-    }    
+    }
   }, [])
 
 
@@ -47,6 +50,10 @@ export const HomeAdmin = () => {
             <Route path="/families" element={<Family />}></Route>
             <Route path="/families/create" element={<FamilyForm />}></Route>
             <Route path="/families/edit/:id" element={<FamilyForm />}></Route>
+            <Route path="/events" element={<Event />}></Route>
+            <Route path="/events/create" element={<EventForm />}></Route>
+            <Route path="/events/edit/:id" element={<EventForm />}></Route>
+            <Route path="/events/details/:id" element={<EventDetails />}></Route>
           </Routes>
         </div>
 

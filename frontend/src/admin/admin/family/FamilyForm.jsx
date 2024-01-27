@@ -125,7 +125,7 @@ const FamilyForm = (props) => {
     <div className="families content">
       <div className="content-header d-flex flex-row justify-content-between align-items-center">
         <h3 className="fs-1">
-          {props.beforeUpdateData ? "update" : "crate"} Family
+          {props.beforeUpdateData ? "update" : "create"} Family
         </h3>
 
         <nav aria-label="breadcrumb">
