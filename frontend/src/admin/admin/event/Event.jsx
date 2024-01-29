@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { BiRefresh, BiSolidUserDetail } from "react-icons/bi";
 import { EnumConsts } from '../../../consts/EnumConsts';
 import { MdDelete } from "react-icons/md";
+import { FaEye } from "react-icons/fa";
 import { BiEdit } from "react-icons/bi";
 import DecisionModal from '../../master/decisionmodal/DecisionModal';
 
@@ -188,13 +189,13 @@ const Event = () => {
                                                 <td aria-colindex="5" data-label="Actions" role="cell">
                                                     <div className="action-btns">
                                                         <button
-                                                            title="Event Details"
+                                                            title=" Preview or Upload More Images"
                                                             className="btn btn-sm btn-success"
                                                             onClick={() => {
                                                                 navigate(`/admin/events/details/${event.id}`)
                                                             }}
                                                         >
-                                                            <BiSolidUserDetail
+                                                            <FaEye
                                                                 fill="#fff"
                                                                 size={"2.5rem"}
                                                                 className="m-1"

@@ -1,88 +1,88 @@
 .admin-panel .content-main {
-    background-color: #fff;
-    padding: 20px;
-    margin-top: 10px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    border: none;
+  background-color: #fff;
+  padding: 20px;
+  margin-top: 10px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  border: none;
 }
 
 .admin-panel .content-main .content-title {
-    background-color: #fff;
-    border: none;
+  background-color: #fff;
+  border: none;
 }
 
 .admin-panel .content-main .content-title h4 {
-    font-size: 2.055rem;
-    float: left;
+  font-size: 2.055rem;
+  float: left;
 }
 
 .admin-panel .content-main .content-title button {
-    background-color: var(--secondary-color);
-    color: #fff;
-    font-size: 1.765rem;
-    border-radius: 8px;
-    border: 1px solid var(--secondary-color);
-    padding: 8px 20px;
+  background-color: var(--secondary-color);
+  color: #fff;
+  font-size: 1.765rem;
+  border-radius: 8px;
+  border: 1px solid var(--secondary-color);
+  padding: 8px 20px;
 }
 
 .admin-panel .content-main .content-title button:hover {
-    background-color: var(--secondary-color-hover);
+  background-color: var(--secondary-color-hover);
 }
 
 .admin-panel .content-main .content-body .box-title {
-    color: var(--secondary-color);
-    font-size: 1.785rem;
+  color: var(--secondary-color);
+  font-size: 1.785rem;
 }
 
-.admin-panel .content-main .content-body input {
-    webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-clip: padding-box;
-    background-color: #fff;
-    border: 1px solid #dce7f1;
-    border-radius: 0.4rem;
-    /* color: #72a18b; */
-    display: block;
-    font-size: 1.785rem;
-    font-weight: 300;
-    line-height: 1.8;
-    /* padding: 0.375rem 0.75rem; */
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-    width: 100%;
+.admin-panel .content-main .content-body input,
+.admin-panel .content-main .content-body textarea {
+  webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-clip: padding-box;
+  background-color: #fff;
+  border: 1px solid #dce7f1;
+  border-radius: 0.4rem;
+  /* color: #72a18b; */
+  display: block;
+  font-size: 1.785rem;
+  text-transform: no;
+  font-weight: 300;
+  line-height: 1.8;
+  /* padding: 0.375rem 0.75rem; */
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  width: 100%;
 }
 
 .admin-panel .content-main .content-body input[disabled] {
-    background-color: #eee;
+  background-color: #eee;
 }
 
 .admin-panel .content-main .content-body .btn-refresh {
-    margin-top: 20px;
-    font-size: 1.785rem;
-    background-color: var(--secondary-color);
-    color: #fff;
-    line-height: 1.8;
+  margin-top: 20px;
+  font-size: 1.785rem;
+  background-color: var(--secondary-color);
+  color: #fff;
+  line-height: 1.8;
 }
 
-
 .admin-panel .table-responsive::-webkit-scrollbar {
-    /* width: 15px; */
-    height: 8px;
-    background-color: #eee;
+  /* width: 15px; */
+  height: 8px;
+  background-color: #eee;
 }
 
 .admin-panel .table-responsive::-webkit-scrollbar-thumb {
-    background-color: var(--sub-text-color);
-    border-radius: 8px;
-
+  background-color: var(--sub-text-color);
+  border-radius: 8px;
 }
 
 .admin-panel .content-main .content-body table * {
-    font-size: 1.875rem;
-    font-weight: 350;
-    text-wrap: nowrap;
+  font-size: 1.875rem;
+  font-weight: 350;
+  text-wrap: nowrap;
 }
 
 /* .admin-panel .content-main .content-body table{
@@ -98,107 +98,105 @@
 
 .admin-panel .content-main .content-body table th,
 .admin-panel .content-main .content-body table td {
-    padding: 10px;
+  padding: 10px;
 }
 
 .admin-panel .content-main .content-body table thead * {
-    font-weight: 600;
+  font-weight: 600;
 }
 
 .admin-panel .content-main .content-body table tbody td div.action-btns button {
-    margin: 0 5px;
-    border-radius: 0.4rem;
-    padding: 3px 5px;
-    line-height: 1.5;
+  margin: 0 5px;
+  border-radius: 0.4rem;
+  padding: 3px 5px;
+  line-height: 1.5;
 }
 
 .admin-panel .btn-save {
-    background-color: var(--secondary-color);
-    color: #fff;
+  background-color: var(--secondary-color);
+  color: #fff;
 }
 
-
 .admin-panel .btn-save:hover {
-    background-color: var(--secondary-color-hover);
+  background-color: var(--secondary-color-hover);
 }
 
 .pull-right {
-    float: right;
+  float: right;
 }
 
 .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
-.table.b-table.table-sm>tfoot>tr>[aria-sort]:not(.b-table-sort-icon-left),
-.table.b-table.table-sm>thead>tr>[aria-sort]:not(.b-table-sort-icon-left) {
-    background-position: right 0.15rem center;
-    padding-right: calc(0.3rem + 0.65em);
+.table.b-table.table-sm > tfoot > tr > [aria-sort]:not(.b-table-sort-icon-left),
+.table.b-table.table-sm
+  > thead
+  > tr
+  > [aria-sort]:not(.b-table-sort-icon-left) {
+  background-position: right 0.15rem center;
+  padding-right: calc(0.3rem + 0.65em);
 }
-
-
 
 .modal * {
-    font-size: 1.865rem;
+  font-size: 1.865rem;
 }
 
 .modal-content {
-    border-radius: 8px;
-    margin: 0;
+  border-radius: 8px;
+  margin: 0;
 }
 
 .modal-header {
-    padding: 20px;
+  padding: 20px;
 }
 
 .modal-header h5 {
-    font-size: 2.345rem;
+  font-size: 2.345rem;
 }
 
 .modal-body {
-    padding: 20px 10px;
+  padding: 20px 10px;
 }
 
 .modal-body form {
-    padding: 0 20px;
+  padding: 0 20px;
 }
 
 .modal-body form label {
-    text-transform: none;
-    font-weight: 400;
+  text-transform: none;
+  font-weight: 400;
 }
-
 
 .create-form-page form label,
 .create-form-page form i {
-    font-size: 1.965rem;
-    font-weight: 400;
+  font-size: 1.965rem;
+  font-weight: 400;
 }
 
-.create-form-page form h3{
-    color: var(--secondary-color);
-    font-size: 2.565rem;
+.create-form-page form h3 {
+  color: var(--secondary-color);
+  font-size: 2.565rem;
 }
-
-
 
 .lookup-modal {
-    cursor: pointer;
-    max-height: 60vh;
-    overflow-y: auto;
+  cursor: pointer;
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
-.lookup-modal:hover, .lookup-modal.active {
-    background-color: var(--secondary-color);
+.lookup-modal:hover,
+.lookup-modal.active {
+  background-color: var(--secondary-color);
 }
 
-.lookup-modal *{
-    text-transform: none;
+.lookup-modal * {
+  text-transform: none;
 }

@@ -225,7 +225,7 @@ const EventForm = (props) => {
             <div className="col-md-6">
               <label htmlFor="eventInputDescription">Event Description</label>
               <i className="text-danger">*</i>
-              <input
+              <textarea
                 id="eventInputDescription"
                 type="text"
                 name="description"
