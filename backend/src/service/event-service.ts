@@ -320,30 +320,74 @@ export class EventService extends BaseService implements IEventService {
             let isEvent = await Events.findOne({
                 where: {
                     id: id,
-                }
+                },
+                raw: true,
+                attributes: ['id']
             })
 
+            console.log(isEvent)
             if (isEvent) {
 
-                let updatedRecord = await Events.update({
-                    ...dtoRecord,
-                    updatedAt: recordModifiedInfo.updatedAt,
-                    updatedById: recordModifiedInfo.updatedById
-                }, {
+                let eventImages : EventImageDto = await EventImages.findOne({
                     where: {
-                        id: id
-                    }
+                        eventId: id,
+                        isCoverImage: true
+                    },
+                    raw: true,
+                    attributes: ['id']
                 })
 
-                if (updatedRecord !== undefined || updatedRecord !== null) {
-                    apiResponse = new ApiResponseDto()
-                    apiResponse.status = 1;
-                    apiResponse.data = { status: parseInt(updatedRecord[0]), message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
-                    return apiResponse;
+            console.log( eventImages)
+
+                if (eventImages) {
+
+                    let updatedRecord = await Events.update({
+                        ...dtoRecord,
+                        updatedAt: recordModifiedInfo.updatedAt,
+                        updatedById: recordModifiedInfo.updatedById
+                    }, {
+                        where: {
+                            id: id
+                        }
+                    })
+
+                    if (updatedRecord !== undefined || updatedRecord !== null) {
+                        apiResponse = new ApiResponseDto()
+                        apiResponse.status = 1;
+                        apiResponse.data = { status: parseInt(updatedRecord[0]), message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
+                        return apiResponse;
+                    }
+                    else {
+                        return undefined
+                    }
                 }
                 else {
-                    return undefined
+
+                    const recordCreatedInfo = this.SetRecordCreatedInfo(dtoRecord);
+
+                    let dtoImageRecord: EventImageDto = new EventImageDto();
+                    dtoImageRecord.eventId = isEvent.id;
+                    dtoImageRecord.imageURL = dtoRecord.mainImageURL;
+                    dtoImageRecord.isCoverImage = true;
+                    dtoImageRecord.createdAt = recordCreatedInfo.createdAt;
+                    dtoImageRecord.createdById = recordCreatedInfo.createdById;
+                    dtoImageRecord.updatedAt = recordModifiedInfo.updatedAt;
+                    dtoImageRecord.updatedById = recordModifiedInfo.updatedById;
+
+
+                    const isCreatedImages = await EventImages.create(dtoImageRecord)
+
+                    if(!isCreatedImages){
+                        return undefined;
+                    }
+                    // console.log("EventImages: ", eventImages)
+                    apiResponse = new ApiResponseDto();
+                    apiResponse.status = 1;
+                    apiResponse.data = { status: 200, message: EnumApiResponseMsg[EnumApiResponse.UPDATED_SUCCESS] };
+
+                    return apiResponse;
                 }
+
             }
             else {
                 apiResponse = new ApiResponseDto()
@@ -380,7 +424,8 @@ export class EventService extends BaseService implements IEventService {
                 where: {
                     eventId: id,
                 },
-                attributes : ['imageURL']
+                raw: true,
+                attributes: ['imageURL']
             });
 
             //No entry of EventImages is found, then continue; else remove all those entries
@@ -442,7 +487,7 @@ export class EventService extends BaseService implements IEventService {
                 where: {
                     id: id,
                 },
-                attributes : ['imageURL']
+                attributes: ['imageURL']
             });
 
             //No entry of EventImages is found
@@ -483,7 +528,7 @@ export class EventService extends BaseService implements IEventService {
      * Remove mainImage of Event
      * @param id 
      */
-    public async RemoveEventMainImage(eventId: number): Promise<ApiResponseDto | undefined>{
+    public async RemoveEventMainImage(eventId: number): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
 
         try {
@@ -493,17 +538,17 @@ export class EventService extends BaseService implements IEventService {
                     eventId: eventId,
                     isCoverImage: true
                 },
-                attributes :['imageURL']
+                attributes: ['imageURL']
             });
 
             //No entry of EventImages is found
             if (!eventImages) {
                 apiResponse = new ApiResponseDto()
-                apiResponse.status = 0;
-                let errorDto = new ErrorDto();
-                errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_RECORD_NOT_FOUND].toString();
-                errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_RECORD_NOT_FOUND]
-                apiResponse.error = errorDto;
+                apiResponse.status = 1;
+                apiResponse.data = {
+                    status: 200,
+                    message: EnumErrorMsgText[EnumErrorMsg.API_RECORD_NOT_FOUND]
+                }
                 return apiResponse;
             }
 

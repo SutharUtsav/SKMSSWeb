@@ -17,7 +17,7 @@ const responseCode = {
  * @returns 
  */
 export const RemoveFile = async (filePath: string) => {
-    const absoluteFilePath = path.resolve(filePath);
+  const absoluteFilePath = path.resolve(filePath);
 
     // Check if the file exists before attempting to delete it
     if (fs.existsSync(absoluteFilePath)) {
@@ -49,7 +49,7 @@ export const RemoveFile = async (filePath: string) => {
  */
 export const RemoveFilesFromDirectory = async (directoryPath: string) => {
 
-    fs.readdir(directoryPath, (err:any, files:any) => {
+    await fs.readdir(directoryPath, (err:any, files:any) => {
         if (err) {
           console.error('Error reading directory:', err);
           return;
