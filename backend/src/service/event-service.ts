@@ -363,6 +363,16 @@ export class EventService extends BaseService implements IEventService {
                 }
                 else {
 
+                    let updatedRecord = await Events.update({
+                        ...dtoRecord,
+                        updatedAt: recordModifiedInfo.updatedAt,
+                        updatedById: recordModifiedInfo.updatedById
+                    }, {
+                        where: {
+                            id: id
+                        }
+                    })
+
                     const recordCreatedInfo = this.SetRecordCreatedInfo(dtoRecord);
 
                     let dtoImageRecord: EventImageDto = new EventImageDto();
@@ -377,7 +387,7 @@ export class EventService extends BaseService implements IEventService {
 
                     const isCreatedImages = await EventImages.create(dtoImageRecord)
 
-                    if(!isCreatedImages){
+                    if(!isCreatedImages || !updatedRecord){
                         return undefined;
                     }
                     // console.log("EventImages: ", eventImages)

@@ -111,7 +111,7 @@ router.post('/images', uploadEventImages, async (req: any, res: any) => {
 
                 if (!eventImagesDto || eventImagesDto instanceof ErrorDto) {
                     await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
-                    outputFilePaths.forEach(async (outputFilePath : string)=> {
+                    outputFilePaths.forEach(async (outputFilePath: string) => {
                         await RemoveFile(outputFilePath);
                     })
                     res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
@@ -122,7 +122,7 @@ router.post('/images', uploadEventImages, async (req: any, res: any) => {
 
                     await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
                     if (!response) {
-                        outputFilePaths.forEach(async (outputFilePath : string)=> {
+                        outputFilePaths.forEach(async (outputFilePath: string) => {
                             await RemoveFile(outputFilePath);
                         })
                         res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
@@ -130,8 +130,8 @@ router.post('/images', uploadEventImages, async (req: any, res: any) => {
                             message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
                         })
                     }
-                    else if (response?.status === 0){
-                        await outputFilePaths.forEach(async (outputFilePath : string)=> {
+                    else if (response?.status === 0) {
+                        await outputFilePaths.forEach(async (outputFilePath: string) => {
                             await RemoveFile(outputFilePath);
                         })
                     }
@@ -286,72 +286,84 @@ const uploadEventMainImage = multer({
  */
 router.post('/', uploadEventMainImage, async (req: any, res: any) => {
 
-    let eventDto: EventDto | ErrorDto | undefined = validateEvent(req.body);
-    //let eventImageDtos : EventImageDto[] | ErrorDto | undefined = validateEventImages(req.body);
-    // console.log("EventDto :", eventDto)
+    try {
 
-    if (!eventDto) {
-        res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
-    }
-    else if (eventDto instanceof ErrorDto) {
-        res.status(parseInt(eventDto.errorCode)).send(eventDto);
-    }
-    else {
-        const imageURL = req.file.path;
-        // const imageFileName = req.file.filename
-        const outputDir = 'Images/Event-Webp';
-        const outputFile = `${Date.now()}-event.webp`;
 
-        // Ensure the output directory exists
-        if (!fs.existsSync(outputDir)) {
-            fs.mkdirSync(outputDir, { recursive: true });
+        let eventDto: EventDto | ErrorDto | undefined = validateEvent(req.body);
+        //let eventImageDtos : EventImageDto[] | ErrorDto | undefined = validateEventImages(req.body);
+        // console.log("EventDto :", eventDto)
+
+        if (!eventDto) {
+            res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
         }
+        else if (eventDto instanceof ErrorDto) {
+            res.status(parseInt(eventDto.errorCode)).send(eventDto);
+        }
+        else {
 
-        const outputFilePath = path.join(outputDir, outputFile);
 
-        sharp(imageURL)
-            .rotate()
-            .webp({ quality: 60 }) // convert to webp format
-            .toFile(outputFilePath)
-            .then(async (data: any) => {
-                if (eventDto instanceof EventDto) {
-                    eventDto.mainImageURL = outputFilePath;
+            const imageURL = req.file.path;
+            // const imageFileName = req.file.filename
+            const outputDir = 'Images/Event-Webp';
+            const outputFile = `${Date.now()}-event.webp`;
 
-                    if (!eventDto.mainImageURL) {
-                        await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
-                        res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
+            // Ensure the output directory exists
+            if (!fs.existsSync(outputDir)) {
+                fs.mkdirSync(outputDir, { recursive: true });
+            }
+
+            const outputFilePath = path.join(outputDir, outputFile);
+
+            sharp(imageURL)
+                .rotate()
+                .webp({ quality: 60 }) // convert to webp format
+                .toFile(outputFilePath)
+                .then(async (data: any) => {
+                    if (eventDto instanceof EventDto) {
+                        eventDto.mainImageURL = outputFilePath;
+
+                        if (!eventDto.mainImageURL) {
+                            await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
+                            res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
+                        }
+                        else {
+                            const eventService: IEventService = new EventService();
+                            const response = await eventService.Create(eventDto);
+
+                            await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
+                            if (!response) {
+                                await RemoveFile(outputFilePath);
+                                res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                                    status: 0,
+                                    message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+                                })
+                            }
+                            else if (response?.status === 0) {
+                                await RemoveFile(outputFilePath);
+                                res.send(response)
+                            }
+                            else if (response instanceof ApiResponseDto) {
+                                res.send(response)
+                            }
+                        }
+
                     }
-                    else {
-                        const eventService: IEventService = new EventService();
-                        const response = await eventService.Create(eventDto);
-
-                        await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
-                        if (!response) {
-                            await RemoveFile(outputFilePath);
-                            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
-                                status: 0,
-                                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
-                            })
-                        }
-                        else if(response?.status === 0){
-                            await RemoveFile(outputFilePath);
-                            res.send(response)
-                        }
-                        else if (response instanceof ApiResponseDto) {
-                            res.send(response)
-                        }
-                    }
-
-                }
-            })
-            .catch(async (error: any) => {
-                await RemoveFile(outputFilePath);
-                // await RemoveFile(process.cwd() + '/Images/Event');
-                res.status(400).send({
-                    status: 0,
-                    message: String(error)
                 })
-            })
+                .catch(async (error: any) => {
+                    await RemoveFile(outputFilePath);
+                    // await RemoveFile(process.cwd() + '/Images/Event');
+                    res.status(500).send({
+                        status: 0,
+                        message: String(error)
+                    })
+                })
+        }
+    }
+    catch (error: any) {
+        res.status(500).send({
+            status: 0,
+            message: String(error)
+        })
     }
 });
 
@@ -384,7 +396,6 @@ router.put('/', uploadEventMainImage, async (req: any, res: any) => {
 
             const eventService: IEventService = new EventService();
 
-            await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
             //check for image file to be updated
             if (req.file?.path) {
 
@@ -418,16 +429,19 @@ router.put('/', uploadEventMainImage, async (req: any, res: any) => {
                                 message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
                             })
                         }
-                        else if(response?.status === 0){
+                        else if (response?.status === 0) {
                             await RemoveFile(outputFilePath);
                             res.send(response)
                         }
                         else {
                             res.send(response)
                         }
+
+                        await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
                     })
-                    .catch(async(error : any)=>{
+                    .catch(async (error: any) => {
                         await RemoveFile(outputFilePath);
+                        await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
                         res.status(400).send({
                             status: 0,
                             message: String(error)
