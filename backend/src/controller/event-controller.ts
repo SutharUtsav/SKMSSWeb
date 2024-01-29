@@ -139,7 +139,6 @@ router.post('/images', uploadEventImages, async (req: any, res: any) => {
                         res.send(response)
                     }
 
-                    res.send({});
                 }
 
             })

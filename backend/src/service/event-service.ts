@@ -607,6 +607,7 @@ export class EventService extends BaseService implements IEventService {
                 where: {
                     id: id
                 },
+                raw: true,
                 attributes: ['id']
             });
 
