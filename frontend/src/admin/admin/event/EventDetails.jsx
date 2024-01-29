@@ -127,7 +127,9 @@ const EventDetails = () => {
           </button>
         </div>
       </form>
-
+      
+      <br />
+      <h3 className="text-center mt-3 pt-5 fs-1 border-top" style={{textTransform:"none"}} >Preview of an Event</h3>
       <Event />
     </div>
   );
