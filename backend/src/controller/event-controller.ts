@@ -67,6 +67,45 @@ router.get('/images', async (req: any, res: any) => {
 })
 
 
+/**
+ * CDN for event image based on filePath
+ */
+router.get('/image/:fileName', async (req: any, res: any) => {
+    try {
+        // const filePath = req.query.path;
+
+        const fileName = req.params.fileName;
+        const filePath = path.join('Images/Event-Webp', fileName);
+
+
+        console.log(filePath)
+        if (fs.existsSync(filePath)) {
+            console.log("File Exist")
+            // Read the file and send it in the response
+            const fileStream = fs.createReadStream(filePath);
+            fileStream.pipe(res);
+        } else {
+            let apiResponse = new ApiResponseDto();
+            apiResponse.status = 1;
+            apiResponse.data = {
+                status: 404,
+                message: "File not found"
+            }
+            res.status(404).send(apiResponse);
+        }
+    }
+    catch (error: any) {
+        console.log(error);
+        let apiResponse = new ApiResponseDto();
+        apiResponse.status = 0;
+        apiResponse.error = new ErrorDto();
+        apiResponse.error.errorCode = "500";
+        apiResponse.error.errorMsg = error
+        res.status(500).send(error);
+    }
+})
+
+
 const uploadEventImages = multer({
     storage: EventImagesStorage,
     limits: { fileSize: "5000000" }, //5 MB
