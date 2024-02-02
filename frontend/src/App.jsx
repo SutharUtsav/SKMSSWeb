@@ -40,7 +40,8 @@ function App() {
           roleId: user.roleId,
           name: user.name,
           roleName: user.role,
-          userType: user.userType
+          userType: user.userType,
+          userImage: user.userImage
         }})
       }
     }
