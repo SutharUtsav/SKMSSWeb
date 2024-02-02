@@ -1,11 +1,11 @@
 import { EnumApiResponse, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { PermissionDto, RoleDto } from "../dtos/role-dto";
-import { UserDto, UserProfileDto } from "../dtos/user-dto";
+import { UserDto, UserProfileDto, UserProfileImageDto } from "../dtos/user-dto";
 import { encrypt } from "../helper/encryption-handling";
 import { Role, RolePermission, RoleRolePermission } from "../model/role";
 import { User } from "../model/user";
-import { UserProfile } from "../model/userProfile";
+import { UserProfile, UserProfileImage } from "../model/userProfile";
 import { BaseService } from "./base-service";
 
 var jwt = require('jsonwebtoken');
@@ -79,7 +79,16 @@ export class AuthService extends BaseService implements IAuthService {
                         raw: true
                     })
 
+
                     if (user) {
+
+                        let userProfileImage: UserProfileImageDto = await UserProfileImage.findOne({
+                            where: {
+                                userId: userProfile.userId
+                            },
+                            attributes: ['image'],
+                            raw: true
+                        })
 
                         let role: RoleDto = await Role.findOne({
                             raw: true,
@@ -102,9 +111,17 @@ export class AuthService extends BaseService implements IAuthService {
                             
                             apiResponse = new ApiResponseDto();
                             apiResponse.status = 1;
-                            apiResponse.data = {
-                                user: {...user, roleName : role.name},
-                                accessToken: accessToken,
+                            if(userProfileImage){
+                                apiResponse.data = {
+                                    user: {...user, roleName : role.name, userImage: `http://${process.env["LOCAL_URL"]}${process.env["LOCAL_SUBURL"]}/image/profile-image/${userProfileImage.image}`},
+                                    accessToken: accessToken,
+                                }    
+                            }
+                            else{
+                                apiResponse.data = {
+                                    user: {...user, roleName : role.name},
+                                    accessToken: accessToken,
+                                }
                             }
                             
                         }

@@ -132,7 +132,7 @@ const uploadProfilePicture = multer({
     storage: profilePictureStorage,
     limits: { fileSize: "10000000" }, //10 MB
     fileFilter: (req: any, file: any, cb: any) => {
-        const fileTypes = /jpeg|png|jpg|JPG|JPEG|PNG/
+        const fileTypes = /jpeg|png|jpg|JPG|JPEG|PNG|webp/
         const mimeType = fileTypes.test(file.mimetype)
         const extname = fileTypes.test(path.extname(file.originalname))
 
