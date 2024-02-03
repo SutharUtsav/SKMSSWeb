@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import useApiCall from '../../../hooks/useApiCall';
 import { del, get } from '../../../service/api-service';
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { MdDelete } from "react-icons/md";
 import { FaEye } from "react-icons/fa";
 import { BiEdit } from "react-icons/bi";
 import DecisionModal from '../../master/decisionmodal/DecisionModal';
+import TableContainer from '../../master/table/TableContainer';
 
 const Event = () => {
 
@@ -64,6 +65,75 @@ const Event = () => {
             });
     };
 
+
+    const columns = useMemo(() => [
+        {
+            Header: "Event",
+            columns: [
+                {
+                    Header: "Id",
+                    accessor: "id"
+                },
+                {
+                    Header: "Title",
+                    accessor: "title"
+                },
+                {
+                    Header: "Description",
+                    accessor: "description"
+                },
+                {
+                    Header: "EventDate",
+                    accessor: "eventOn"
+                },
+                {
+                    Header: "Action",
+                    Cell: (props) => {
+                        return (
+                            <td aria-colindex="5" data-label="Actions" role="cell">
+                                <div className="action-btns">
+                                    <button
+                                        title=" Preview or Upload More Images"
+                                        className="btn btn-sm btn-success"
+                                        onClick={() => {
+                                            navigate(`/admin/events/details/${props.id}`)
+                                        }}
+                                    >
+                                        <FaEye
+                                            fill="#fff"
+                                            size={"2.5rem"}
+                                            className="m-1"
+                                        />
+                                    </button>
+                                    <button
+                                        title="Edit"
+                                        className="btn btn-sm btn-primary btn-edit"
+                                        onClick={() => {
+                                            navigate(`/admin/events/edit/${props.id}`)
+                                        }}
+                                    >
+                                        <BiEdit fill="#fff" size={"2.5rem"} className="m-1" />
+                                    </button>
+                                    <button
+                                        title="Delete"
+                                        className="btn btn-sm btn-danger btn-delete"
+                                        data-bs-toggle="modal"
+                                        data-bs-target={`#${EnumConsts.DECISIONMODALID}`}
+                                        onClick={() => {
+                                            setdeleteRecordId(props.id);
+                                        }}
+                                    >
+                                        <MdDelete fill="#fff" size={"2.5rem"} className="m-1" />
+                                    </button>
+                                </div>
+                            </td>
+                        )
+                    }
+                },
+            ]
+        }
+    ])
+
     return (
         <>
             <div className="events content">
@@ -93,7 +163,7 @@ const Event = () => {
                     </div>
 
                     <div className="card-body content-body">
-                        <div className="row mb-2">
+                        {/* <div className="row mb-2">
                             <div className="input-search col-md-3 offset-md-8">
                                 <h4 className="box-title">Search</h4>
                                 <input
@@ -108,9 +178,15 @@ const Event = () => {
                                     <BiRefresh fill="#fff" size="2.5rem" />
                                 </button>
                             </div>
-                        </div>
+                        </div> */}
 
                         {data && data.status === 1 ? (
+                            <TableContainer columns={columns} data={data.data} />
+                        ) : (
+                            <>loading</>
+                        )}
+
+                        {/* {data && data.status === 1 ? (
                             <div className="table-responsive mt-5">
                                 <table
                                     role="table"
@@ -129,7 +205,6 @@ const Event = () => {
                                                 aria-sort="none"
                                             >
                                                 <div>ID</div>
-                                                {/* <span className='sr-only'> (Click to sort ascending) </span> */}
                                             </th>
 
                                             <th
@@ -141,7 +216,6 @@ const Event = () => {
                                                 aria-sort="none"
                                             >
                                                 <div>Title</div>
-                                                {/* <span className='sr-only'> (Click to sort ascending) </span> */}
                                             </th>
 
                                             <th
@@ -153,7 +227,6 @@ const Event = () => {
                                                 aria-sort="none"
                                             >
                                                 <div>Discription</div>
-                                                {/* <span className='sr-only'> (Click to sort ascending) </span> */}
                                             </th>
 
                                             <th
@@ -165,7 +238,6 @@ const Event = () => {
                                                 aria-sort="none"
                                             >
                                                 <div>Event Date</div>
-                                                {/* <span className='sr-only'> (Click to sort ascending) </span> */}
                                             </th>
                                         </tr>
                                     </thead>
@@ -231,7 +303,7 @@ const Event = () => {
                             </div>
                         ) : (
                             <>loading</>
-                        )}
+                        )} */}
                     </div>
 
                 </div>

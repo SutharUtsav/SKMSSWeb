@@ -10,6 +10,7 @@ const EventDetails = () => {
 
   const [imageFiles, setimageFiles] = useState([]);
   const [error, seterror] = useState(null);
+  const [relaodEvent, setrelaodEvent] = useState(false);
 
   const handleSubmitForm = (e) => {
     e.preventDefault();
@@ -35,13 +36,16 @@ const EventDetails = () => {
       .then((response) => {
         if(response.data.status === 1){
           console.log(response.data.data)
+          setrelaodEvent(true);
         }
         else{
           console.log(response)
+          setrelaodEvent(false);
         }
       })
       .catch((error) => {
         console.log(error);
+        setrelaodEvent(false);
       })
       .finally(() => {
         setimageFiles([]);
@@ -122,7 +126,7 @@ const EventDetails = () => {
               ))}
             </div>
           ) : null}
-          <button type="submit" className="upload-button">
+          <button type="submit" className="upload-button" disabled={!imageFiles || imageFiles.length <= 0 || error}>
             Upload
           </button>
         </div>
@@ -130,7 +134,7 @@ const EventDetails = () => {
       
       <br />
       <h3 className="text-center mt-3 pt-5 fs-1 border-top" style={{textTransform:"none"}} >Preview of an Event</h3>
-      <Event />
+      <Event relaodEvent={relaodEvent} setrelaodEvent={setrelaodEvent}/>
     </div>
   );
 };

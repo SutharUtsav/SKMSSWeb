@@ -5,54 +5,75 @@ import EventImg from "../../images/event.jpg";
 import { get } from "../../service/api-service";
 import { EnumMonths } from "../../consts/EnumMonths";
 
-const Event = () => {
+const Event = (props) => {
   const params = useParams();
   const eventId = params.id;
   const defaultEvent = {
-    title : "Social Gettogether at Samajwadi",
+    title: "Social Gettogether at Samajwadi",
     description: `The hyphenated term, get-together, is a noun that describes a
     casual social gathering. The word get-together came into use at
     the beginning of the twentieth century. Remember, the verb
     phrase get together is never hyphenated, the noun form
     get-together is always hyphenated.`,
-    eventDate : "1",
+    eventDate: "1",
     eventMonth: "May",
     eventYear: "2024",
-    images: {EventImg},
-    mainImage: {EventImg}
   }
 
   const [event, setevent] = useState(defaultEvent);
+  const [eventImages, seteventImages] = useState([EventImg])
+  const [eventMainImage, setEventMainImage] = useState(EventImg);
+
+  useEffect(() => {
+    if (eventId || props.relaodEvent === true) {
+      get(`/event/${eventId}`)
+        .then((response) => {
+          if (response.data.status === 1) {
+            const localEvent = response.data.data
+            const eventOn = new Date(response.data.data?.eventOn);
+
+            setevent({
+              ...event,
+              title: localEvent.title,
+              description: localEvent.description,
+              eventDate: eventOn.getDate(),
+              eventMonth: EnumMonths[eventOn.getMonth()],
+              eventYear: eventOn.getFullYear(),
+            })
+
+            if (localEvent.mainImageURL) {
+              setEventMainImage(localEvent.mainImageURL)
+            }
+            console.log(localEvent.imageURLs)
+            if(localEvent.imageURLs && localEvent.imageURLs.length > 0){
+              
+              seteventImages(localEvent.imageURLs)
+            }
+          }
+          else {
+            setevent(defaultEvent)
+            seteventImages([EventImg])
+            setEventMainImage(EventImg)
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+          setevent(defaultEvent)
+          seteventImages([EventImg])
+          setEventMainImage(EventImg)
+        })
+        .finally(()=>{
+          if(props.seteventImages){
+            props.seteventImages(false)
+          }
+        })
+    }
+  }, [eventId, props.relaodEvent]);
 
 
   useEffect(() => {
-    if (eventId) {
-      get(`/event/${eventId}`)
-      .then((response) => {
-        if(response.data.status === 1){
-          const localEvent = response.data.data
-          const eventOn = new Date(response.data.data?.eventOn);
-          
-          setevent({
-            ...event,
-            title: localEvent.title,
-            description: localEvent.description,
-            eventDate: eventOn.getDate(),
-            eventMonth: EnumMonths[eventOn.getMonth()],
-            eventYear: eventOn.getFullYear(), 
-          })
-        }
-        else{
-          setevent(defaultEvent)
-        }
-      })
-      .catch((error)=>{
-        console.log(error)
-        setevent(defaultEvent)
-      })
-    }
-  }, [eventId]);
-
+  console.log(eventImages.length) 
+  }, [eventImages])
   return (
     <section className="events-list-section">
       <div className="container">
@@ -77,28 +98,26 @@ const Event = () => {
                 </div>
               </div>
               <div className="main-image-container shadow">
-                <img src={EventImg} alt="event" loading="lazy"/>
+                <img src={eventMainImage} alt="event" loading="lazy" />
               </div>
             </div>
 
             <div className="event-desc">
               <h5 className="event-title">{event.title}</h5>
-              <p className="event-description">
+              <p className="event-description" style={{textTransform:"none"}}>
                 {event.description}
               </p>
             </div>
 
-            <div className="image-wrapper">
-              <div className="image-container shadow">
-                <img src={EventImg} alt="event" />
+            {eventImages && eventImages.length > 0 ? (
+              <div className="image-wrapper">
+                {eventImages.map((image, index) => (
+                  <div className="image-container shadow" key={index}>
+                    <img src={image} alt="event" />
+                  </div>
+                ))}
               </div>
-              <div className="image-container shadow">
-                <img src={EventImg} alt="event" />
-              </div>
-              <div className="image-container shadow">
-                <img src={EventImg} alt="event" />
-              </div>
-            </div>
+            ) : null}
           </div>
         </div>
       </div>

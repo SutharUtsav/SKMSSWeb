@@ -72,7 +72,7 @@ const UserDetails = () => {
     <div className="user-details p-5 m-4 d-flex flex-column justify-content-center align-items-center">
       <div className="user-image shadow">
         {userProfileImage 
-        ? <img src={'http://'+userProfileImage} alt="user-profile" />
+        ? <img src={userProfileImage} alt="user-profile" />
         : <img src={UserImage} alt="user-profile" />
         }
         <button title="Upload Image" className="edit-btn" data-bs-toggle="modal" data-bs-target="#uploadProfileImageModal">

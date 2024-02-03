@@ -105,6 +105,7 @@ const UserProfileImageModal = (props) => {
                         type="file"
                         className="default-file-input"
                         name="image"
+                        accept="image/*"
                         onChange={(e) => {
                           const file = e.target.files[0];
 
@@ -154,7 +155,7 @@ const UserProfileImageModal = (props) => {
                   </div>
                 ) : null}
 
-                <button type="submit" className="upload-button">
+                <button type="submit" className="upload-button" disabled={!selectedFile}>
                   Upload
                 </button>
               </div>
@@ -163,6 +164,7 @@ const UserProfileImageModal = (props) => {
               type="button"
               className="upload-button bg-danger"
               onClick={handleRemoveProfileImage}
+              disabled={!selectedFile}
             >
               Remove Image
             </button>

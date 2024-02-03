@@ -46,10 +46,10 @@
 
 .admin-panel .profile .profile-dropdown li{
     font-size: 1.565rem;
-    
-    padding: 5px;
 }
 
 .admin-panel .profile .profile-dropdown li *{
     font-weight: 400;
+    padding: 5px;
+    text-align: center;
 }
