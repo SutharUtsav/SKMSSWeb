@@ -545,7 +545,8 @@ export class UserService extends BaseService implements IUserService {
             let userProfile: UserProfileDto = await UserProfile.findOne({
                 where: {
                     userId: id
-                }
+                },
+                attributes: UserProfileFieldsArr
             });
 
             if (userProfile) {
@@ -678,7 +679,7 @@ export class UserService extends BaseService implements IUserService {
             });
 
             if (userProfileImage) {
-                userProfileImage.image = `localhost:3303/api/v1/image/profile-image/${userProfileImage.image}`
+                userProfileImage.image = `http://${process.env["LOCAL_URL"]}${process.env["LOCAL_SUBURL"]}/image/profile-image/${userProfileImage.image}`
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
                 apiResponse.data = userProfileImage;

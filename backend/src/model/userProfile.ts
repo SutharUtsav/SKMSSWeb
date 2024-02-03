@@ -175,4 +175,4 @@ export const UserProfileImage = sequelize.define('UserProfileImage', {
 }, { tableName: 'UserProfileImage' })
 
 
-export const UserProfileFieldsArr = [...commonFieldsArr, 'userId', 'name', 'surname', 'wifeSurname', 'village', 'marriedStatus', 'education', 'occupation', 'mobileNumber', 'email', 'countryCode', 'familyId', 'gender', 'isMainFamilyMember', 'mainFamilyMemberId', 'mainFamilyMemberRelation', 'motherId', 'motherName', 'fatherId', 'fatherName', 'birthDate', 'weddingDate', 'password'];
+export const UserProfileFieldsArr = [...commonFieldsArr, 'userId', 'name', 'surname', 'wifeSurname', 'village', 'marriedStatus', 'education', 'occupation', 'mobileNumber', 'email', 'countryCode', 'familyId', 'gender', 'isMainFamilyMember', 'mainFamilyMemberId', 'mainFamilyMemberRelation', 'motherId', 'motherName', 'fatherId', 'fatherName', 'birthDate', 'weddingDate'];

@@ -354,11 +354,11 @@ router.post('/', uploadEventMainImage, async (req: any, res: any) => {
 
             sharp(imageURL)
                 .rotate()
-                .webp({ quality: 60 }) // convert to webp format
+                .webp({ quality: 90, lossless: true }) // convert to webp format
                 .toFile(outputFilePath)
                 .then(async (data: any) => {
                     if (eventDto instanceof EventDto) {
-                        eventDto.mainImageURL = outputFilePath;
+                        eventDto.mainImageURL = outputFile;
 
                         if (!eventDto.mainImageURL) {
                             await RemoveFilesFromDirectory(process.cwd() + '/Images/Event');
@@ -450,14 +450,14 @@ router.put('/', uploadEventMainImage, async (req: any, res: any) => {
                 const outputFilePath = path.join(outputDir, outputFile);
                 sharp(imageURL)
                     .rotate()
-                    .webp({ quality: 60 }) // convert to webp format
+                    .webp({  quality: 90, lossless: true }) // convert to webp format
                     .toFile(outputFilePath)
                     .then(async (data: any) => {
 
                         let response: any = await eventService.RemoveEventMainImage(id);
 
                         if (response?.status == 1 && eventDto instanceof EventDto) {
-                            eventDto.mainImageURL = outputFilePath;
+                            eventDto.mainImageURL = outputFile;
                             response = await eventService.Update(eventDto, id);
                         }
 
@@ -538,7 +538,8 @@ router.delete('/', async (req: any, res: any) => {
 
 const convertToWebP = async (filePaths: string[], outputDir: string) => {
 
-    const outputFilePaths: string[] = [];
+    let outputFiles: string[] = [];
+    let outputFilePaths: string[] = [];
 
     try {
         // Ensure the output directory exists
@@ -555,12 +556,13 @@ const convertToWebP = async (filePaths: string[], outputDir: string) => {
                 .webp({ quality: 60 })
                 .toFile(outputFilePath)
 
+            outputFiles.push(outputFile);
             outputFilePaths.push(outputFilePath);
             console.log(`${imageURL} converted to ${outputFilePath}`);
         });
         await Promise.all(conversionPromises);
 
-        return outputFilePaths;
+        return outputFiles;
     }
     catch (error) {
         // Handle exceptions by cleaning up created files

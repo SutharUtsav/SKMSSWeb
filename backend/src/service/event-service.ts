@@ -8,6 +8,7 @@ import { EventImages } from "../model/eventImage";
 import { BaseService } from "./base-service";
 
 const sequelize = require('../config/db')
+const _ = require('lodash');
 
 export interface IEventService {
     /**
@@ -162,13 +163,45 @@ export class EventService extends BaseService implements IEventService {
             let event: EventDto = await Events.findOne({
                 where: {
                     id: id
-                }
+                },
+                raw: true
             });
 
             if (event) {
+
+                let eventImages: EventImageDto[] = await EventImages.findAll({
+                    where:{ 
+                        eventId: id
+                    },
+                    raw: true,
+                    attributes: ['imageURL', 'isCoverImage']
+                })
+
+                
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                apiResponse.data = event;
+                if(eventImages){
+                    const mainImageURL = _.chain(eventImages).find({isCoverImage:true}).get('imageURL').value();
+                    console.log("mainImageURL : "+mainImageURL)
+
+                    let imageURLs = _.chain(eventImages).filter({isCoverImage:false}).map('imageURL').value();
+
+                    let modifiedImageURLs = _.map(imageURLs, (imageURL: string) => `http://${process.env["LOCAL_URL"]}${process.env["LOCAL_SUBURL"]}/event/image/${imageURL}`)
+                
+                    // console.log("ImageURLs : "+imageURLs)
+                    // console.log("ImageURLs : "+modifiedImageURLs)
+
+                    apiResponse.data = {
+                        ...event,
+                        mainImageURL: `http://${process.env["LOCAL_URL"]}${process.env["LOCAL_SUBURL"]}/event/image/${mainImageURL}`,
+                        imageURLs : modifiedImageURLs
+                    }
+                   
+                }
+                else{
+                    apiResponse.data = event
+                }
+
             }
             else {
                 apiResponse = new ApiResponseDto();
@@ -548,6 +581,7 @@ export class EventService extends BaseService implements IEventService {
                     eventId: eventId,
                     isCoverImage: true
                 },
+                raw: true,
                 attributes: ['imageURL']
             });
 
@@ -562,7 +596,7 @@ export class EventService extends BaseService implements IEventService {
                 return apiResponse;
             }
 
-            await RemoveFile(eventImages.imageURL);
+            await RemoveFile("Images/Event-Webp/"+eventImages.imageURL);
 
             const respRemoveImg = await EventImages.destroy({
                 where: {
