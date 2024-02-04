@@ -1,4 +1,5 @@
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
+import { ReadFilesFromDirectory } from "../helper/file-handling";
 import { IVastiPatrakService, VastiPatrakService } from "../service/vasti-patrak-service";
 
 const express = require('express');
@@ -16,7 +17,7 @@ router.post('/add-template', async (req: any, res: any) => {
 /**
  * Get VastiPatrak Tempate
  */
-router.get('/get-template', async (req:any, res: any) => {
+router.get('/get-template', async (req: any, res: any) => {
     const vastiPatrakService: IVastiPatrakService = new VastiPatrakService();
     const response = await vastiPatrakService.GetTempates();
 
@@ -54,7 +55,7 @@ router.get('/', async (req: any, res: any) => {
  * Generate VastiPatrak
  */
 router.get('/generate', async (req: any, res: any) => {
-    
+
     const templateFileName = req.query.templateFileName;
 
     await fs.readFile(path.join('VastiPatrak/templates', templateFileName), 'utf8', async (err: any, data: any) => {
@@ -68,8 +69,8 @@ router.get('/generate', async (req: any, res: any) => {
         }
         const vastiPatrakService: IVastiPatrakService = new VastiPatrakService();
         const response = await vastiPatrakService.GenerateVastiPatrak(data);
-    
-    
+
+
         if (!response) {
             res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
                 status: 0,
@@ -81,14 +82,15 @@ router.get('/generate', async (req: any, res: any) => {
         }
     })
 
-    
+
 })
 
 /**
  * Get VastiPatrak PDF
  */
-router.get('/pdf', async (req: any, res:any)=>{
-    
+router.get('/get-pdf', async (req: any, res: any) => {
+    path.join('VastiPatrak/pdfs', 'VastiPatrak.pdf');
+    res.download(path.join('VastiPatrak/pdfs', 'VastiPatrak.pdf')); 
 })
 
 

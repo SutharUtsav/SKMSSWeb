@@ -1,13 +1,9 @@
-import { rgb } from "pdf-lib";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { ReadFilesFromDirectory, RemoveFilesFromDirectory } from "../helper/file-handling";
-
-
 
 const sequelize = require('../config/db');
 const puppeteer = require('puppeteer');
 const PDFMerger = require('pdf-merger-js');
-const { PDFDocument } = require('pdf-lib');
 const fs = require('fs')
 const path = require('path')
 const hb = require('handlebars')
@@ -218,8 +214,7 @@ SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS "kut
                 pdfPaths.push(path.join(VasriPatrakFolderPath, `Family${entry.kutumb_no}-${entry.surname}.pdf`));
             }
 
-            console.log(pdfPaths)
-            await this.CreateVastiPatrakPDF(VasriPatrakFolderPath, `VastiPatrak-${Date.now()}.pdf`, pdfPaths);
+            await this.CreateVastiPatrakPDF(`VastiPatrak.pdf`, pdfPaths);
 
             apiResponse = new ApiResponseDto();
             apiResponse.status = 1;
@@ -264,23 +259,22 @@ SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS "kut
         }
     }
 
-    private async CreateVastiPatrakPDF(VasriPatrakFolderPath: string, outputFileName: string, pdfPaths: string[]) {
-        const mergedPdf = await PDFDocument.create();
+    private async CreateVastiPatrakPDF( outputFileName: string, pdfPaths: string[]) {
+        const merger = new PDFMerger();
 
-        for (const pdfPath of pdfPaths) {
-            const pdfBytes = await fs.readFile(pdfPath);
-            const pdfDoc = await PDFDocument.load(pdfBytes);
-            const copiedPages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
-            copiedPages.forEach((page: any) => {
-                const copiedPage = mergedPdf.addPage(page);
-                const { width, height } = copiedPage.getSize();
-                copiedPage.drawText('Sample Text', { x: 50, y: height - 200, color: rgb(0, 0, 0) });
-            });
-        }
+        await Promise.all(pdfPaths.map(async (pdfPath) => {
+            await merger.add(pdfPath);
+        }))
 
-        const mergedPdfBytes = await mergedPdf.save();
+        await merger.setMetadata({
+            producer: "pdf-merger-js based script",
+            author: "Kutch Suthar Mevada Suthar Samaj-Sukhpar",
+            creator: "Kutch Suthar Mevada Suthar Samaj-Sukhpar",
+            title: `Kutch Suthar Mevada Suthar Samaj-Sukhpar Vastipatrak ${new Date().getFullYear()}`
+        });
 
-        const outputPath = path.join(VasriPatrakFolderPath, outputFileName);
-        await fs.writeFile(outputPath, mergedPdfBytes);
+        const VasriPatrakFolderPath = path.join('VastiPatrak/pdfs', outputFileName)
+        const mergedPdfBuffer = await merger.saveAsBuffer();
+        fs.writeFileSync(VasriPatrakFolderPath, mergedPdfBuffer);
     }
 }
