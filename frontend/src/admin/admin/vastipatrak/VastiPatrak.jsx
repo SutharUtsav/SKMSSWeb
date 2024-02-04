@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { get, getByQueryParams } from '../../../service/api-service';
 import { FaEye } from "react-icons/fa";
 import ViewTemplateModal from './ViewTemplateModal';
+import axios from 'axios';
+import { EnvConfig } from '../../../config/env-config';
 
 const VastiPatrak = () => {
     let { data, setData, error, setError, loading, setLoading } = useApiCall(() =>
@@ -12,8 +14,8 @@ const VastiPatrak = () => {
     );
 
     const [fileContentDict, setFileContentDict] = useState({});
-    const [viewTempate, setviewTempate] = useState(null)
-    const [selectedTempate, setselectedTempate] = useState(null)
+    const [viewTempate, setviewTempate] = useState(null);
+    const [selectedTempate, setselectedTempate] = useState(null);
 
     useEffect(() => {
         get("/vastipatrak/get-template")
@@ -154,23 +156,45 @@ const VastiPatrak = () => {
             };
 
             getByQueryParams("/vastipatrak/generate", queryJson)
-            .then((response)=> {
-                if(response.data.status === 1){
-                    console.log(response.data)
-                }
-                else{
-                    console.log(response.data)
-                }
-            })
-            .catch((error)=>{
-                console.log(error)
-            })
-            .finally(()=>{
-                setselectedTempate(null);
-                setviewTempate(null);
-            })
+                .then((response) => {
+                    if (response.data.status === 1) {
+                        console.log(response.data)
+                    }
+                    else {
+                        console.log(response.data)
+                    }
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+                .finally(() => {
+                    setselectedTempate(null);
+                    setviewTempate(null);
+                })
         }
     }
+
+
+    const handleViewVastiPatrak = async () => {
+        try {
+            
+            const response = await axios.get(`${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}/vastipatrak/get-pdf`, {
+                responseType: 'blob', // Specify response type as a Blob
+                headers: {
+                  'Content-Type': 'application/pdf'
+                }
+              });
+
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            window.location.href = url; // Load the PDF in the new window
+        } catch (error) {
+            console.log('Error fetching PDF:', error);
+            // Handle errors gracefully, e.g., display an error message to the user
+        }
+    }
+
+
     return (
         <>
             <div className="vastipatrak content">
@@ -195,6 +219,8 @@ const VastiPatrak = () => {
                             <h4>VastiPatrak</h4>
                             <span className="pull-right">
                                 <button type='submit' disabled={!selectedTempate}>Generate PDF</button>
+                                
+                                <button type='button' className='mx-3' onClick={handleViewVastiPatrak}>View Vastipatrak</button>
                             </span>
                         </div>
 
@@ -208,7 +234,7 @@ const VastiPatrak = () => {
                                     <div className='d-flex flex-column align-items-center form-check' style={{
                                         position: "relative"
                                     }}>
-                                        <input className="form-check-input my-3 fs-2" type="radio" name="templateRadio" onChange={()=>{setselectedTempate(fileName)}} />
+                                        <input className="form-check-input my-3 fs-2" type="radio" name="templateRadio" onChange={() => { setselectedTempate(fileName) }} />
                                         <button id={`view-btn${index}`} style={{
                                             position: "absolute",
                                             top: "35px",
