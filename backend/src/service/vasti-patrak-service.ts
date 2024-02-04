@@ -1,11 +1,13 @@
+import { rgb } from "pdf-lib";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
-import { RemoveFilesFromDirectory } from "../helper/file-handling";
+import { ReadFilesFromDirectory, RemoveFilesFromDirectory } from "../helper/file-handling";
 
 
 
 const sequelize = require('../config/db');
 const puppeteer = require('puppeteer');
-const PDFDocument = require('pdf-merger-js');
+const PDFMerger = require('pdf-merger-js');
+const { PDFDocument } = require('pdf-lib');
 const fs = require('fs')
 const path = require('path')
 const hb = require('handlebars')
@@ -23,6 +25,11 @@ export interface IVastiPatrakService {
      * @param htmlContent 
      */
     GenerateVastiPatrak(htmlContent: any): Promise<ApiResponseDto | undefined>
+
+    /**
+     * Get VastiPatrak Templates
+     */
+    GetTempates(): Promise<ApiResponseDto | undefined>;
 }
 
 
@@ -56,7 +63,7 @@ export class VastiPatrakService implements IVastiPatrakService {
                     occupation: user.occupation,
                     email: user.email,
                     kutumb_member_no: user.kutumb_member_no,
-                    number: i+1,
+                    number: i + 1,
                 }
 
                 return returnUser
@@ -78,10 +85,10 @@ export class VastiPatrakService implements IVastiPatrakService {
                 users: users,
                 sponsor: [
                     {
-                        imageURL : '../sponsor/image003.jpeg'
+                        imageURL: '../sponsor/image003.jpeg'
                     },
                     {
-                        imageURL : '../sponsor/image003.jpeg'
+                        imageURL: '../sponsor/image003.jpeg'
                     }
                 ]
             }
@@ -110,7 +117,7 @@ SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS "kut
 	f."village" as "village",
 	f."villageGuj" as "villageGuj",
 	f."currResidency" as "currResidency",
-	(SELECT us."username" from "User" as us WHERE us."id"=u."mainFamilyMemberId") as "mainFamilyMemberName",
+	(SELECT us."name" from "User" as us WHERE us."id"=u."mainFamilyMemberId") as "mainFamilyMemberName",
 	f."adobeOfGod" as "abode_of_God",
     f."surname" as "surname",
 	f."goddess" as "goddess",
@@ -179,7 +186,7 @@ SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS "kut
             if (!fs.existsSync(VasriPatrakFolderPath)) {
                 fs.mkdirSync(VasriPatrakFolderPath, { recursive: true });
             }
-            
+
             const browser = await puppeteer.launch({
                 headless: 'new'
             });
@@ -201,7 +208,18 @@ SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS "kut
                 await page.close()
             }))
 
-            await browser.close()
+            await browser.close();
+
+            const familyData = data.family;
+
+            const pdfPaths: string[] = [];
+
+            for (const entry of familyData) {
+                pdfPaths.push(path.join(VasriPatrakFolderPath, `Family${entry.kutumb_no}-${entry.surname}.pdf`));
+            }
+
+            console.log(pdfPaths)
+            await this.CreateVastiPatrakPDF(VasriPatrakFolderPath, `VastiPatrak-${Date.now()}.pdf`, pdfPaths);
 
             apiResponse = new ApiResponseDto();
             apiResponse.status = 1;
@@ -224,4 +242,45 @@ SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS "kut
     }
 
 
+    /**
+     * Get VastiPatrak Templates
+     */
+    public async GetTempates(): Promise<ApiResponseDto | undefined> {
+        let apiResponse = new ApiResponseDto();
+
+        try {
+
+            let fileContentDictionary = await ReadFilesFromDirectory(process.cwd() + '/VastiPatrak/templates')
+
+            apiResponse.status = 1;
+            apiResponse.data = fileContentDictionary;
+            return apiResponse;
+        } catch (error: any) {
+            apiResponse.status = 0;
+            apiResponse.error = new ErrorDto();
+            apiResponse.error.errorCode = "501";
+            apiResponse.error.errorMsg = error;
+            return apiResponse;
+        }
+    }
+
+    private async CreateVastiPatrakPDF(VasriPatrakFolderPath: string, outputFileName: string, pdfPaths: string[]) {
+        const mergedPdf = await PDFDocument.create();
+
+        for (const pdfPath of pdfPaths) {
+            const pdfBytes = await fs.readFile(pdfPath);
+            const pdfDoc = await PDFDocument.load(pdfBytes);
+            const copiedPages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+            copiedPages.forEach((page: any) => {
+                const copiedPage = mergedPdf.addPage(page);
+                const { width, height } = copiedPage.getSize();
+                copiedPage.drawText('Sample Text', { x: 50, y: height - 200, color: rgb(0, 0, 0) });
+            });
+        }
+
+        const mergedPdfBytes = await mergedPdf.save();
+
+        const outputPath = path.join(VasriPatrakFolderPath, outputFileName);
+        await fs.writeFile(outputPath, mergedPdfBytes);
+    }
 }

@@ -1,3 +1,4 @@
+import { Sequelize } from "sequelize";
 import { EnumApiResponse, EnumApiResponseCode, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { EnumFamilyMemberRelation, EnumFamilyMemberRelationName } from "../consts/enumFamilyMemberRelation";
@@ -154,13 +155,13 @@ export class UserService extends BaseService implements IUserService {
             console.log("dtoUsersRecord: ", dtoUsersRecord);
             console.log("UserFieldsArr: ", userFieldsArr)
             const users = await User.bulkCreate(dtoUsersRecord, { fields: userFieldsArr, transaction, updateOnDuplicate: ['name', 'surname', 'village'] })
-            
+
             if (!users) {
                 throw new Error("Error Occurs while Inserting Into User Entity")
             }
             const userArray = users.map((user: any) => user.dataValues);
 
-            const dtoProfileRecordPromise =  dtoProfilesRecord.map(async (profileRecord: UserProfileDto)=>{
+            const dtoProfileRecordPromise = dtoProfilesRecord.map(async (profileRecord: UserProfileDto) => {
                 profileRecord.familyId = familyArray.find((family: FamilyDto) => family.surname === profileRecord.surname && family.village === profileRecord.village && family.currResidency === profileRecord.currResidency && profileRecord.mainFamilyMemberName === family.mainFamilyMemberName)?.id;
 
                 if (profileRecord.mainFamilyMemberRelation?.toUpperCase() !== EnumFamilyMemberRelationName[EnumFamilyMemberRelation.SELF]) {
@@ -178,7 +179,7 @@ export class UserService extends BaseService implements IUserService {
 
                 profileRecord.userId = userArray.find((user: UserDto) => user.name === profileRecord.name && user.surname === profileRecord.surname && user.village === profileRecord.village)?.id
 
-                
+
                 const father: UserDto = userArray.find((user: UserDto) => user.name === profileRecord.fatherName && user.surname === profileRecord.fatherSurname && user.village === profileRecord.fatherVillage);
                 if (father) {
                     profileRecord.fatherId = father.id;
@@ -209,12 +210,12 @@ export class UserService extends BaseService implements IUserService {
             await Promise.all(dtoProfileRecordPromise);
 
             console.log("dtoProfilesRecord: ", dtoProfilesRecord);
-            const userProfiles = await UserProfile.bulkCreate(dtoProfilesRecord, { fields: UserProfileFieldsArr, transaction, updateOnDuplicate: [ 'name', 'surname', 'village'] })
+            const userProfiles = await UserProfile.bulkCreate(dtoProfilesRecord, { fields: [...UserProfileFieldsArr, 'password'], transaction, updateOnDuplicate: ['name', 'surname', 'village'] })
             if (!userProfiles) {
                 throw new Error("Error Occurs while Inserting Into UserProfile Entity")
             }
 
-           // Send mail to each users
+            // Send mail to each users
             dtoProfilesRecord.forEach((profileRecord: UserProfileDto) => {
                 //Sent Mail
                 //Mail Body
@@ -501,17 +502,78 @@ export class UserService extends BaseService implements IUserService {
     public async GetRecordByEmail(email: string): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
         try {
-            let users: UserDto[] = await UserProfile.findAll({
-                where: {
-                    email: email
-                },
-                attributes: ['name']
+            // let users: UserDto[] = await User.findAll({
+            //     // attributes: [Sequelize.col('UserProfile.name'), Sequelize.col('UserProfileImage.image')],
+            //     attributes: ['"UserProfileId"."name"', '"UserProfileImageId"."image"'],
+            //     include: [
+            //         {
+            //             model: UserProfile,
+            //             as: 'UserProfileId',
+            //             where: {
+            //                 email: email
+            //             },
+            //             attributes: ['name'],
+
+            //         },
+            //         {
+            //             model: UserProfileImage,
+            //             as: 'UserProfileImageId',
+            //             attributes: ['image'],
+            //             required: false,
+            //             on: {
+            //                 userId: Sequelize.literal('"UserProfileId"."userId"')
+            //             },
+            //             association: {
+            //                 source: User,
+            //                 target: UserProfileImage,
+            //                 identifier: 'userId',
+            //             },
+            //         }
+            //     ]
+            // });
+
+            let users: any = await User.findAll({
+                attributes: [],
+                include: [
+                    {
+                        model: UserProfile,
+                        as: 'UserProfileId',
+                        where: {
+                            email: email,
+                        },
+                        on: {
+                            userId: Sequelize.literal('"User"."id"="UserProfileId"."userId"')
+                        },
+                        attributes: ['name'],
+                    },
+                    {
+                        model: UserProfileImage,
+                        as: 'UserProfileImageId',
+                        attributes: ['image'],
+                        required: false,        // LEFT OUTER JOIN
+                        on: {
+                            userId: Sequelize.literal('"User"."id"="UserProfileImageId"."userId"'),
+                        },
+                    },
+                ],
             });
 
+
             if (users.length !== 0) {
+                let response = [];
+                
+                for (const user of users) {
+                    let json = {
+                        name: user.UserProfileId.name,
+                        image: user.UserProfileImageId?.image ? `http://${process.env['LOCAL_URL']}${process.env['LOCAL_SUBURL']}/image/profile-image/${user.UserProfileImageId.image}` : null 
+                    }
+
+                    response.push(json);
+                }
+
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                apiResponse.data = users;
+                apiResponse.data = response;
             }
             else {
                 apiResponse = new ApiResponseDto();

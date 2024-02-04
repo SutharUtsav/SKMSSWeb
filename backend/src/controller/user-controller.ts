@@ -140,6 +140,7 @@ router.post('/bulkInsert', uploadExcelSheet, async (req: any, res: any) => {
                 }
             })
 
+            //res.send({})
             // console.log("FamilyDtos:", familyDtos)
             // console.log("UserDtos:", userDtos)
             // console.log("UserProfileDtos:", userProfileDtos)

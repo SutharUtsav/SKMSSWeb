@@ -312,6 +312,8 @@ export const validateRolePermission = (body: PermissionDto): PermissionDto | Err
 
 
 export const validateBulkEntries = (row: any): any => {
+
+    console.log(row)
     let userProfileDto: UserProfileDto = new UserProfileDto();
     let userDto: UserDto = new UserDto();
     let familyDto: FamilyDto = new FamilyDto();
@@ -358,7 +360,16 @@ export const validateBulkEntries = (row: any): any => {
     familyDto.residencyAddress = String(row[9])?.trim() === "undefined" ? null : String(row[9])?.trim();
     familyDto.mainFamilyMemberName = String(row[21])?.trim() === "undefined" ? null : String(row[21])?.trim();
 
+    // const imageData = row[30] ? row[30] : null;
 
+    // console.log(row[30])
+    // console.log(imageData);
+    // const img = new Image();
+
+
+    // img.src = `data:image/png;base64,${imageData}`
+
+    // console.log(img)
     return {
         userDto: userDto,
         userProfileDto: userProfileDto,

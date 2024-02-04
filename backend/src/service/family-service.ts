@@ -1,11 +1,15 @@
+import { Sequelize } from "sequelize";
 import { EnumApiResponse, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { FamilyDto, FamilyLookupDto } from "../dtos/family-dto";
 import { Family } from "../model/family";
-import { UserProfile } from "../model/userProfile";
+import { User } from "../model/user";
+import { UserProfile, UserProfileImage } from "../model/userProfile";
 import { BaseService } from "./base-service";
 import { IUserService, UserService } from "./user-service";
+
+const sequelize = require('../config/db')
 
 export interface IFamilyService {
     /**
@@ -52,10 +56,10 @@ export class FamilyService extends BaseService implements IFamilyService {
             if (lookup) {
 
                 if (id) {
-                    let family: FamilyLookupDto = await Family.findOne({ 
+                    let family: FamilyLookupDto = await Family.findOne({
                         attributes: ['surname', 'village', 'villageGuj', 'mainFamilyMemberName'],
                         where: {
-                            id : id
+                            id: id
                         }
                     });
 
@@ -74,13 +78,32 @@ export class FamilyService extends BaseService implements IFamilyService {
                     }
                 }
                 else {
-
-                    let families: FamilyLookupDto[] = await Family.findAll({ attributes: ['surname', 'village', 'villageGuj', 'mainFamilyMemberName'] });
+                    console.log("else")
+                    let families: any = await sequelize.query(`
+                    SELECT "Family"."surname", "Family"."village", "Family"."villageGuj", "Family"."mainFamilyMemberName", "UserProfileImage"."image"
+                    FROM "Family" AS "Family"
+                    JOIN "User" AS "User" ON "Family"."surname"="User"."surname" AND "Family"."mainFamilyMemberName"="User"."name"
+                    LEFT OUTER JOIN "UserProfileImage" AS "UserProfileImage" ON "UserProfileImage"."userId"="User"."id"
+                  `, { type: sequelize.QueryTypes.SELECT });;
 
                     if (families.length !== 0) {
+                        console.log(families)
+
+                        let response = [];
+                        for (const family of families) {
+                            let json = {
+                                surname: family.surname,
+                                village: family.village,
+                                villageGuj: family.villageGuj,
+                                mainFamilyMemberName: family.mainFamilyMemberName,
+                                mainFamilyMemberImage: family.image ? `http://${process.env["LOCAL_URL"]}${process.env["LOCAL_SUBURL"]}/image/profile-image/${family.image}` : null 
+                            }
+                            response.push(json);
+                        }
+
                         apiResponse = new ApiResponseDto();
                         apiResponse.status = 1;
-                        apiResponse.data = families
+                        apiResponse.data = response
                     }
                     else {
                         apiResponse = new ApiResponseDto();
@@ -140,7 +163,7 @@ export class FamilyService extends BaseService implements IFamilyService {
             if (family) {
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                apiResponse.data =  family;
+                apiResponse.data = family;
             }
             else {
                 apiResponse = new ApiResponseDto();

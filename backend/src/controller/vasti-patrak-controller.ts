@@ -14,6 +14,25 @@ router.post('/add-template', async (req: any, res: any) => {
 })
 
 /**
+ * Get VastiPatrak Tempate
+ */
+router.get('/get-template', async (req:any, res: any) => {
+    const vastiPatrakService: IVastiPatrakService = new VastiPatrakService();
+    const response = await vastiPatrakService.GetTempates();
+
+    if (!response) {
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+        })
+    }
+    else {
+        res.send(response)
+    }
+})
+
+
+/**
  * Get VastiPatrak Data
  */
 router.get('/', async (req: any, res: any) => {
@@ -36,7 +55,9 @@ router.get('/', async (req: any, res: any) => {
  */
 router.get('/generate', async (req: any, res: any) => {
     
-    await fs.readFile(path.join('VastiPatrak/templates', 'Template.html'), 'utf8', async (err: any, data: any) => {
+    const templateFileName = req.query.templateFileName;
+
+    await fs.readFile(path.join('VastiPatrak/templates', templateFileName), 'utf8', async (err: any, data: any) => {
         if (err) {
             console.error(err);
             res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
