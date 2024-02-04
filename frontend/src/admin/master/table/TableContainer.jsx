@@ -89,7 +89,7 @@ const TableContainer = ({ columns, data }) => {
                                                             ) : (
                                                                 <td {...cell.getCellProps()} aria-colindex="1"
                                                                     role="cell"
-                                                                    className="text-center">{cell.render('Cell')}
+                                                                    className="text-center" style={{textTransform:"none"}}>{cell.render('Cell')}
                                                                 </td>
                                                             )}
                                                         </>

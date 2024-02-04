@@ -17,7 +17,10 @@ const BulkUser = (props) => {
               console.log(response);
               if (response && response.data.status === 1) {
                 console.log(response.data.data.message)
-                props.setisReloadData();
+                props.setisReloadData(true);
+                setbulkUploadForm({
+                  excelSheet: null,
+                })
               } else {
                 console.log("Data not inserted successfully")
               }
@@ -46,7 +49,7 @@ const BulkUser = (props) => {
           </div>
         </div>
         <div className="col-md-12">
-          <button type="submit" className="btn" name="btnAdd" id="submit_btn">
+          <button type="submit" className="btn" name="btnAdd" id="submit_btn" disabled={!bulkUploadForm.excelSheet}>
             <FaUpload fill="#fff" /> Upload
           </button>
         </div>

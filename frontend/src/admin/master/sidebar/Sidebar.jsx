@@ -37,6 +37,12 @@ export const Sidebar = () => {
         </li>
 
         <li>
+          <NavLink end to='/admin/vastipatrak' className='nav-link link-dark'>
+            Vasti Patrak
+          </NavLink>
+        </li>
+
+        <li>
           <NavLink end to='/admin/roles' className='nav-link link-dark'>
             Role
           </NavLink>

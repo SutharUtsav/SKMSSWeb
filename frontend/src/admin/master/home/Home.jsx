@@ -16,6 +16,7 @@ import { authorizeAdmin } from "../../../middleware/authMiddleWare";
 import Event from "../../admin/event/Event";
 import EventForm from "../../admin/event/EventForm";
 import EventDetails from "../../admin/event/EventDetails";
+import VastiPatrak from "../../admin/vastipatrak/VastiPatrak";
 
 
 export const HomeAdmin = () => {
@@ -54,6 +55,7 @@ export const HomeAdmin = () => {
             <Route path="/events/create" element={<EventForm />}></Route>
             <Route path="/events/edit/:id" element={<EventForm />}></Route>
             <Route path="/events/details/:id" element={<EventDetails />}></Route>
+            <Route path="/vastipatrak/" element={<VastiPatrak />}></Route>
           </Routes>
         </div>
 

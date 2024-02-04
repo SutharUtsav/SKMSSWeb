@@ -7,6 +7,7 @@ import { post } from "../../service/api-service";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ActionTypes } from "../../redux/action-type";
+import UserImage from "../../images/profile.jpg";
 
 const Login = () => {
 
@@ -194,12 +195,14 @@ const Login = () => {
                   {userList.map((user, index) => (
                     <div
                       key={index}
-                      className={`fs-3 mt-1 username ${selectedUser === user.name ? "active" : ""
+                      className={`fs-3 mt-3 username ${selectedUser === user.name ? "active" : ""
                         }`}
                       onClick={() => {
                         setselectedUser(user.name);
                       }}
                     >
+                      
+                      <img src={user.image ? user.image : UserImage} style={{ width:"50px", aspectRatio:"1", objectFit:"cover", border:"1px solid", padding:"2px", borderRadius:"50%", marginRight:"5px"}}/>
                       {user.name}
                     </div>
                   ))}
