@@ -1,6 +1,7 @@
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
 import { ReadFilesFromDirectory, RemoveFilesFromDirectory } from "../helper/file-handling";
 
+
 const sequelize = require('../config/db');
 const puppeteer = require('puppeteer');
 const PDFMerger = require('pdf-merger-js');
@@ -59,6 +60,7 @@ export class VastiPatrakService implements IVastiPatrakService {
                     occupation: user.occupation,
                     email: user.email,
                     kutumb_member_no: user.kutumb_member_no,
+                    image: user.image ? `http://${process.env["LOCAL_URL"]}${process.env["LOCAL_SUBURL"]}/image/profile-image/${user.image}` : "",
                     number: i + 1,
                 }
 
@@ -88,6 +90,8 @@ export class VastiPatrakService implements IVastiPatrakService {
                     }
                 ]
             }
+
+            
             formatedData.family.push(dataWithUser)
         }
 
@@ -114,6 +118,7 @@ SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS "kut
 	f."villageGuj" as "villageGuj",
 	f."currResidency" as "currResidency",
 	(SELECT us."name" from "User" as us WHERE us."id"=u."mainFamilyMemberId") as "mainFamilyMemberName",
+    (SELECT usp."image" from "UserProfileImage" as usp WHERE u."userId" = usp."userId" ),
 	f."adobeOfGod" as "abode_of_God",
     f."surname" as "surname",
 	f."goddess" as "goddess",
@@ -187,6 +192,8 @@ SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS "kut
                 headless: 'new'
             });
             await Promise.all(data.family.map(async (entry: any, i: number) => {
+                
+            console.log(entry.users)
                 const template = hb.compile(htmlContent, { strict: true })
                 const result = template(entry)
 
