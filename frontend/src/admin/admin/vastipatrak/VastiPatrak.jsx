@@ -220,7 +220,7 @@ const VastiPatrak = () => {
                             <span className="pull-right">
                                 <button type='submit' disabled={!selectedTempate}>Generate PDF</button>
                                 
-                                <button type='button' className='mx-3' onClick={handleViewVastiPatrak}>View Vastipatrak</button>
+                                <button type='button' title="View Vastipatrak PDF" className='mx-3' style={{background:"none", color:"#000", border:"none", textDecoration:"underline"}} onClick={handleViewVastiPatrak}>View Vastipatrak</button>
                             </span>
                         </div>
 
@@ -234,7 +234,7 @@ const VastiPatrak = () => {
                                     <div className='d-flex flex-column align-items-center form-check' style={{
                                         position: "relative"
                                     }}>
-                                        <input className="form-check-input my-3 fs-2" type="radio" name="templateRadio" onChange={() => { setselectedTempate(fileName) }} />
+                                        <input className="form-check-input my-3 fs-2" type="radio" name="templateRadio" checked={selectedTempate === fileName} onChange={() => { setselectedTempate(fileName) }} />
                                         <button id={`view-btn${index}`} style={{
                                             position: "absolute",
                                             top: "35px",
