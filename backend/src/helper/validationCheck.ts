@@ -7,6 +7,7 @@ import { EventDto, EventImageDto } from "../dtos/event-dto";
 import { FamilyDto } from "../dtos/family-dto";
 import { PermissionDto, RoleDto } from "../dtos/role-dto";
 import { SamajWadiOccupiedDto } from "../dtos/samajwadi-occpied-dto";
+import { SocialWorkerDto } from "../dtos/social-worker-dto";
 import { UserDto, UserProfileDto } from "../dtos/user-dto";
 import { areAllFieldsFilled } from "./heper";
 
@@ -18,6 +19,31 @@ export const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export const regexDate = /^\d{4}-\d{2}-\d{2}$/;
 
 //#endregion
+
+
+
+/**
+ * Social Worker validation check
+ * @param body 
+ */
+export const validateSocialWorker = (body : SocialWorkerDto) : SocialWorkerDto | ErrorDto | undefined => {
+    let socialWorkerDto: SocialWorkerDto = new SocialWorkerDto();
+
+    //check for all required fields
+    if(!body.name || !body.surname || !body.village || !body.position ){
+        let errorDto = new ErrorDto();
+        errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+        errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        return errorDto;
+    }
+
+    // set fields for SamajWadiOccupiedDto
+    socialWorkerDto.name = body.name;
+    socialWorkerDto.surname = body.surname;
+    socialWorkerDto.village = body.village;
+    socialWorkerDto.position = body.position;
+    return socialWorkerDto;
+}
 
 
 /**

@@ -2,6 +2,7 @@ import { Events } from "./event";
 import { EventImages } from "./eventImage";
 import { Family } from "./family";
 import { Role, RolePermission, RoleRolePermission } from "./role"
+import { SocialWorker } from "./socialWorket";
 import { User } from "./user";
 import { UserProfile, UserProfileImage } from "./userProfile";
 
@@ -67,5 +68,15 @@ export const dbContext = () => {
     })
     EventImages.belongsTo(Events, {
         foreignKey: 'eventId'
+    })
+
+
+    //One to One relationship between SocialWorker and User
+    User.hasOne(SocialWorker, {
+        foreignKey: 'id',
+        as: 'UserProfileId'
+    })
+    SocialWorker.belongsTo(User, {
+        foreignKey: 'userId'
     })
 }
