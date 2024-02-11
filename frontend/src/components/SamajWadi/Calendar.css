@@ -1,0 +1,80 @@
+.react-calendar, .react-calendar *, .react-calendar *:before, .react-calendar *:after{
+    width: 100%;
+    box-sizing: border-box;
+    background: #eee;
+    border: none;
+    line-height: 5rem;
+    font-size: 2.355rem;
+    text-transform: uppercase;
+}
+
+.react-calendar__month-view__weekdays__weekday{
+    font-weight: 300;
+}
+
+.react-calendar__month-view__days__day--neighboringMonth, .react-calendar__decade-view__years__year--neighboringDecade, .react-calendar__century-view__decades__decade--neighboringCentury{
+    opacity: 0.5;
+}
+
+.react-calendar__tile--active, 
+.react-calendar__tile--active *
+{
+    border-radius: 5px;
+    color: #fff;
+    background-color: var(--secondary-background);
+}
+
+.react-calendar__tile--active:enabled:hover, .react-calendar__tile--active:enabled:focus{
+    background-color: var(--secondary-background);
+}
+
+.highlight-date, .highlight-date *{
+    color: var(--secondary-color);
+    background: #fff;
+}
+
+div.highlight-event{
+    position: relative;
+}
+
+div.highlight-event p{
+    color: #fff;
+    background-color: var(--secondary-background);
+    font-size: 1.675rem;
+    text-transform: capitalize;
+    border-radius: 5px;
+    line-height: normal;
+}
+
+div.highlight-event:hover .highlight-event-card{
+    display: block;
+}
+
+
+div.highlight-event .highlight-event-card{
+    position: absolute;
+    top: -50px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    background-color: var(--secondary-background);
+    display: none;
+    border-radius: 5px;
+}
+
+
+div.highlight-event .highlight-event-card p{
+    font-size: 1.465rem;
+    line-height: normal;
+    background-color: var(--secondary-background);
+    color: #fff;
+    text-transform: capitalize;
+    text-overflow: ellipsis;
+    text-align: left;
+} 
+
+div.highlight-event .highlight-event-card p:first-child{
+    color: var(--secondary-color);
+    text-align: center;
+}
