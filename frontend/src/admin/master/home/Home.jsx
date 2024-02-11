@@ -20,6 +20,7 @@ import VastiPatrak from "../../admin/vastipatrak/VastiPatrak";
 import Gallery from "../../admin/gallery/Gallery";
 import Sponsor from "../../admin/sponsor/Sponsor";
 import SamajWadiOccupied from "../../admin/Samajwadi-Occupied/SamajWadiOccupied";
+import SocialWorker from "../../admin/social-worker/SocialWorker";
 
 
 export const HomeAdmin = () => {
@@ -62,6 +63,7 @@ export const HomeAdmin = () => {
             <Route path="/gallery/" element={<Gallery />}></Route>
             <Route path="/sponsor/" element={<Sponsor />}></Route>
             <Route path="/samajwadi-occupied/" element={<SamajWadiOccupied />}></Route>
+            <Route path="/social-worker/" element={<SocialWorker />}></Route>
           </Routes>
         </div>
 

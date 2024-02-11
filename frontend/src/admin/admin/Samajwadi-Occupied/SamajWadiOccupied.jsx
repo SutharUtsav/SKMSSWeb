@@ -22,7 +22,7 @@ const SamajWadiOccupied = () => {
 
     const date = new Date();
     const jsonForm = {
-        month: date.getMonth()+1,
+        month: date.getMonth() + 1,
         year: date.getFullYear()
     }
     let { data, setData, error, setError, loading, setLoading } = useApiCall(() =>
@@ -36,7 +36,7 @@ const SamajWadiOccupied = () => {
     const [toTime, settoTime] = useState("")
     const [isReloadData, setisReloadData] = useState(false);
     const [deleteRecordId, setdeleteRecordId] = useState(null);
-
+    
     const columns = useMemo(() => [
         {
             Header: "Samaj Wadi Occupied Events List",
@@ -99,7 +99,7 @@ const SamajWadiOccupied = () => {
         if (isReloadData) {
             const date = occupiedForm.fromDate;
             const jsonForm = {
-                month: date.getMonth()+1,
+                month: date.getMonth() + 1,
                 year: date.getFullYear()
             }
             getByQueryParams("/samajwadi-occupied", jsonForm)
@@ -108,7 +108,7 @@ const SamajWadiOccupied = () => {
                     if (response.data.status === 1) {
                         setData(response.data);
                     } else {
-                        if(response.data.error?.errorMsg === "No Data Found!"){
+                        if (response.data.error?.errorMsg === "No Data Found!") {
                             setData([]);
                         }
                         setError(response.data.error);
@@ -123,6 +123,11 @@ const SamajWadiOccupied = () => {
         }
     }, [isReloadData]);
 
+    useEffect(() => {
+        return () => {
+            setdeleteRecordId(null);
+        }
+    }, [])
 
     const handleSubmitEvent = (e) => {
         e.preventDefault();
@@ -402,7 +407,7 @@ const SamajWadiOccupied = () => {
 
             <DecisionModal onYes={() => {
                 handleDelete(deleteRecordId)
-            }} deleteRecordId={deleteRecordId} setdeleteRecordId={setdeleteRecordId} topic="Delete Family" message="Are you sure you want to delete this Family?" />
+            }} deleteRecordId={deleteRecordId} setdeleteRecordId={setdeleteRecordId} topic="Delete Event" message="Are you sure you want to delete this Event?" />
 
         </>
     )

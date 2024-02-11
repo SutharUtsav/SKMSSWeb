@@ -86,7 +86,12 @@ const TableContainer = ({ columns, data }) => {
                                                                     role="cell"
                                                                     className="text-center">{cell.render('Cell', { id: row.cells[0].value })}
                                                                 </td>
-                                                            ) : (
+                                                            ) : cell.column.Header === "Image" ? (
+                                                                <td {...cell.getCellProps()} aria-colindex="1"
+                                                                role="cell"
+                                                                className="text-center"> {cell.render('Cell', {image: row.cells[0].value})}
+                                                                </td>
+                                                            ) :(
                                                                 <td {...cell.getCellProps()} aria-colindex="1"
                                                                     role="cell"
                                                                     className="text-center" style={{textTransform:"none"}}>{cell.render('Cell')}

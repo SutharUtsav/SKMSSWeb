@@ -13,7 +13,7 @@ const OccupiedCalender = (props) => {
 
   const date = new Date();
   const jsonForm = {
-    month: date.getMonth()+1,
+    month: date.getMonth() + 1,
     year: date.getFullYear()
   }
   let { data, setData, error, setError, loading, setLoading } = useApiCall(() =>
@@ -35,7 +35,7 @@ const OccupiedCalender = (props) => {
     props.setDates(fromDate, fromDate);
 
     const jsonForm = {
-      month: fromDate.getMonth()+1,
+      month: fromDate.getMonth() + 1,
       year: fromDate.getFullYear()
     }
     getByQueryParams("/samajwadi-occupied/look-up", jsonForm)
@@ -56,7 +56,7 @@ const OccupiedCalender = (props) => {
     const fromDate = new Date(e.activeStartDate);
     props.setDates(fromDate, fromDate);
     const jsonForm = {
-      month: fromDate.getMonth()+1,
+      month: fromDate.getMonth() + 1,
       year: fromDate.getFullYear()
     }
     getByQueryParams("/samajwadi-occupied/look-up", jsonForm)
@@ -84,7 +84,7 @@ const OccupiedCalender = (props) => {
             tileClassName={({ date }) => {
               return data.data.find(event => new Date(event.fromDate).setHours(0, 0, 0, 0) <= date && new Date(event.toDate).setHours(0, 0, 0, 0) >= date) ? 'highlight-date' : ""
             }}
-            tileContent={({date})=>{
+            tileContent={({ date }) => {
               const event = data.data.find(event => new Date(event.fromDate).setHours(0, 0, 0, 0) <= date && new Date(event.toDate).setHours(0, 0, 0, 0) >= date);
               return event ? <div className='highlight-event px-1 py-2'>
                 <p>{event.eventTitle}</p>
@@ -92,11 +92,19 @@ const OccupiedCalender = (props) => {
                   <p className='px-1'>{event.eventTitle}</p>
                   <p className='px-1'>{event.eventDescription}</p>
                 </div>
-                </div> : ""
+              </div> : ""
             }}
           />
         ) :
-        null}
+
+        (
+          <>
+            <p className='text-danger fs-3'>{error?.errorMsg}</p>
+            <Calendar defaultValue={new Date()} showNavigation={true} selectRange={true}
+            onChange={handleDateChange}
+            onClickMonth={handleClickMonth}
+            onActiveStartDateChange={handleOnActiveStartDateChange}/>
+          </>)}
     </div>
   )
 }

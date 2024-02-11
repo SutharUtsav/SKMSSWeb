@@ -37,6 +37,12 @@ export const Sidebar = () => {
         </li>
 
         <li>
+          <NavLink end to='/admin/social-worker' className='nav-link link-dark'>
+            Social Worker
+          </NavLink>
+        </li>
+
+        <li>
           <NavLink end to='/admin/samajwadi-occupied' className='nav-link link-dark'>
             Samajwadi Occupied
           </NavLink>
