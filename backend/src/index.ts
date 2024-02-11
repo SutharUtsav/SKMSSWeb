@@ -41,6 +41,7 @@ const initApp = async () => {
         const vastipatrakController = require('./controller/vasti-patrak-controller');
         const imageController = require('./controller/image-controller');
         const eventController = require('./controller/event-controller');
+        const samajwadiOccupiedController = require('./controller/samajwadi-occupied-controller');
 
         app.use(`${commonURL}/person`, personController);
         app.use(`${commonURL}/role`, roleController);
@@ -51,7 +52,8 @@ const initApp = async () => {
         app.use(`${commonURL}/vastipatrak`, vastipatrakController);
         app.use(`${commonURL}/auth`,authController);
         app.use(`${commonURL}/image`, imageController);
-        app.use(`${commonURL}/event`, eventController)
+        app.use(`${commonURL}/event`, eventController);
+        app.use(`${commonURL}/samajwadi-occupied`, samajwadiOccupiedController);
 
 
         if (process.env['NODE_ENV'] === "production") {

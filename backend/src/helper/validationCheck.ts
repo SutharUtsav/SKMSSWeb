@@ -6,6 +6,7 @@ import { ErrorDto } from "../dtos/api-response-dto";
 import { EventDto, EventImageDto } from "../dtos/event-dto";
 import { FamilyDto } from "../dtos/family-dto";
 import { PermissionDto, RoleDto } from "../dtos/role-dto";
+import { SamajWadiOccupiedDto } from "../dtos/samajwadi-occpied-dto";
 import { UserDto, UserProfileDto } from "../dtos/user-dto";
 import { areAllFieldsFilled } from "./heper";
 
@@ -17,6 +18,33 @@ export const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export const regexDate = /^\d{4}-\d{2}-\d{2}$/;
 
 //#endregion
+
+
+/**
+ * Samajwadi Occupied validation check
+ * @param body 
+ */
+export const validateSamajwadiOccupied = (body : SamajWadiOccupiedDto) : SamajWadiOccupiedDto | ErrorDto | undefined => {
+    let samajwadiOccupiedDto: SamajWadiOccupiedDto = new SamajWadiOccupiedDto();
+
+    //check for all required fields
+    if(!body.eventTitle || !body.eventDescription || !body.fromDate || !body.toDate || !body.fair || !body.totalDays ){
+        let errorDto = new ErrorDto();
+        errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+        errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        return errorDto;
+    }
+
+    // set fields for SamajWadiOccupiedDto
+    samajwadiOccupiedDto.eventTitle = body.eventTitle;
+    samajwadiOccupiedDto.eventDescription = body.eventDescription;
+    samajwadiOccupiedDto.isOccupied = true;
+    samajwadiOccupiedDto.fair = body.fair;
+    samajwadiOccupiedDto.fromDate = body.fromDate;
+    samajwadiOccupiedDto.toDate = body.toDate;
+    samajwadiOccupiedDto.totalDays = body.totalDays;
+    return samajwadiOccupiedDto;
+}
 
 /**
  * Validation Check Function for Event Entity
