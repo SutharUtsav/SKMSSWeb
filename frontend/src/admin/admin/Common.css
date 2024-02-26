@@ -201,3 +201,10 @@
 .lookup-modal * {
   text-transform: none;
 }
+
+.lookup-modal img {
+  width: 60px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  object-fit: cover;
+}

@@ -21,6 +21,7 @@ import Gallery from "../../admin/gallery/Gallery";
 import Sponsor from "../../admin/sponsor/Sponsor";
 import SamajWadiOccupied from "../../admin/Samajwadi-Occupied/SamajWadiOccupied";
 import SocialWorker from "../../admin/social-worker/SocialWorker";
+import SocialWorkerForm from "../../admin/social-worker/SocialWorkerForm";
 
 
 export const HomeAdmin = () => {
@@ -64,6 +65,7 @@ export const HomeAdmin = () => {
             <Route path="/sponsor/" element={<Sponsor />}></Route>
             <Route path="/samajwadi-occupied/" element={<SamajWadiOccupied />}></Route>
             <Route path="/social-worker/" element={<SocialWorker />}></Route>
+            <Route path="/social-worker/create" element={<SocialWorkerForm />}></Route>
           </Routes>
         </div>
 
