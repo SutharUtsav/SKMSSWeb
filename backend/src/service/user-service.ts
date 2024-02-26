@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize";
+import { Sequelize, Op } from "sequelize";
 import { EnumApiResponse, EnumApiResponseCode, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { EnumFamilyMemberRelation, EnumFamilyMemberRelationName } from "../consts/enumFamilyMemberRelation";
@@ -672,15 +672,50 @@ export class UserService extends BaseService implements IUserService {
                 }
                 else {
 
-                    let userProfile: UserProfileLookUpDto[] = await UserProfile.findAll({
-                        raw: true,
-                        attributes: ['name', 'surname', 'village', 'gender']
+                    // let userProfile: UserProfileLookUpDto[] = await UserProfile.findAll({
+                    //     raw: true,
+                    //     attributes: ['name', 'surname', 'village', 'gender']
+                    // });
+
+                    let userProfile: any = await User.findAll({
+                        attributes: [],
+                        include: [
+                            {
+                                model: UserProfile,
+                                as: 'UserProfileId',
+                                on: {
+                                    userId: Sequelize.literal('"User"."id"="UserProfileId"."userId"')
+                                },
+                                where:{
+                                    name:{
+                                        [Op.ne]: 'Admin'
+                                    }
+                                },
+                                raw:true,
+                                attributes: ['name', 'surname', 'village', 'gender'],
+                            },
+                            {
+                                model: UserProfileImage,
+                                as: 'UserProfileImageId',
+                                attributes: ['image'],
+                                required: false,        // LEFT OUTER JOIN
+                                on: {
+                                    userId: Sequelize.literal('"User"."id"="UserProfileImageId"."userId"'),
+                                },
+                                raw: true,
+                            },
+                        ],
                     });
+
+
 
                     if (userProfile) {
                         apiResponse = new ApiResponseDto();
                         apiResponse.status = 1;
-                        apiResponse.data = userProfile
+                        apiResponse.data = await Promise.all(userProfile.map((user: any) => ({
+                            name: user.UserProfileId.name,
+                            image: user.UserProfileImageId ? `http://${process.env["LOCAL_URL"]}${process.env["LOCAL_SUBURL"]}/image/profile-image/${user.UserProfileImageId.image}` : null,
+                        })))
                     }
                     else {
                         apiResponse = new ApiResponseDto();

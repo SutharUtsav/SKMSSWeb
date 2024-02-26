@@ -73,7 +73,7 @@ router.get('/', async (req: any, res: any) => {
 })
 
 /**
- * Get UserProfile Details based on userId
+ * Get UserProfile Lookup Details 
  */
 router.get('/look-up', async (req: any, res: any) => {
     const userService: IUserService = new UserService();
