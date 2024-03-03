@@ -79,17 +79,19 @@ const TableContainer = ({ columns, data }) => {
                                         {row.cells.map((cell, ind) => {
                                             return (
                                                 <>
-                                                    {ind != 0 ? (
+                                                    {ind !== 0 ? (
                                                         <>
                                                             {cell.column.Header === "Action" ? (
+                                
                                                                 <td {...cell.getCellProps()} aria-colindex="1"
                                                                     role="cell"
                                                                     className="text-center">{cell.render('Cell', { id: row.cells[0].value })}
                                                                 </td>
+                                                                
                                                             ) : cell.column.Header === "Image" ? (
                                                                 <td {...cell.getCellProps()} aria-colindex="1"
                                                                 role="cell"
-                                                                className="text-center"> {cell.render('Cell', {image: row.cells[0].value})}
+                                                                className="text-center"> {cell.render('Cell', {image: cell.value})}
                                                                 </td>
                                                             ) :(
                                                                 <td {...cell.getCellProps()} aria-colindex="1"

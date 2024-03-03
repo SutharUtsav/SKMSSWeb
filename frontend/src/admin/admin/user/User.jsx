@@ -10,6 +10,9 @@ import { EnumConsts } from "../../../consts/EnumConsts";
 import DecisionModal from "../../master/decisionmodal/DecisionModal";
 import BulkUser from "./BulkUser";
 import TableContainer from "../../master/table/TableContainer";
+import DefaultProfileImage from '../../../images/profile.jpg'
+
+
 export const User = () => {
   const navigate = useNavigate();
 
@@ -71,7 +74,17 @@ export const User = () => {
         {
           Header: "Id",
           accessor: "id"
-        }, {
+        },
+        {
+          Header: "Image",
+          accessor: "image",
+          Cell: (props) => {
+            return <img src={props.image ? props.image : DefaultProfileImage} alt='user-profile-image' className='border' style={{
+              width: "50px", borderRadius: "50%", aspectRatio: "1", objectFit: "cover"
+            }} />
+          }
+        },
+        {
           Header: "Username",
           accessor: "name"
         },
@@ -139,7 +152,7 @@ export const User = () => {
               </td>
             )
           }
-        },
+        }
       ]
     }
   ])

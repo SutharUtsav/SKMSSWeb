@@ -1,14 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import useApiCall from '../../../hooks/useApiCall';
-import { get } from 'lodash';
 import { Link, useNavigate } from 'react-router-dom';
-import { del } from '../../../service/api-service';
+import { del, get } from '../../../service/api-service';
 import { MdDelete } from 'react-icons/md';
-import { BiEdit } from 'react-icons/bi';
+import { BiEdit, BiSolidUserDetail } from 'react-icons/bi';
 import DecisionModal from '../../master/decisionmodal/DecisionModal';
 import { EnumConsts } from '../../../consts/EnumConsts';
 import TableContainer from "../../master/table/TableContainer";
-
+import DefaultProfileImage from '../../../images/profile.jpg'
 
 const SocialWorker = () => {
 
@@ -72,29 +71,30 @@ const SocialWorker = () => {
       columns: [
         {
           Header: "Id",
-          accessor: "id"
-        },{
-          Header: "Image",
-          Cell: (props) => {
-            return(
-              <img src={props.image} alt="UserProfileImage" />
-            )
-          }
+          accessor: "userId"
         },
         {
-          Header: "Name",
+          Header: "Image",
+          accessor:"image",
+          Cell : (props) => {
+            return <img src={props.image ? props.image : DefaultProfileImage} alt='user-profile-image' className='border' style={{
+              width:"50px",borderRadius:"50%", aspectRatio:"1", objectFit:"cover"
+            }}/>
+          }
+        }, 
+        {
+          Header: "Username",
           accessor: "name"
         },
         {
           Header: "Surname",
           accessor: "surname"
-        },
-        {
-          Header: "village",
+        }, {
+          Header: "Village",
           accessor: "village"
         },
         {
-          Header: "position",
+          Header: "Position",
           accessor: "position"
         },
         {
@@ -104,15 +104,6 @@ const SocialWorker = () => {
               <td aria-colindex="5" data-label="Actions" role="cell">
                 <div className="action-btns">
                   <button
-                    title="Edit"
-                    className="btn btn-sm btn-primary btn-edit"
-                    onClick={() => {
-                      navigate(`/admin/social-worker/edit/${props.id}`)
-                    }}
-                  >
-                    <BiEdit fill="#fff" size={"2.5rem"} className="m-1" />
-                  </button>
-                  <button
                     title="Delete"
                     className="btn btn-sm btn-danger btn-delete"
                     data-bs-toggle="modal"
@@ -120,8 +111,13 @@ const SocialWorker = () => {
                     onClick={() => {
                       setdeleteRecordId(props.id);
                     }}
+
                   >
-                    <MdDelete fill="#fff" size={"2.5rem"} className="m-1" />
+                    <MdDelete
+                      fill="#fff"
+                      size={"2.5rem"}
+                      className="m-1"
+                    />
                   </button>
                 </div>
               </td>
@@ -154,11 +150,11 @@ const SocialWorker = () => {
         <div className="card content-main">
           <div className="card-header content-title">
             <h4>Social Worker</h4>
-            <span className="pull-right">
+            {/* <span className="pull-right">
               <button onClick={() => {
                 navigate("create")
               }}>Add New</button>
-            </span>
+            </span> */}
           </div>
 
 
@@ -176,7 +172,7 @@ const SocialWorker = () => {
       </div>
       <DecisionModal onYes={() => {
         handleDelete(deleteRecordId)
-      }} deleteRecordId={deleteRecordId} setdeleteRecordId={setdeleteRecordId} topic="Delete Social Worker" message="Are you sure you want to delete this Social Worker?" />
+      }} deleteRecordId={deleteRecordId} setdeleteRecordId={setdeleteRecordId} topic="Delete Social Worker Position" message="Are you sure you want to delete this Social Worker Position?" />
 
     </>
   )
