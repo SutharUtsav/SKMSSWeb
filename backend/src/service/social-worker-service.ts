@@ -1,3 +1,4 @@
+import { Sequelize } from "sequelize";
 import { EnumApiResponse, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
@@ -19,11 +20,11 @@ export interface ISocialWorkerService {
      */
     Create(dtoRecord: SocialWorkerDto): Promise<ApiResponseDto | undefined>;
 
-    // /**
-    //  * Remove Record by given parameter id
-    //  * @param id 
-    //  */
-    // Remove(id: number): Promise<ApiResponseDto | undefined>;
+    /**
+     * Remove Record by given parameter id
+     * @param id 
+     */
+    Remove(id: number): Promise<ApiResponseDto | undefined>;
 }
 
 
@@ -42,14 +43,25 @@ export class SocialWorkerService extends BaseService implements ISocialWorkerSer
                 include: [
                     {
                         model: User,
-                        attributes: ['name', 'surname'],
+                        attributes: ['id', 'name', 'surname', 'village'],
+                        as: "User",
                         include: [
                             {
                                 model: UserProfileImage,
                                 attributes: ['image'],
-                                as: 'UserProfileImageId'
+                                as: 'UserProfileImageId',
+                                required: false,
+                                raw: true,
+                                on: {
+                                    userId: Sequelize.literal('"User"."id"="User->UserProfileImageId"."userId"')
+                                }
                             }
-                        ]
+                        ],
+                        required: true,
+                        raw: true,
+                        on: {
+                            id: Sequelize.literal('"User"."id"="SocialWorker"."userId"'),
+                        }
                     }
                 ]
             });
@@ -57,7 +69,14 @@ export class SocialWorkerService extends BaseService implements ISocialWorkerSer
             if (socialWorkers.length !== 0) {
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                apiResponse.data = socialWorkers
+                apiResponse.data = await Promise.all(socialWorkers.map((socialWorker: any) => ({
+                    userId: socialWorker.User.id,
+                    position : socialWorker.position,
+                    name: socialWorker.User.name,
+                    surname: socialWorker.User.surname,
+                    village: socialWorker.User.village,
+                    image: socialWorker.User.UserProfileImageId.image ? `http://${process.env["LOCAL_URL"]}${process.env["LOCAL_SUBURL"]}/image/profile-image/${socialWorker.User.UserProfileImageId.image}` : null,
+                })))
             }
             else {
                 apiResponse = new ApiResponseDto();
@@ -117,7 +136,7 @@ export class SocialWorkerService extends BaseService implements ISocialWorkerSer
 
                 const socialWorker = await SocialWorker.create({
                     position : dtoRecord.position,
-                    userId: isUser.userId,
+                    userId: isUser.id,
                     createdAt: recordCreatedInfo.createdAt,
                     createdById: recordCreatedInfo.createdById,
                     updatedAt: recordModifiedInfo.updatedAt,
@@ -151,6 +170,50 @@ export class SocialWorkerService extends BaseService implements ISocialWorkerSer
             errorDto.errorCode = '400';
             errorDto.errorMsg = error.toString();
             apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
+
+
+    /**
+     * Remove Record by given parameter id
+     * @param id 
+     */
+    public async Remove(id: number): Promise<ApiResponseDto | undefined> {
+        let apiResponse!: ApiResponseDto;
+
+        try {
+
+            const response = await SocialWorker.destroy({
+                where: {
+                 userId: id
+                }
+            })
+
+            if (response) {
+                apiResponse = new ApiResponseDto()
+                apiResponse.status = 1;
+                apiResponse.data = { status: parseInt(response), message: EnumApiResponseMsg[EnumApiResponse.REMOVE_SUCCESS] };
+                return apiResponse;
+            }
+            else {
+
+                apiResponse = new ApiResponseDto()
+                apiResponse.status = 0;
+                let errorDto = new ErrorDto();
+                errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_RECORD_NOT_FOUND].toString();
+                errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_RECORD_NOT_FOUND]
+                apiResponse.error = errorDto;
+                return apiResponse;
+            }
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            apiResponse.status = 0;
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
             apiResponse.error = errorDto;
             return apiResponse;
         }

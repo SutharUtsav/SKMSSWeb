@@ -61,6 +61,29 @@ router.post('/', upload, async (req: any, res: any) => {
     }
 });
 
+router.delete('/', async (req: any, res: any) => {
+    const useId = req.query.id;
+    if (useId === undefined || useId === null) {
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        })
+    }
+    else {
+        const socialWorkerService: ISocialWorkerService = new SocialWorkerService();
+        const response = await socialWorkerService.Remove(useId);
+
+        if (!response) {
+            res.status(EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                status: 0,
+                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+            })
+        }
+        else {
+            res.send(response)
+        }
+    }
+})
 
 //#endregion
 

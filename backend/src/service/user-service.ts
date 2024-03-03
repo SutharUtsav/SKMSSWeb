@@ -427,12 +427,34 @@ export class UserService extends BaseService implements IUserService {
     public async GetRecords(): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
         try {
-            let users: UserDto[] = await User.findAll({});
+            //let users: UserDto[] = await User.findAll({});
+
+            let users: any = await User.findAll({
+                attributes: ["name","surname", "village", "userType", "id"],
+                include: [
+                    {
+                        model: UserProfileImage,
+                        as: 'UserProfileImageId',
+                        attributes: ['image'],
+                        required: false,        // LEFT OUTER JOIN
+                        on: {
+                            userId: Sequelize.literal('"User"."id"="UserProfileImageId"."userId"'),
+                        },
+                    },
+                ],
+            });
 
             if (users.length !== 0) {
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                apiResponse.data = users
+                apiResponse.data = await Promise.all(users.map((user: any) => ({
+                    id: user.id,
+                    name: user.name,
+                    surname: user.surname,
+                    village: user.village,
+                    userType: user.userType,
+                    image: user.UserProfileImageId ? `http://${process.env["LOCAL_URL"]}${process.env["LOCAL_SUBURL"]}/image/profile-image/${user.UserProfileImageId.image}` : null,
+                })))
             }
             else {
                 apiResponse = new ApiResponseDto();

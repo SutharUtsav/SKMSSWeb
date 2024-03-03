@@ -74,7 +74,7 @@ export const dbContext = () => {
     //One to One relationship between SocialWorker and User
     User.hasOne(SocialWorker, {
         foreignKey: 'id',
-        as: 'UserProfileIdtoSocialWorker'
+        as: 'UserIdtoSocialWorker'
     })
     SocialWorker.belongsTo(User, {
         foreignKey: 'userId'
