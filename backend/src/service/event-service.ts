@@ -1,3 +1,4 @@
+import { Sequelize } from "sequelize";
 import { EnumApiResponse, EnumApiResponseCode, EnumApiResponseMsg } from "../consts/enumApiResponse";
 import { EnumErrorMsg, EnumErrorMsgCode, EnumErrorMsgText } from "../consts/enumErrors";
 import { ApiResponseDto, ErrorDto } from "../dtos/api-response-dto";
@@ -10,6 +11,9 @@ import { BaseService } from "./base-service";
 const sequelize = require('../config/db')
 const _ = require('lodash');
 
+const defaultLimit = 10;
+const defaultOffset = 0;
+
 export interface IEventService {
     /**
      * Get All Records of Event Entity 
@@ -21,6 +25,13 @@ export interface IEventService {
      * @param id 
      */
     GetRecordById(id: number): Promise<ApiResponseDto | undefined>
+
+    /**
+     * Get Recent Event Records based on limit and offset
+     * @param limit 
+     * @param offset 
+     */
+    GetRecentRecords(limit: number, offset: number, activityCategory?:string): Promise<ApiResponseDto | undefined>
 
     /**
      * Create Record for Entity Event
@@ -170,35 +181,35 @@ export class EventService extends BaseService implements IEventService {
             if (event) {
 
                 let eventImages: EventImageDto[] = await EventImages.findAll({
-                    where:{ 
+                    where: {
                         eventId: id
                     },
                     raw: true,
                     attributes: ['imageURL', 'isCoverImage']
                 })
 
-                
+
                 apiResponse = new ApiResponseDto();
                 apiResponse.status = 1;
-                if(eventImages){
-                    const mainImageURL = _.chain(eventImages).find({isCoverImage:true}).get('imageURL').value();
-                    console.log("mainImageURL : "+mainImageURL)
+                if (eventImages) {
+                    const mainImageURL = _.chain(eventImages).find({ isCoverImage: true }).get('imageURL').value();
+                    console.log("mainImageURL : " + mainImageURL)
 
-                    let imageURLs = _.chain(eventImages).filter({isCoverImage:false}).map('imageURL').value();
+                    let imageURLs = _.chain(eventImages).filter({ isCoverImage: false }).map('imageURL').value();
 
                     let modifiedImageURLs = _.map(imageURLs, (imageURL: string) => `http://${process.env["LOCAL_URL"]}${process.env["LOCAL_SUBURL"]}/event/image/${imageURL}`)
-                
+
                     // console.log("ImageURLs : "+imageURLs)
                     // console.log("ImageURLs : "+modifiedImageURLs)
 
                     apiResponse.data = {
                         ...event,
                         mainImageURL: `http://${process.env["LOCAL_URL"]}${process.env["LOCAL_SUBURL"]}/event/image/${mainImageURL}`,
-                        imageURLs : modifiedImageURLs
+                        imageURLs: modifiedImageURLs
                     }
-                   
+
                 }
-                else{
+                else {
                     apiResponse.data = event
                 }
 
@@ -212,6 +223,85 @@ export class EventService extends BaseService implements IEventService {
                 apiResponse.error = errorDto;
 
             }
+            return apiResponse;
+        }
+        catch (error: any) {
+            apiResponse = new ApiResponseDto();
+            let errorDto = new ErrorDto();
+            errorDto.errorCode = '400';
+            errorDto.errorMsg = error.toString();
+            apiResponse.status = 0;
+            apiResponse.error = errorDto;
+            return apiResponse;
+        }
+    }
+
+    /**
+     * Get Recent Event Records based on limit and offset
+     * @param limit 
+     * @param offset 
+     */
+    public async GetRecentRecords(limit: number = defaultLimit, offset: number = defaultOffset, activityCategory?: string | undefined): Promise<ApiResponseDto | undefined> {
+        let apiResponse!: ApiResponseDto;
+        try {
+
+            console.log(activityCategory)
+            let activityCategoryCondition = activityCategory ? {
+                where: {
+                    activityCategory
+                }
+            }: {};
+
+            let events: [] = await Events.findAll({
+                attributes: ['id', 'title', 'description', 'eventOn', 'activityCategory'],
+                order: [['eventOn', 'DESC']],
+                ...activityCategoryCondition,
+                limit: limit,
+                offset: offset,
+                raw: true,
+                include: [
+                    {
+                        model: EventImages,
+                        as: 'EventEventImageId',
+                        attributes: ['imageURL', 'isCoverImage'],
+                        required: false,        // LEFT OUTER JOIN
+                        on: {
+                            id: Sequelize.literal('"Events"."id"="EventEventImageId"."eventId"'),
+                        },
+                    },
+                ],
+            })
+
+            const result = await Promise.all(events.reduce((newEvent: any, event: any) => {
+                const existingEvent = newEvent.find((e: any) => e.id === event.id);
+
+                const imageDetails = {
+                    imageURL: event["EventEventImageId.imageURL"] ? `http://${process.env["LOCAL_URL"]}${process.env["LOCAL_SUBURL"]}/event/image/${event['EventEventImageId.imageURL']}` : null,
+                    isCoverImage: event['EventEventImageId.isCoverImage'],
+                } ;
+
+                if (existingEvent) {
+                    if(imageDetails.imageURL)
+                        existingEvent.images.push(imageDetails);
+                }
+                else {
+                    newEvent.push({
+                        id: event.id,
+                        title: event.title,
+                        description: event.description,
+                        eventOn: event.eventOn,
+                        activityCategory: activityCategory ? event.activityCategory : null,
+                        images: imageDetails.imageURL ?  [imageDetails] : []
+                    });
+                }
+                return newEvent;
+            }, []));
+
+            console.log(result);
+
+            apiResponse = new ApiResponseDto();
+            apiResponse.status = 1;
+            apiResponse.data = result;
             return apiResponse;
         }
         catch (error: any) {
@@ -361,7 +451,7 @@ export class EventService extends BaseService implements IEventService {
             console.log(isEvent)
             if (isEvent) {
 
-                let eventImages : EventImageDto = await EventImages.findOne({
+                let eventImages: EventImageDto = await EventImages.findOne({
                     where: {
                         eventId: id,
                         isCoverImage: true
@@ -370,7 +460,7 @@ export class EventService extends BaseService implements IEventService {
                     attributes: ['id']
                 })
 
-            console.log( eventImages)
+                console.log(eventImages)
 
                 if (eventImages) {
 
@@ -420,7 +510,7 @@ export class EventService extends BaseService implements IEventService {
 
                     const isCreatedImages = await EventImages.create(dtoImageRecord)
 
-                    if(!isCreatedImages || !updatedRecord){
+                    if (!isCreatedImages || !updatedRecord) {
                         return undefined;
                     }
                     // console.log("EventImages: ", eventImages)
@@ -480,7 +570,7 @@ export class EventService extends BaseService implements IEventService {
                 })
 
                 for (const eventImage of eventImages) {
-                    await RemoveFile(eventImage.imageURL);
+                    await RemoveFile(`Images\\Event-Webp\\${eventImage.imageURL}`);
                 }
 
                 if (respRemoveImg === null || respRemoveImg === undefined) {
@@ -596,7 +686,7 @@ export class EventService extends BaseService implements IEventService {
                 return apiResponse;
             }
 
-            await RemoveFile("Images/Event-Webp/"+eventImages.imageURL);
+            await RemoveFile("Images/Event-Webp/" + eventImages.imageURL);
 
             const respRemoveImg = await EventImages.destroy({
                 where: {

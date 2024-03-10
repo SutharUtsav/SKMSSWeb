@@ -31,7 +31,7 @@ const initApp = async () => {
         app.use('/Images', express.static('./Images'))   
 
         //routes
-        const personController = require('./controller/person-controller');
+        //const personController = require('./controller/person-controller');
         const roleController = require('./controller/role-controller')
         const rolePermissionController = require('./controller/role-permission-controller');
         const userController = require('./controller/user-controller');
@@ -44,7 +44,7 @@ const initApp = async () => {
         const samajwadiOccupiedController = require('./controller/samajwadi-occupied-controller');
         const socialWorkerController = require('./controller/social-worker-controller');
 
-        app.use(`${commonURL}/person`, personController);
+        //app.use(`${commonURL}/person`, personController);
         app.use(`${commonURL}/role`, roleController);
         app.use(`${commonURL}/role-permission`, rolePermissionController);
         app.use(`${commonURL}/family`, familyController);

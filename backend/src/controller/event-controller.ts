@@ -225,6 +225,33 @@ router.delete('/images', async (req: any, res: any) => {
 //#region CRUD operation on Event Entity
 
 /**
+ * Get Recent events 
+ */
+router.get('/recent-events', async (req: any, res:any) => {
+    const limit = req.query.limit;
+    const offset = req.query.offset;
+    const activityCategory = req.query.activityCategory;
+
+    console.log(typeof(activityCategory))
+
+    console.log(activityCategory && activityCategory!=='undefined') 
+
+    const eventService: IEventService = new EventService();
+    const response = await eventService.GetRecentRecords(limit,offset, activityCategory && activityCategory!=='undefined'? activityCategory : null);
+
+    if (!response) {
+        res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+            status: 0,
+            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+        })
+    }
+    else {
+        res.send(response)
+    }
+
+})
+
+/**
  * Get All Records of Event
  */
 router.get('/', async (req: any, res: any) => {
@@ -241,7 +268,6 @@ router.get('/', async (req: any, res: any) => {
         res.send(response)
     }
 })
-
 
 /**
  * Get All Lookup Records of Event
@@ -302,6 +328,8 @@ router.get('/:id', async (req: any, res: any) => {
 })
 
 
+
+
 const uploadEventMainImage = multer({
     storage: EventImagesStorage,
     limits: { fileSize: "5000000" }, //5 MB
@@ -317,7 +345,6 @@ const uploadEventMainImage = multer({
         cb('Give proper file format to upload')
     }
 }).single('mainImageURL');
-
 
 /**
  * Add Event Detail
@@ -404,7 +431,6 @@ router.post('/', uploadEventMainImage, async (req: any, res: any) => {
         })
     }
 });
-
 
 
 /**
