@@ -11,7 +11,7 @@ const ActivityContainer = () => {
     return (
         <section className='activity-category'>
             <div className='container activity-container'>
-                <div className='activity col-12 col-sm-10 col-md-4' onClick={()=>{navigate("/events")}}>
+                <div className='activity col-12 col-sm-10 col-md-4' onClick={()=>{navigate("/activity/social")}}>
                     <div className='logo-container'>
                         <img src={Social} alt='Social Activity'></img>
                     </div>
@@ -20,7 +20,7 @@ const ActivityContainer = () => {
 
                 </div>
 
-                <div className='activity col-12 col-sm-10 col-md-4 ' onClick={()=>{navigate("/events")}}>
+                <div className='activity col-12 col-sm-10 col-md-4 ' onClick={()=>{navigate("/activity/educational")}}>
                     <div className='logo-container'>
                         <img src={Educational} alt='Educational Activity'></img>
                     </div>
@@ -28,7 +28,7 @@ const ActivityContainer = () => {
                     <p> Educational activity is the activities of educating or instructing; activities that impart knowledge or skill. </p>
                 </div>
 
-                <div className='activity col-12 col-sm-10 col-md-4 ' onClick={()=>{navigate("/events")}}>
+                <div className='activity col-12 col-sm-10 col-md-4 ' onClick={()=>{navigate("/activity/other")}}>
                     <div className='logo-container'>
                         <img src={Fun} alt='Other Activity'></img>
                     </div>

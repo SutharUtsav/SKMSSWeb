@@ -37,7 +37,9 @@
 }
 
 .admin-panel .content-main .content-body input,
-.admin-panel .content-main .content-body textarea {
+.admin-panel .content-main .content-body textarea,
+.admin-panel .content-main .content-body select 
+  {
   webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;

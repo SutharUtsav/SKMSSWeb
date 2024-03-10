@@ -61,6 +61,7 @@ const EventForm = (props) => {
   };
 
   const handleChange = (e) => {
+    
     seteventForm({
       ...eventForm,
       [e.target.name]: e.target.value,
@@ -284,8 +285,13 @@ const EventForm = (props) => {
                 <label htmlFor="eventInputActivityCatagory">
                   Activity Category
                 </label>
-                {/* <i className='text-danger'>*</i> */}
-                <input
+                <select className="form-select" name="activityCatagory" id="eventInputActivityCatagory" onChange={handleChange}>
+                  <option value=""></option>
+                  <option value="social">Social</option>
+                  <option value="educational">Educational</option>
+                  <option value="other">Other</option>
+                </select>
+                {/* <input
                   id="eventInputActivityCatagory"
                   type="text"
                   name="activityCatagory"
@@ -293,7 +299,7 @@ const EventForm = (props) => {
                   className="form-control"
                   value={eventForm.activityCategory}
                   onChange={handleChange}
-                />
+                /> */}
               </div>
             ) : null}
 

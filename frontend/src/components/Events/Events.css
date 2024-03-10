@@ -48,7 +48,13 @@
 }
 
 .event-page-container .events-container {
-  max-width: 80%;
+  flex: 1;
+}
+
+.event-page-container .events-container .load-more-events{
+  width: 100%;
+  text-align: center;
+  color: var(--secondary-background);
 }
 
 .events-list-section .event-page-sidenav-container {
@@ -60,6 +66,7 @@
 .event-page-container .event,
 .events-list-section .event-wrapper {
   margin: 20px 0;
+  padding: 30px;
   cursor: pointer;
   border-bottom: 1px solid #ddd;
 }
@@ -83,7 +90,7 @@
 .event-page-container .events-container .image-date-wrapper,
 .events-list-section .event-wrapper .image-date-wrapper {
   display: flex;
-  gap: 10px;
+  gap: 15px;
 }
 
 .event-page-container .events-container .date-container,

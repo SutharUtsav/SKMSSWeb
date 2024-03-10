@@ -57,6 +57,7 @@ function App() {
       <Routes>
         <Route path="/" exact={true} element={<Layout Component={Home} />} />
         <Route path="/events" element={<Layout Component={Events} />}></Route>
+        <Route path="/activity/:activityCategory" element={<Layout Component={Events}/>}></Route>
         <Route
           path="/events/:id"
           element={<Layout Component={Event} />}
