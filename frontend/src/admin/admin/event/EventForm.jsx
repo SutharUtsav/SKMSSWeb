@@ -285,7 +285,7 @@ const EventForm = (props) => {
                 <label htmlFor="eventInputActivityCatagory">
                   Activity Category
                 </label>
-                <select className="form-select" name="activityCatagory" id="eventInputActivityCatagory" onChange={handleChange}>
+                <select className="form-select" name="activityCategory" id="eventInputActivityCatagory" onChange={handleChange}>
                   <option value=""></option>
                   <option value="social">Social</option>
                   <option value="educational">Educational</option>
