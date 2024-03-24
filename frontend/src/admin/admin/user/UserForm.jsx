@@ -313,6 +313,7 @@ const UserForm = (props) => {
   //selected Father details
   useEffect(() => {
     if (selectedFather !== null) {
+      console.log("useEffect" + selectedFather);
       setUserForm({
         ...userForm,
         fatherName: selectedFather.name,
@@ -776,6 +777,7 @@ const UserForm = (props) => {
                   }
                   onClick={() => {
                     setmodalForMother(true);
+                    console.log("open modal for mother")
                   }}
                 />
               </div>
@@ -797,6 +799,8 @@ const UserForm = (props) => {
                   }
                   onClick={() => {
                     setmodalForFather(true);
+                    console.log("open modal for father")
+
                   }}
                 />
               </div>

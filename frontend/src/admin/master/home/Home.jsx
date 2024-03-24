@@ -65,7 +65,7 @@ export const HomeAdmin = () => {
             <Route path="/sponsor/" element={<Sponsor />}></Route>
             <Route path="/samajwadi-occupied/" element={<SamajWadiOccupied />}></Route>
             <Route path="/social-worker/" element={<SocialWorker />}></Route>
-            <Route path="/social-worker/create" element={<SocialWorkerForm />}></Route>
+            {/* <Route path="/social-worker/create" element={<SocialWorkerForm />}></Route> */}
           </Routes>
         </div>
 

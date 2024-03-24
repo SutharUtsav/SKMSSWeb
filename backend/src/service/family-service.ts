@@ -82,7 +82,7 @@ export class FamilyService extends BaseService implements IFamilyService {
                     let families: any = await sequelize.query(`
                     SELECT "Family"."surname", "Family"."village", "Family"."villageGuj", "Family"."mainFamilyMemberName", "UserProfileImage"."image"
                     FROM "Family" AS "Family"
-                    JOIN "User" AS "User" ON "Family"."surname"="User"."surname" AND "Family"."mainFamilyMemberName"="User"."name"
+                    LEFT OUTER JOIN "User" AS "User" ON "Family"."surname"="User"."surname" AND "Family"."mainFamilyMemberName"="User"."name"
                     LEFT OUTER JOIN "UserProfileImage" AS "UserProfileImage" ON "UserProfileImage"."userId"="User"."id"
                   `, { type: sequelize.QueryTypes.SELECT });;
 

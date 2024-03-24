@@ -1,8 +1,16 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import "../Common.css";
 import UserImage from "../../../images/profile.jpg"
 const UserLookUpModal = (props) => {
   const closeModal = useRef(null);
+
+
+  useEffect(()=>{
+
+    console.log(props.modalForFather)
+    console.log(props.modalForMother)
+    
+  })
 
   return (
     <div
@@ -44,29 +52,27 @@ const UserLookUpModal = (props) => {
                     }
                   }}
                 >
-                  {`No ${
-                    props.modalForFather
+                  {`No ${props.modalForFather
                       ? "Father"
                       : props.modalForMother
-                      ? "Mother"
-                      : "User"
-                  } Selected`}
+                        ? "Mother"
+                        : "User"
+                    } Selected`}
                 </div>
                 {props.userLookUp.map((user, index) => (
                   <div key={index}>
                     {(props.modalForFather && user.gender === "MALE") ||
-                    (props.modalForMother && user.gender === "FEMALE") ? (
+                      (props.modalForMother && user.gender === "FEMALE") ? (
                       <div
-                        className={`border-bottom px-5 py-4 lookup-modal ${
-                          (props.selectedFather &&
+                        className={`border-bottom px-5 py-4 lookup-modal ${(props.selectedFather &&
                             props.selectedFather.name === user.name) ||
-                          (props.selectedMother &&
-                            props.selectedMother.name === user.name) ||
-                          (props.selectedUser &&
-                            props.selectedUser.name === user.name)
+                            (props.selectedMother &&
+                              props.selectedMother.name === user.name) ||
+                            (props.selectedUser &&
+                              props.selectedUser.name === user.name)
                             ? "active"
                             : ""
-                        }`}
+                          }`}
                         data-bs-dismiss="modal"
                         onClick={() => {
                           if (props.modalForFather) {
@@ -119,63 +125,64 @@ const UserLookUpModal = (props) => {
                           </div>
                         )}
                       </div>
-                    ) : (
-                      <div
-                        className={`border-bottom px-5 py-4 lookup-modal ${
-                          props.selectedUser &&
-                          props.selectedUser.name === user.name
-                            ? "active"
-                            : ""
-                        }`}
-                        data-bs-dismiss="modal"
-                        onClick={() => {
-                          if (props.modalForUser) {
-                            props.setselectedUser(user);
-                          }
+                    ) : null
+                    // (
+                    //   <div
+                    //     className={`border-bottom px-5 py-4 lookup-modal ${props.selectedUser &&
+                    //         props.selectedUser.name === user.name
+                    //         ? "active"
+                    //         : ""
+                    //       }`}
+                    //     data-bs-dismiss="modal"
+                    //     onClick={() => {
+                    //       if (props.modalForUser) {
+                    //         props.setselectedUser(user);
+                    //       }
 
-                          closeModal.current.click();
-                        }}
-                      >
-                        {props.isImageShown ? (
-                          <div className="d-flex align-items-center justify-content-between">
-                            {user.image ? (
-                              <img src={user.image} alt="user=profile-image" />
-                            ) : (
-                              <img src={UserImage} alt="user=profile-image" />
-                            )}
-                            <div className="d-flex align-items-center justify-content-between">
-                              <p className="d-block">
-                                <b>Name :</b>
-                                <span>{user.name}</span>
-                              </p>
-                              <p>
-                                <b>Surname : </b>
-                                {user.surname}
-                              </p>
-                              <p>
-                                <b>Village : </b>
-                                {user.village}
-                              </p>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="d-flex align-items-center justify-content-between">
-                            <p className="d-block">
-                              <b>Name :</b>
-                              <span>{user.name}</span>
-                            </p>
-                            <p>
-                              <b>Surname : </b>
-                              {user.surname}
-                            </p>
-                            <p>
-                              <b>Village : </b>
-                              {user.village}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                    //       closeModal.current.click();
+                    //     }}
+                    //   >
+                    //     {props.isImageShown ? (
+                    //       <div className="d-flex align-items-center justify-content-between">
+                    //         {user.image ? (
+                    //           <img src={user.image} alt="user=profile-image" />
+                    //         ) : (
+                    //           <img src={UserImage} alt="user=profile-image" />
+                    //         )}
+                    //         <div className="d-flex align-items-center justify-content-between">
+                    //           <p className="d-block">
+                    //             <b>Name :</b>
+                    //             <span>{user.name}</span>
+                    //           </p>
+                    //           <p>
+                    //             <b>Surname : </b>
+                    //             {user.surname}
+                    //           </p>
+                    //           <p>
+                    //             <b>Village : </b>
+                    //             {user.village}
+                    //           </p>
+                    //         </div>
+                    //       </div>
+                    //     ) : (
+                    //       <div className="d-flex align-items-center justify-content-between">
+                    //         <p className="d-block">
+                    //           <b>Name :</b>
+                    //           <span>{user.name}</span>
+                    //         </p>
+                    //         <p>
+                    //           <b>Surname : </b>
+                    //           {user.surname}
+                    //         </p>
+                    //         <p>
+                    //           <b>Village : </b>
+                    //           {user.village}
+                    //         </p>
+                    //       </div>
+                    //     )}
+                    //   </div>
+                    // )
+                    }
                   </div>
                 ))}
               </>

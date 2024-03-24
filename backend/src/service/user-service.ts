@@ -737,6 +737,9 @@ export class UserService extends BaseService implements IUserService {
                         apiResponse.data = await Promise.all(userProfile.map((user: any) => ({
                             name: user.UserProfileId.name,
                             image: user.UserProfileImageId ? `http://${process.env["LOCAL_URL"]}${process.env["LOCAL_SUBURL"]}/image/profile-image/${user.UserProfileImageId.image}` : null,
+                            surname: user.UserProfileId.surname,
+                            gender: user.UserProfileId.gender,
+                            village: user.UserProfileId.village
                         })))
                     }
                     else {
