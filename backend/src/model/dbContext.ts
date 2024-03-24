@@ -1,8 +1,10 @@
 import { Events } from "./event";
 import { EventImages } from "./eventImage";
 import { Family } from "./family";
+import { Donor, Funds } from "./fund-donor";
 import { Role, RolePermission, RoleRolePermission } from "./role"
 import { SocialWorker } from "./socialWorket";
+import { Sponsor, Sponsorship } from "./sponsor";
 import { User } from "./user";
 import { UserProfile, UserProfileImage } from "./userProfile";
 
@@ -79,4 +81,31 @@ export const dbContext = () => {
     SocialWorker.belongsTo(User, {
         foreignKey: 'userId'
     })
+
+    //One to Many relationship between Sponsor and Sponsorship
+    Sponsor.hasMany(Sponsorship, {
+        foreignKey: 'id',
+        as: 'SponsorShip'
+    });
+    Sponsorship.belongsTo(Sponsor, {
+        foreignKey: 'sponsorId'
+    })
+
+    //One to one relationship between Donor and User
+    User.hasOne(Donor, {
+        foreignKey: 'id',
+        as: 'UserIdtoDonor'
+    })
+    Donor.belongsTo(User, {
+        foreignKey: 'userId'
+    })
+
+    //One to Many relationship beetween Donor and Funds
+    Donor.hasMany(Funds, {
+        foreignKey: 'id',
+        as: 'donorFunds'
+    });
+    Funds.belongsTo(Donor, {
+        foreignKey: 'donorId'
+    }) 
 }

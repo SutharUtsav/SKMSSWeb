@@ -313,17 +313,19 @@ router.get('/:id', async (req: any, res: any) => {
             message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
         })
     }
-    const eventService: IEventService = new EventService();
-    const response = await eventService.GetRecordById(id);
-
-    if (!response) {
-        res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
-            status: 0,
-            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
-        })
-    }
-    else {
-        res.send(response)
+    else{
+        const eventService: IEventService = new EventService();
+        const response = await eventService.GetRecordById(id);
+    
+        if (!response) {
+            res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+                status: 0,
+                message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+            })
+        }
+        else {
+            res.send(response)
+        }
     }
 })
 
@@ -579,7 +581,7 @@ const convertToWebP = async (filePaths: string[], outputDir: string) => {
 
             await sharp(imageURL)
                 .rotate()
-                .webp({ quality: 60 })
+                .webp({ quality: 90 })
                 .toFile(outputFilePath)
 
             outputFiles.push(outputFile);

@@ -8,6 +8,7 @@ import { FamilyDto } from "../dtos/family-dto";
 import { PermissionDto, RoleDto } from "../dtos/role-dto";
 import { SamajWadiOccupiedDto } from "../dtos/samajwadi-occpied-dto";
 import { SocialWorkerDto } from "../dtos/social-worker-dto";
+import { SponsorDto } from "../dtos/sponsor-dto";
 import { UserDto, UserProfileDto } from "../dtos/user-dto";
 import { areAllFieldsFilled } from "./heper";
 
@@ -432,3 +433,85 @@ export const validateBulkEntries = (row: any): any => {
 }
 
 //#endregion
+
+//#region Validation functions for sponsors and sponsorships
+
+export const validateSponsor = (body: SponsorDto) : SponsorDto | ErrorDto | undefined => {
+    let sponsorDto: SponsorDto = new SponsorDto();
+
+    if(!body.name || !body.email || !body.phone ){
+        let errorDto = new ErrorDto();
+        errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+        errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        return errorDto;
+    }
+
+    sponsorDto.name = body.name;
+    sponsorDto.email = body.email;
+    sponsorDto.phone = body.phone;
+    sponsorDto.address = body.address;
+    
+    return sponsorDto;
+}
+
+export const validateSponsorship = (body : SponsorDto) : SponsorDto | ErrorDto | undefined => {
+    let sponsorDto: SponsorDto = new SponsorDto();
+
+    if(!body.amount || !body.startDate || !body.endDate || !body.paymentStatus || !body.purpose){
+        let errorDto = new ErrorDto();
+        errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+        errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        return errorDto;
+    }
+
+    let startDate = new Date(body.startDate).toISOString().slice(0, 19).replace('T', ' ');
+    let endDate = new Date(body.endDate).toISOString().slice(0, 19).replace('T', ' ');
+
+
+    sponsorDto.purpose = body.purpose;
+    sponsorDto.amount = body.amount;
+    sponsorDto.startDate = startDate;
+    sponsorDto.endDate = endDate;
+    sponsorDto.paymentStatus = body.paymentStatus;
+
+    return sponsorDto;
+
+}
+
+
+export const validateSponsorSponsorships = (body : SponsorDto, paths : string[]) : SponsorDto | ErrorDto | undefined => {
+
+    let sponsorDto: SponsorDto = new SponsorDto();
+
+    if(!body.name || !body.email || !body.phone || !body.amount || !body.startDate || !body.endDate || !body.paymentStatus || !body.purpose){
+        console.log("failed validation"  );
+
+        SponsorDto.printToConsole(body)
+        
+        let errorDto = new ErrorDto();
+        errorDto.errorCode = EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST].toString();
+        errorDto.errorMsg = EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+        return errorDto;
+    }
+
+    let startDate = new Date(body.startDate).toISOString().slice(0, 19).replace('T', ' ');
+    let endDate = new Date(body.endDate).toISOString().slice(0, 19).replace('T', ' ');
+
+    sponsorDto.name = body.name;
+    sponsorDto.email = body.email;
+    sponsorDto.phone = body.phone;
+    sponsorDto.address = body.address;
+    sponsorDto.purpose = body.purpose;
+    sponsorDto.amount = body.amount;
+    sponsorDto.startDate = startDate
+    sponsorDto.endDate = endDate;
+    sponsorDto.paymentStatus = body.paymentStatus;
+    sponsorDto.adsAttachments = paths.join(',');
+
+
+    return sponsorDto;
+}
+
+//#endregion
+
+

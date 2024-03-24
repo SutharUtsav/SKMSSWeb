@@ -269,9 +269,15 @@ SELECT ROW_NUMBER() OVER (PARTITION BY f."village" ORDER BY f."village") AS "kut
     private async CreateVastiPatrakPDF( outputFileName: string, pdfPaths: string[]) {
         const merger = new PDFMerger();
 
-        await Promise.all(pdfPaths.map(async (pdfPath) => {
+        //For in invalid sequencing issue
+
+        for(let pdfPath of pdfPaths){
             await merger.add(pdfPath);
-        }))
+        }
+
+        // await Promise.all(pdfPaths.map(async (pdfPath) => {
+        //     await merger.add(pdfPath);
+        // }))
 
         await merger.setMetadata({
             producer: "pdf-merger-js based script",

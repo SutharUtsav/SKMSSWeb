@@ -43,6 +43,8 @@ const initApp = async () => {
         const eventController = require('./controller/event-controller');
         const samajwadiOccupiedController = require('./controller/samajwadi-occupied-controller');
         const socialWorkerController = require('./controller/social-worker-controller');
+        const sponsorController = require('./controller/sponsor-controller');
+        const fundsController = require('./controller/funds-controller');
 
         //app.use(`${commonURL}/person`, personController);
         app.use(`${commonURL}/role`, roleController);
@@ -56,6 +58,9 @@ const initApp = async () => {
         app.use(`${commonURL}/event`, eventController);
         app.use(`${commonURL}/samajwadi-occupied`, samajwadiOccupiedController);
         app.use(`${commonURL}/social-worker`, socialWorkerController);
+        app.use(`${commonURL}/sponsor`, sponsorController);
+        app.use(`${commonURL}/funds`, fundsController);
+
 
 
         if (process.env['NODE_ENV'] === "production") {

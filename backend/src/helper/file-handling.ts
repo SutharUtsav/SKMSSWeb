@@ -21,20 +21,21 @@ export const RemoveFile = async (filePath: string) => {
 
   // Check if the file exists before attempting to delete it
   if (fs.existsSync(absoluteFilePath)) {
-    await fs.unlink(absoluteFilePath, (err: any) => {
-      if (err) {
-        return {
-          status: 0,
-          message: err
-        };
-      }
-      else {
-        return {
-          status: responseCode.FILE_REMOVED,
-          message: responseMsg.FILE_REMOVED
-        };
-      }
-    });
+    try {
+
+      await fs.promises.unlink(absoluteFilePath);
+      return {
+        status: responseCode.FILE_REMOVED,
+        message: responseMsg.FILE_REMOVED
+      };
+
+    }
+    catch (error: any) {
+      return {
+        status: 0,
+        message: error
+      };
+    }
   }
 
   return {
@@ -96,7 +97,7 @@ export const ReadFilesFromDirectory = async (directoryPath: string) => {
   const files = await fs.readdirSync(directoryPath);
   const fileContentDict: FileContentDictionary = {};
 
-  files.forEach(async(file:any) => {
+  files.forEach(async (file: any) => {
     const filePath = path.join(directoryPath, file);
 
     // Read the content of the file

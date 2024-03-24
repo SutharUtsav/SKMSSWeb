@@ -108,6 +108,7 @@ export class BaseDtoWithCommonFields extends BaseDtoWithCreatedInfoFields implem
     updatedAt!: Date;
     updatedById!: number;
     rowVersion!: Uint8Array;
+    
 }
 
 //#endregion

@@ -48,6 +48,9 @@ router.get('/profile-image/:imageName', async (req: any, res: any) => {
 
 //#region Common Images model specific api
 
+/**
+ * Get Common Image based on image name
+ */
 router.get('/common-image/:imageName', async (req: any, res: any) => {
   // Get the image name from the request
   const imageName = req.params.imageName;
@@ -78,43 +81,29 @@ router.get('/common-image/:imageName', async (req: any, res: any) => {
   }
 })
 
-router.get('/common-image', async (req:any, res:any) => {
+
+/**
+ * Get Common Image
+ */
+router.get('/common-image', async (req: any, res: any) => {
+
+  const category = req.query.category;
+
   const commonImageService: ICommonImagesService = new CommonImagesService();
-    const response = await commonImageService.GetRecords();
+  const response = await commonImageService.GetRecords(category ? category : null);
 
-    if (!response) {
-        res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
-            status: 0,
-            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
-        })
-    }
-    else {
-        res.send(response)
-    }
-})
-
-router.get('/common-image/:category', async (req:any, res:any) => {
-  const category = req.params.category;
-
-  if(category===undefined || category===null){
-    res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
-        status: 0,
-        message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+  if (!response) {
+    res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+      status: 0,
+      message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
     })
-}
-  const commonImageService: ICommonImagesService = new CommonImagesService();
-    const response = await commonImageService.GetRecords(category);
-
-    if (!response) {
-        res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
-            status: 0,
-            message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
-        })
-    }
-    else {
-        res.send(response)
-    }
+  }
+  else {
+    res.send(response)
+  }
 })
+
+
 
 
 // Multer setup for image upload
@@ -164,7 +153,7 @@ router.post('/common-image', uploadCommonImage, async (req: any, res: any) => {
 
   sharp(imageURL)
     .rotate()
-    .webp({ quality: 60 }) // convert to webp format
+    .webp({ quality: 80 }) // convert to webp format
     .toFile(outputFilePath)
     .then(async (data: any) => {
       const body: CommonImagesDto = req.body;
@@ -175,8 +164,8 @@ router.post('/common-image', uploadCommonImage, async (req: any, res: any) => {
         res.send({ status: EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG], message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG] })
       }
       else {
-         const commonImageService: ICommonImagesService = new CommonImagesService();
-         const response = await commonImageService.Create(body);
+        const commonImageService: ICommonImagesService = new CommonImagesService();
+        const response = await commonImageService.Create(body);
 
         await RemoveFilesFromDirectory(process.cwd() + '/Images/Common');
         if (!response) {
@@ -197,6 +186,34 @@ router.post('/common-image', uploadCommonImage, async (req: any, res: any) => {
         message: String(error)
       })
     })
+})
+
+/**
+ * Remove Common Image
+ */
+router.delete('/common-image', async (req: any, res: any) => {
+  const id = req.query.id;
+
+  if (id === undefined || id === null) {
+    res.status(EnumErrorMsgCode[EnumErrorMsg.API_BAD_REQUEST]).send({
+      status: 0,
+      message: EnumErrorMsgText[EnumErrorMsg.API_BAD_REQUEST]
+    })
+  }
+  else {
+    const commonImageService: ICommonImagesService = new CommonImagesService();
+    const response = await commonImageService.Remove(id);
+
+    if (!response) {
+      res.status(EnumErrorMsgCode[EnumErrorMsg.API_SOMETHING_WENT_WRONG]).send({
+        status: 0,
+        message: EnumErrorMsgText[EnumErrorMsg.API_SOMETHING_WENT_WRONG]
+      })
+    }
+    else {
+      res.send(response)
+    }
+  }
 })
 
 //#endregion
