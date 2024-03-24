@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize"
-import { ModelBaseWithCommonFields } from "./modelBase"
+import { ModelBaseWithCommonFields, commonFieldsArr } from "./modelBase"
 
 const sequelize = require('../config/db')
 
@@ -22,6 +22,11 @@ export const Funds = sequelize.define('Funds', {
 })
 
 
+export const fundsAttributesList = ['id','donorId', 'amount', 'donationDate', 'purpose', ...commonFieldsArr];
+export const fundsAttributesLookupList = ['id','donorId', 'amount', 'donationDate', 'purpose'];
+
+
+
 export const Donor = sequelize.define('Donor', {
     name: {
         type: DataTypes.TEXT,
@@ -42,3 +47,8 @@ export const Donor = sequelize.define('Donor', {
 },{
     tableName: 'Donor',
 })
+
+
+
+export const donorAttributesList = ['id','name', 'communityMemberId', 'email', 'phone', 'address', ...commonFieldsArr];
+export const donorAttributesLookupList = ['id','name', 'communityMemberId', 'email', 'phone', 'address'];

@@ -1,4 +1,3 @@
-import { commonFieldsArr } from "../model/modelBase";
 import { BaseDtoWithCommonFields } from "./base-dto";
 
 export const sponsorshipActivationList = ["Active", "Expire"];

@@ -57,7 +57,7 @@ export interface ISponsorService {
 
 export class SponsorService extends BaseService implements ISponsorService {
     /**
-     * Get All Records of Event Entity 
+     * Get All Records of Sponsor Entity 
      */
     public async GetRecords(lookup?: boolean, id?: number, isActive?: boolean): Promise<ApiResponseDto | undefined> {
         let apiResponse!: ApiResponseDto;
