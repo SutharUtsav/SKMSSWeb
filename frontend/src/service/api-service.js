@@ -10,7 +10,7 @@ export const get = async (endpoint) => {
   let config = {
     method: "get",
     maxBodyLength: Infinity,
-    url: `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}`,
+    url: `${process.env.REACT_APP_LOCAL_URL}${process.env.REACT_APP_LOCAL_SUBURL}${endpoint}`,
     headers: {},
   };
 
@@ -28,11 +28,11 @@ export const getByQueryParams = async (endpoint, params) => {
     return null;
   }
 
-  const url = `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}?${Object.keys(params).map((key)=> encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&')}`;
+  const url = `${process.env.REACT_APP_LOCAL_URL}${process.env.REACT_APP_LOCAL_SUBURL}${endpoint}?${Object.keys(params).map((key)=> encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&')}`;
   let config = {
     method: 'get',
     maxBodyLength: Infinity,
-    url: `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}?${Object.keys(params).map((key)=> encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&')}`,
+    url: `${process.env.REACT_APP_LOCAL_URL}${process.env.REACT_APP_LOCAL_SUBURL}${endpoint}?${Object.keys(params).map((key)=> encodeURIComponent(key) + '=' + encodeURIComponent(params[key])).join('&')}`,
     headers: { }
   };
   
@@ -59,7 +59,7 @@ export const post = async (endpoint, jsonData = null) => {
   let config = {
     method: "post",
     maxBodyLength: Infinity,
-    url: `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}`,
+    url: `${process.env.REACT_APP_LOCAL_URL}${process.env.REACT_APP_LOCAL_SUBURL}${endpoint}`,
     headers: {},
     data: formData,
   };
@@ -81,7 +81,7 @@ export const bulkInsert = async (endpoint, jsonData = null) => {
   let config = {
     method: "post",
     maxBodyLength: Infinity,
-    url: `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}`,
+    url: `${process.env.REACT_APP_LOCAL_URL}${process.env.REACT_APP_LOCAL_SUBURL}${endpoint}`,
     headers: {},
     data: formData,
   };
@@ -115,7 +115,7 @@ export const edit = async (endpoint, id, jsonData = null) => {
   let config = {
     method: 'put',
     maxBodyLength: Infinity,
-    url: `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}?id=${id}`,
+    url: `${process.env.REACT_APP_LOCAL_URL}${process.env.REACT_APP_LOCAL_SUBURL}${endpoint}?id=${id}`,
     headers: { },
     data : formData
   };
@@ -139,7 +139,7 @@ export const del = async (endpoint, id) => {
   let config = {
     method: "delete",
     maxBodyLength: Infinity,
-    url: `${EnvConfig.LOCAL_URL}${EnvConfig.LOCAL_SUBURL}${endpoint}?id=${id}`,
+    url: `${process.env.REACT_APP_LOCAL_URL}${process.env.REACT_APP_LOCAL_SUBURL}${endpoint}?id=${id}`,
     headers: {},
   };
 
