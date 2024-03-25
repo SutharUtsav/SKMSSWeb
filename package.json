@@ -35,7 +35,7 @@
   },
   "scripts": {
     "build": "tsc && cd src && react-scripts build",
-    "start": "concurrently \"cd src && serve -s build\" \"node dist/index.js\"",
+    "start": "node dist/index.js",
     "build-frontend": "cd frontend && react-scripts build",
     "start-frontend": "react-scripts start",
     "build-backend": "tsc",
