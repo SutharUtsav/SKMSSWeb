@@ -8,8 +8,8 @@ const sequelize: Sequelize = new Sequelize(process.env['DB_NAME'] as string,
         port: Number(process.env['DB_PORT']),
         dialect: 'postgres',
         dialectOptions: {
-            supportBigNumbers: true,
             ssl: {
+                require: true,
                 rejectUnauthorized: false, // Trust the self-signed certificate
             }
         }
