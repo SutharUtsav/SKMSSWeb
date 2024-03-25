@@ -8,10 +8,10 @@ const sequelize: Sequelize = new Sequelize(process.env['DB_NAME'] as string,
         port: Number(process.env['DB_PORT']),
         dialect: 'postgres',
         dialectOptions: {
-            ssl: {
+            ssl: process.env['NODE_ENV'] === 'production' ?{
                 require: true,
                 rejectUnauthorized: false, // Trust the self-signed certificate
-            }
+            } : false
         }
     });
 
