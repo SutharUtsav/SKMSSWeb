@@ -5,6 +5,8 @@ const app = express()
 const bodyParser = require('body-parser')
 const db = require('./config/db')
 const cors = require('cors')
+const path = require('path')
+
 
 import { dbContext } from "./model/dbContext";
 
@@ -29,6 +31,11 @@ const initApp = async () => {
 
         //static Images folder
         app.use('/Images', express.static('./Images'))   
+
+        console.log(__dirname + '/../frontend/build');
+        
+        app.use(express.static(path.join(__dirname, '/../frontend/build')));
+
 
         //routes
         //const personController = require('./controller/person-controller');
